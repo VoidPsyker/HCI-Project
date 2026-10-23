@@ -1,0 +1,204 @@
+<!-- ================= 11 MEASURES ================= -->
+<section class="section" id="measures">
+  <h1><span class="num">11</span> Measures and instruments</h1>
+
+  <p class="lead">The measurement plan balances three demands: capture the constructs precisely, keep repeated measurement short enough not to destroy the task, and avoid confounding the emotion manipulation with the outcome measures. The last point is easy to miss: the standard NASA-TLX includes a frustration subscale, which would overlap with the frustration induction. The plan therefore uses a workload score that excludes that subscale.</p>
+
+  <h2>11.1 Core instruments</h2>
+  <table class="long">
+    <thead><tr><th style="width:17%">Construct</th><th style="width:29%">Instrument / items</th><th style="width:20%">Timing</th><th style="width:14%">Scale</th><th style="width:20%">Role / reliability target</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Valence / arousal</td><td>Self-Assessment Manikin (SAM), 2 pictorial items (Bradley &amp; Lang, 1994)</td><td>Baseline, post-induction, post-block, 2 micro-checks per block</td><td>9-point</td><td>Manipulation check and continuous covariate; no internal consistency expected (2 different dimensions).</td></tr>
+      <tr><td class="k">Discrete emotion</td><td>4 items: happy, frustrated, confused, bored; 7-point “not at all” to “extremely”; plus “none of these”</td><td>Baseline, post-induction, post-block</td><td>7-point</td><td>Primary state label; pilot checks comprehension and discriminant validity.</td></tr>
+      <tr><td class="k">Cognitive load</td><td>NASA-TLX workload: mental demand, temporal demand, effort, performance (reverse-scored); <b>frustration subscale excluded</b> (Hart &amp; Staveland, 1988)</td><td>After each block</td><td>0–100 visual analogue or 21-point</td><td>Primary mediator/outcome; α ≥ .70 in pilot.</td></tr>
+      <tr><td class="k">Perceived usability</td><td>UMUX-Lite (2 items) after each block; SUS (10 items; Brooke, 1996) per menu at the end</td><td>Block / end</td><td>7-point / 5-point</td><td>Primary usability; SUS α ≥ .70; UMUX-Lite correlation with SUS ≥ .70 in pilot.</td></tr>
+      <tr><td class="k">Disorientation</td><td>4 items: “I felt lost,” “I knew where I was,” “I could predict where to go,” “I felt in control” (2 reverse-scored)</td><td>After each block</td><td>7-point</td><td>Primary wayfinding measure; α ≥ .75.</td></tr>
+      <tr><td class="k">Engagement</td><td>4-item short form adapted from the User Engagement Scale (O’Brien et al., 2018): focused attention, perceived usability, aesthetic appeal, reward</td><td>After each block</td><td>7-point</td><td>Secondary; α ≥ .70.</td></tr>
+      <tr><td class="k">Trust / perceived intelligence</td><td>4 items: “The interface understood my needs,” “The change was appropriate,” “I trusted the system,” “The interface felt intelligent”</td><td>Study 2/3, after each condition</td><td>7-point</td><td>Secondary adaptation measure; α ≥ .75.</td></tr>
+      <tr><td class="k">Adaptation experience</td><td>Notice, understanding, disruption, acceptance, revert intention; behavioural revert/keep-current counts</td><td>Study 2/3, after each block</td><td>7-point + counts</td><td>Secondary; single items reported separately and as a composite if α supports it.</td></tr>
+      <tr><td class="k">Preference</td><td>Rank the six menus; forced choice for each state (“Which would you want if you felt this way?”)</td><td>End of Study 1/2</td><td>Rank / choice</td><td>Secondary; descriptive, not a substitute for performance.</td></tr>
+      <tr><td class="k">Individual differences</td><td>Age, gender, education, online shopping frequency, watch expertise, tech savvy; 4-item need for cognition; 4-item ambiguity tolerance</td><td>Baseline</td><td>Mixed</td><td>Exploratory moderators; keep short to avoid burden.</td></tr>
+      <tr><td class="k">Suspicion / strategy</td><td>Open-ended: “What did you think the study was about?” “Did you notice any pattern in the interface?”</td><td>Debrief</td><td>Open</td><td>Demand-characteristic check; sensitivity analysis excluding correct guessers.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>Why the NASA-TLX frustration subscale is excluded</h4>
+    <p class="small">The standard NASA-TLX has six subscales, one of which is “frustration level.” Using it after a frustration induction would make the load measure partly a manipulation check, inflating the association between state and load. The plan uses a <b>four-item workload score</b> (mental demand, temporal demand, effort, performance) and treats frustration as an emotion variable, not a workload variable. If a full NASA-TLX is reported for comparability, the frustration subscale is reported separately and never included in the workload composite.</p>
+  </div>
+
+  <h2>11.2 Self-report timing and reactivity</h2>
+  <p>Repeated self-report can interrupt navigation and make participants aware of their state. The design uses three levels of measurement:</p>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Block-level:</b> full SAM + discrete items before and after each emotion block; NASA-TLX, UMUX-Lite, disorientation, and engagement after each block. This is the primary self-report.</li>
+    <li><b>Micro-check:</b> a 2-item valence/arousal check after trials 3 and 6 of each block (not after every trial). This provides trial-level anchors without constant interruption.</li>
+    <li><b>End-of-session:</b> SUS per menu, preference ranking, trust/adaptation items, suspicion check, and interview. These are not repeated per trial.</li>
+  </ul>
+
+  <p>For the estimator, the block-level label is the target; micro-checks are used only to assess fade. The model is trained on Study 1 block labels and features from the preceding trials. This avoids using a trial-level self-report that would be too sparse to train on.</p>
+
+  <h2>11.3 Reliability and validity plan</h2>
+  <table>
+    <thead><tr><th style="width:22%">Check</th><th style="width:38%">Method</th><th style="width:40%">Criterion / action</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Internal consistency</td><td>Cronbach’s α and McDonald’s ω for multi-item scales in the pilot.</td><td>α/ω ≥ .70; if lower, inspect item-total correlations and remove or revise the item before the main study.</td></tr>
+      <tr><td class="k">Comprehension</td><td>Cognitive interviews with 5 participants; think-aloud on each item.</td><td>No item misunderstood by more than one participant; revise wording.</td></tr>
+      <tr><td class="k">Discriminant validity</td><td>Correlations among the four discrete emotion items; expected moderate, not r &gt; .85.</td><td>If two states are indistinguishable (r &gt; .85), merge or revise the induction; report the overlap.</td></tr>
+      <tr><td class="k">Manipulation validity</td><td>Dominant-state rule; change from baseline; dose-response with intensity.</td><td>≥ 60% intended dominant; intensity ≥ 5/7; otherwise revise.</td></tr>
+      <tr><td class="k">Convergent validity</td><td>UMUX-Lite vs SUS; NASA-TLX vs disorientation; expected moderate correlations.</td><td>r ≥ .50 for convergent pairs; if not, report and interpret cautiously.</td></tr>
+      <tr><td class="k">Reactivity</td><td>Compare trials with and without a preceding micro-check.</td><td>No meaningful difference in time/success; if present, report and adjust.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>11.4 Optional eye-tracking extension</h2>
+  <p>Eye tracking is not required for the core claim, but it can explain <i>why</i> a menu helps. The folder’s Chiu and Yang (2024) paper provides a useful AOI/metric template. The extension uses a screen-based tracker (e.g., Tobii Pro Spectrum or Fusion, 120 Hz), a 9-point calibration, and a fixation filter pre-registered as I-VT with a 30°/s velocity threshold and 100-ms minimum fixation.</p>
+
+  <table class="long">
+    <thead><tr><th style="width:22%">AOI / metric</th><th style="width:44%">Definition</th><th style="width:34%">Hypothesis</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Target department AOI</td><td>Bounding box of the correct department in each menu.</td><td>Faster time to first fixation in menus that make the category salient (C, E, B).</td></tr>
+      <tr><td class="k">Target leaf AOI</td><td>Bounding box of the correct leaf at the final level.</td><td>More direct scanpath and fewer fixations in C (all leaves visible) and E (icon salience).</td></tr>
+      <tr><td class="k">Menu region AOI</td><td>Top bar, dropdown, flyout, panel, sidebar, tile grid, hub, rings.</td><td>Dwell distribution reveals whether users search the hierarchy or the product area.</td></tr>
+      <tr><td class="k">Fixation count / duration</td><td>Number and total duration of fixations per AOI.</td><td>Lower load in the matched menu; higher in dense panels under frustration.</td></tr>
+      <tr><td class="k">Scanpath length</td><td>Sum of saccade amplitudes between fixations.</td><td>Shorter, more direct paths in familiar/spatially stable menus.</td></tr>
+      <tr><td class="k">AOI transitions</td><td>Number of transitions between menu levels and product area.</td><td>More transitions indicate backtracking/uncertainty (confusion).</td></tr>
+      <tr><td class="k">Pupil diameter (optional)</td><td>Mean pupil size during the trial, controlling for luminance.</td><td>Arousal/load; interpret cautiously because luminance differs across menus.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Eye-tracking analysis uses LMMs with menu, state, and their interaction; participant random intercepts; AOI size and luminance as covariates. Trials with calibration error &gt; 1.5° or &gt; 20% missing gaze are excluded. The extension requires separate ethics approval because gaze data are more identifying than click logs; store raw gaze separately and do not share it publicly.</p>
+
+  <h2>11.5 Data-quality checks</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Attention:</b> one embedded instruction check (“Press 3 if you are reading this”) in the questionnaires; failure is flagged, not automatically excluded.</li>
+    <li><b>Straight-lining:</b> long runs of identical responses; flag and inspect.</li>
+    <li><b>Completion time:</b> questionnaire completion &lt; 2 min or &gt; 3 SD above the mean is flagged.</li>
+    <li><b>Technical:</b> missing <code>trial_end</code>, duplicate events, clock drift, browser errors; automated validation on ingestion.</li>
+    <li><b>Randomisation:</b> server-side audit of condition sequences; no participant sees a condition twice per state.</li>
+    <li><b>Manipulation:</b> dominant-state rate by induction, order, and participant; report failures.</li>
+    <li><b>Bots / duplicate IDs:</b> for online recruitment, check IP duplicates (hashed), completion patterns, and open-ended responses; exclude only with documented evidence.</li>
+  </ul>
+</section>
+
+<!-- ================= 12 ANALYSIS ================= -->
+<section class="section" id="analysis">
+  <h1><span class="num">12</span> Analysis plan</h1>
+
+  <p class="lead">The analysis is pre-registered, model-based, and effect-size focused. The goal is not to find a significant p-value for the 6 × 4 interaction; it is to estimate the matrix with enough precision to make a defensible policy decision. Where the design is underpowered for a small effect, the paper reports the uncertainty rather than pretending the null is definitive.</p>
+
+  <h2>12.1 Principles</h2>
+  <ol class="small" style="padding-left:5mm">
+    <li><b>Pre-register</b> the primary outcomes, the 6 × 4 interaction, the four focused contrasts, the Study 2 contrasts, and the policy rule.</li>
+    <li><b>Analyse as randomised</b> (intention-to-treat) for the primary test; report per-protocol and CACE as sensitivity analyses.</li>
+    <li><b>Model the clustering</b> of trials within participants and targets; do not treat 1,728 trials as independent.</li>
+    <li><b>Report effect sizes with 95% CIs</b>; exact p-values; no dichotomous “significant / not significant” language without the estimate.</li>
+    <li><b>Correct for multiple comparisons</b> within families; label exploratory analyses.</li>
+    <li><b>Freeze the mapping</b> after Study 1; do not revise it after seeing Study 2.</li>
+    <li><b>Share</b> the anonymised data, analysis code, task bank, and materials where ethics allow.</li>
+  </ol>
+
+  <h2>12.2 Data preparation</h2>
+  <table>
+    <thead><tr><th style="width:24%">Step</th><th style="width:76%">Rule</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Event → trial table</td><td>Collapse events by <code>trial_id</code>; compute success, time, clicks, errors, backtracks, category switches, path efficiency, first-click correctness, menu open/close count, search attempts. Validate against the raw log for 5% of trials.</td></tr>
+      <tr><td class="k">Time</td><td>Use client <code>performance.now()</code>; subtract trial start; cap at 120,000 ms. Log-transform after adding 1 ms. Failures are censored, not set to 120 s in the primary LMM; the survival model handles censoring.</td></tr>
+      <tr><td class="k">Outliers</td><td>Flag trials with time &gt; 3 SD from the participant×menu×state mean after log transform; inspect, do not automatically delete. Report a sensitivity analysis excluding flagged trials.</td></tr>
+      <tr><td class="k">Missing data</td><td>Missing trial outcomes are not imputed; they are analysed as failures if the trial started and no product was reached. Missing questionnaire items (&lt; 10%) are imputed with multiple imputation (m = 20) as a sensitivity analysis; the primary analysis uses complete cases.</td></tr>
+      <tr><td class="k">Exclusions</td><td>Pre-registered only: incomplete log, &lt; 75% trials, technical failure, prior participation. Report a flow diagram with reasons.</td></tr>
+      <tr><td class="k">Derived variables</td><td>Path efficiency = min clicks / actual clicks; backtrack = deeper-to-shallower transition without a leaf; category switch = change of department or subcategory after a selection.</td></tr>
+      <tr><td class="k">State label</td><td>Dominant-state rule (§3.3). Mixed/neutral is retained as a category in descriptive analyses; the primary model uses the randomised state (ITT) and a sensitivity model uses the dominant label.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12.3 Primary models</h2>
+  <div class="formula">
+    <b>Success:</b> logit P(y<sub>ijk</sub> = 1) = β<sub>0</sub> + β<sub>menu(j)</sub> + β<sub>state(k)</sub> + β<sub>menu×state(jk)</sub> + β<sub>trial</sub> + β<sub>difficulty</sub> + u<sub>i</sub> + v<sub>target</sub><br>
+    <b>Time:</b> log(T<sub>ijk</sub>) = α<sub>0</sub> + α<sub>menu(j)</sub> + α<sub>state(k)</sub> + α<sub>menu×state(jk)</sub> + α<sub>trial</sub> + α<sub>difficulty</sub> + a<sub>i</sub> + b<sub>target</sub> + ε<sub>ijk</sub>
+  </div>
+
+  <p>Use sum-to-zero contrasts for menu and state so that main effects are interpretable as average effects. The interaction is tested with a likelihood-ratio test (or a parametric bootstrap when the asymptotic approximation is doubtful). Estimated marginal means and pairwise contrasts are computed with <code>emmeans</code>; p-values are adjusted within the pre-registered families. For the four focused contrasts, use Holm correction; for the exploratory 6 × 4 cell comparisons, use Benjamini–Hochberg FDR and label them exploratory.</p>
+
+  <table>
+    <thead><tr><th style="width:22%">Outcome</th><th style="width:30%">Model</th><th style="width:48%">Reporting</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Success</td><td>Binomial GLMM, logit link; random intercepts for participant and target.</td><td>Odds ratios, 95% CIs, predicted probabilities by cell.</td></tr>
+      <tr><td class="k">Time</td><td>LMM on log time; Cox frailty model as censoring sensitivity.</td><td>Geometric means, ratio of geometric means, 95% CIs.</td></tr>
+      <tr><td class="k">Errors / backtracks</td><td>Negative-binomial GLMM with offset for opportunities.</td><td>Incidence-rate ratios, 95% CIs.</td></tr>
+      <tr><td class="k">NASA-TLX / UMUX-Lite / disorientation</td><td>LMM or ordinal cumulative-link model for individual items.</td><td>Estimated marginal means, 95% CIs, standardized differences.</td></tr>
+      <tr><td class="k">Preference / ranking</td><td>Descriptive; Friedman test; paired Wilcoxon with correction.</td><td>Rank distributions, Kendall’s W, effect sizes.</td></tr>
+      <tr><td class="k">Study 2 condition effects</td><td>Same mixed-model family with condition, state, condition × state, period, sequence.</td><td>Planned contrasts; non-inferiority and equivalence tests.</td></tr>
+      <tr><td class="k">Study 3 estimator</td><td>Participant-grouped CV; multinomial logistic regression and gradient boosting.</td><td>Macro-F1, balanced accuracy, per-class recall, confusion matrix, Brier score, calibration slope.</td></tr>
+      <tr><td class="k">Mediation</td><td>Structural equation model or causal mediation with bootstrapped indirect effects.</td><td>Indirect effect, 95% CI, proportion mediated.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12.4 Multiplicity, equivalence, and the “no difference” problem</h2>
+  <p>A non-significant interaction is not evidence that menus are equivalent. If the interaction is small and the CI is wide, the correct conclusion is “inconclusive.” If the CI excludes a pre-specified meaningful effect, the correct conclusion is “equivalent within the margin.” The paper therefore reports:</p>
+  <ul class="small" style="padding-left:5mm">
+    <li>The interaction estimate and its 95% CI on the log-odds / log-time scale.</li>
+    <li>A equivalence test for the global-best menu vs the state-specific menu, with a margin of 5 percentage points on success and 10% on time.</li>
+    <li>A “practical significance” statement: would the observed difference change the recommended menu under the policy rule?</li>
+  </ul>
+
+  <h2>12.5 Bayesian policy model</h2>
+  <p>The policy model is a hierarchical Bayesian version of the primary model, fitted with <code>brms</code>. Regularising priors (normal(0, 1) on the log-odds scale; half-normal(0, 1) on random-effect SDs) shrink extreme cell estimates and produce posterior probabilities that each menu is best in each state. The policy rule in §8.10 is applied to the posterior predictive distribution. The Bayesian model is not used to “find significance”; it is used to quantify uncertainty and to avoid overfitting a 24-cell matrix with a modest sample.</p>
+
+  <h2>12.6 Qualitative and process data</h2>
+  <p>Retrospective think-aloud and interview data are analysed with reflexive thematic analysis. The codebook is developed inductively from a subset of transcripts, then applied to the rest; a second coder independently codes 20% of the material. Disagreements are resolved by discussion. Qualitative data are used to explain unexpected patterns, illustrate switching costs, and generate hypotheses; they are not used to replace the quantitative test. Quotes are anonymised and checked for identifying details.</p>
+
+  <h2>12.7 Reporting and reproducibility</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Flow diagram:</b> participants screened, enrolled, completed, excluded, analysed.</li>
+    <li><b>Descriptive table:</b> demographics, baseline affect, prior menu experience, colour vision, input modality.</li>
+    <li><b>Manipulation check:</b> dominant-state rate by induction and order; mean intensity; adverse events.</li>
+    <li><b>Primary results:</b> 6 × 4 matrix with estimates and 95% CIs; interaction test; focused contrasts; effect sizes.</li>
+    <li><b>Secondary results:</b> usability, load, disorientation, engagement, preference; mediation.</li>
+    <li><b>Study 2/3:</b> condition contrasts, switch cost, estimator performance, calibration, break-even curve.</li>
+    <li><b>Transparency:</b> pre-registration link, analysis code, data dictionary, session logs, software versions, random seeds.</li>
+  </ul>
+
+  <h2>12.8 Analysis code skeleton (R)</h2>
+  <pre><span class="c"># Primary success model</span>
+m_success &lt;- glmer(
+  success ~ menu * state + trial_pos + difficulty +
+            (1 | participant_id) + (1 | target_id),
+  data = trials, family = binomial(link = <span class="s">"logit"</span>),
+  control = glmerControl(optimizer = <span class="s">"bobyqa"</span>)
+)
+car::Anova(m_success, type = 3)
+
+<span class="c"># Time model (log scale; failures censored separately)</span>
+m_time &lt;- lmer(
+  log_time ~ menu * state + trial_pos + difficulty +
+             (1 | participant_id) + (1 | target_id),
+  data = trials_success, REML = FALSE
+)
+emmeans::emmeans(m_time, pairwise ~ menu | state, adjust = <span class="s">"holm"</span>)
+
+<span class="c"># Errors</span>
+m_errors &lt;- glmer.nb(
+  errors ~ menu * state + trial_pos + difficulty +
+            offset(log(opportunities)) +
+            (1 | participant_id) + (1 | target_id),
+  data = trials
+)
+
+<span class="c"># Censoring sensitivity</span>
+m_surv &lt;- coxme::coxme(
+  Surv(time_ms, success) ~ menu * state + difficulty + (1 | participant_id),
+  data = trials
+)
+
+<span class="c"># Bayesian policy model</span>
+m_bayes &lt;- brms::brm(
+  success ~ menu * state + (1 | participant_id) + (1 | target_id),
+  data = trials, family = brms::bernoulli(),
+  prior = c(prior(normal(0, 1), class = <span class="s">"b"</span>),
+            prior(normal(0, 1.5), class = <span class="s">"Intercept"</span>),
+            prior(exponential(1), class = <span class="s">"sd"</span>)),
+  chains = 4, iter = 4000, seed = 20261023
+)</pre>
+
+  <p class="small muted">The code is a skeleton, not the final script. The final script is frozen before data lock, run in a container with a session-info file, and archived with the manuscript.</p>
+</section>

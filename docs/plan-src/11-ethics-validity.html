@@ -1,0 +1,150 @@
+<!-- ================= 15 ETHICS ================= -->
+<section class="section" id="ethics">
+  <h1><span class="num">15</span> Ethics, privacy, and risk</h1>
+
+  <p class="lead">The study induces mild emotions and observes navigation behaviour. Neither is inherently harmful, but both require care: the frustration induction can feel manipulative, the confusion task can make participants feel incompetent, and the interaction logs can become identifying if handled casually. The ethics plan is therefore part of the design, not a formality at the end.</p>
+
+  <h2>15.1 Approval and oversight</h2>
+  <p>Obtain approval from the relevant institutional research ethics committee before recruitment or pilot data collection. The protocol, consent forms, induction scripts, questionnaires, data-management plan, and debrief must be approved. Any change to the induction, the deception, the data collected, or the sample requires an amendment. If the study is conducted across institutions, obtain approval at each site and a data-sharing agreement.</p>
+
+  <h2>15.2 Informed consent</h2>
+  <p>Participants receive a plain-language information sheet covering: the purpose (comparing website layouts for product finding); what they will do; the duration; the mild mood tasks; the fact that the interface may change; the data collected (clicks, timing, questionnaire responses, optionally gaze); how data are stored and shared; the right to withdraw without penalty; compensation; and contact details. Consent is recorded electronically or on paper, separate from the research data.</p>
+
+  <div class="keybox">
+    <h4>Consent must mention the mood tasks without revealing the hypothesis</h4>
+    <p class="small">“This study compares different website navigation layouts. You will complete short product-finding tasks and brief mood exercises, including a short comedy clip, a search task that may not work as expected, an ambiguous categorisation task, and a repetitive catalogue task. These are mild and temporary. You can stop at any time.” This is honest about what happens without telling participants that we are testing whether frustration changes menu choice.</p>
+  </div>
+
+  <h2>15.3 Emotion induction: risks and safeguards</h2>
+  <table class="long">
+    <thead><tr><th style="width:14%">Induction</th><th style="width:28%">Potential risk</th><th style="width:32%">Safeguard</th><th style="width:26%">Stop / debrief</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Happiness</td><td>Mild amusement; possible discomfort with comedy content.</td><td>Pre-screen the clip for offensive content; allow skipping; no obligation to laugh.</td><td>Stop if distress &gt; 6/10; debrief that the clip was for mood.</td></tr>
+      <tr><td class="k">Frustration</td><td>Irritation, feeling incompetent, or distrust of the researcher.</td><td>Buggy search, not personal failure; cap at three attempts; no false feedback about ability; neutral copy; experimenter support.</td><td>Immediate debrief: “The search was designed to fail; it was not your fault.” Offer a break and a neutral task.</td></tr>
+      <tr><td class="k">Confusion</td><td>Feeling stupid or anxious about “getting it wrong.”</td><td>Instructions state there is no right answer; no feedback; the ambiguity is the point.</td><td>Reveal the ambiguity; explain the purpose; check affect before continuing.</td></tr>
+      <tr><td class="k">Boredom</td><td>Frustration, fatigue, or feeling the task is pointless.</td><td>Short (90 s), clear cover story, no quota; allow a break.</td><td>Stop at 90 s; debrief; offer a stimulating break.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Exclusion and self-exclusion:</b> adults only. Participants with a history of significant mental-health difficulties that could be exacerbated by mood induction may self-exclude; the information sheet says so without requiring disclosure. The study does not collect clinical data. If a participant becomes distressed, the experimenter stops the session, stays with them, offers water and a neutral activity, and provides contact details for support services. Adverse events are recorded and reported to the ethics committee.</p>
+
+  <h2>15.4 Deception and debrief</h2>
+  <p>The study uses mild deception: the “buggy search” is intentional, and the purpose is described broadly rather than as an emotion-and-menu study. This is justified only if the deception is necessary (it is: knowing the hypothesis would change behaviour), the risk is minimal, and the debrief is full. The debrief explains the four inductions, the menu conditions, the adaptation hypotheses, and why the search failed. Participants can withdraw their data at that point without penalty. The debrief also checks mood and offers a positive closing task.</p>
+
+  <h2>15.5 Privacy and data protection</h2>
+  <table>
+    <thead><tr><th style="width:22%">Data</th><th style="width:34%">Sensitivity</th><th style="width:44%">Handling</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Consent / contact</td><td>Identifiable</td><td>Stored separately from research data; encrypted; access limited to the PI; deleted after the retention period.</td></tr>
+      <tr><td class="k">Click / timing logs</td><td>Pseudonymous</td><td>Participant ID only; no names, emails, IPs, or free-text identifiers; stored on an encrypted server.</td></tr>
+      <tr><td class="k">Questionnaire responses</td><td>Pseudonymous; affect data</td><td>Treated as sensitive; reported in aggregate; free-text quotes checked for identifiers.</td></tr>
+      <tr><td class="k">Eye tracking (optional)</td><td>Biometric-like; more identifying</td><td>Separate consent; store gaze coordinates and AOI metrics, not raw video, unless necessary; separate access; no public sharing of raw gaze.</td></tr>
+      <tr><td class="k">Audio / video</td><td>High</td><td>Not collected in the core study. If interviews are recorded, separate consent and transcription; delete audio after transcription.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Legal basis:</b> for EU/UK participants, consent is the legal basis for processing; the study is not clinical. A data protection impact assessment (DPIA) is completed if eye tracking or large-scale affect data are collected. Data are stored in the EU/UK or in a jurisdiction with an adequacy decision. Retention follows the ethics approval (e.g., five years after publication), after which data are deleted or anonymised. Participants can request deletion of their identifiable data during the retention period; anonymised research data may be exempt from deletion if it is already part of the analysis, as explained in the information sheet.</p>
+
+  <h2>15.6 Compensation and power</h2>
+  <p>Compensate at £12–£15 per hour or course credit with a comparable alternative. Do not make compensation contingent on performance or on completing the frustration induction; that would be coercive. Participants are paid for their time even if they withdraw. The experimenter is not the participant’s instructor or supervisor where possible; if they are, a third party handles recruitment and consent to reduce power imbalance.</p>
+
+  <h2>15.7 AI / estimator ethics</h2>
+  <p>The estimator predicts a self-reported state; it does not diagnose a disorder, infer protected characteristics, or make consequential decisions. It runs locally in the experiment and is not deployed to real users. The interface explains when it adapts and why, offers “keep current” and “switch back,” and never changes mid-route. The paper reports the estimator’s failure modes and does not claim emotional accuracy beyond the tested labels. If the system were deployed commercially, it would need a separate fairness, transparency, and consent review.</p>
+
+  <h2>15.8 Risk register</h2>
+  <table class="long">
+    <thead><tr><th style="width:22%">Risk</th><th style="width:10%">Likelihood</th><th style="width:10%">Impact</th><th style="width:58%">Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Emotional distress</td><td>Low</td><td>Medium</td><td>Mild inductions, stop rules, debrief, support resources, experimenter training.</td></tr>
+      <tr><td class="k">Feeling deceived / distrust</td><td>Medium</td><td>Medium</td><td>Full debrief, explanation of why deception was necessary, right to withdraw data, neutral closing task.</td></tr>
+      <tr><td class="k">Privacy breach</td><td>Low</td><td>High</td><td>Pseudonymous IDs, encryption, access control, no third-party scripts, DPIA, retention schedule.</td></tr>
+      <tr><td class="k">Data loss</td><td>Medium</td><td>High</td><td>Offline queue, nightly backups, checksum, dry-run network-drop test.</td></tr>
+      <tr><td class="k">Coercion / power imbalance</td><td>Low</td><td>Medium</td><td>Third-party recruitment, course-credit alternative, no performance bonus, right to withdraw.</td></tr>
+      <tr><td class="k">Accessibility exclusion</td><td>Medium</td><td>Medium</td><td>Keyboard support, contrast, reduced motion, separate keyboard-only session, report input modality.</td></tr>
+      <tr><td class="k">Researcher bias</td><td>Medium</td><td>Medium</td><td>Pre-registration, automated scoring, blinded analysis where possible, open code and data.</td></tr>
+      <tr><td class="k">Adverse event</td><td>Low</td><td>High</td><td>Stop, support, record, report to ethics committee, follow up.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= 16 VALIDITY ================= -->
+<section class="section" id="validity">
+  <h1><span class="num">16</span> Validity, limitations, and falsification</h1>
+
+  <p class="lead">A strong paper is not one that hides its weaknesses; it is one that anticipates them and designs around them. This section states the threats to inference and the limits of what the study can claim. It also says what evidence would falsify the core hypothesis.</p>
+
+  <h2>16.1 Internal validity</h2>
+  <table class="long">
+    <thead><tr><th style="width:22%">Threat</th><th style="width:38%">Why it matters</th><th style="width:40%">Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Menu confounds</td><td>The six menus differ in click depth, visible breadth, persistence, animation, colour, and motor demand. A difference cannot be attributed to “structure” alone.</td><td>Parity contract; click-depth mediation; matched-depth sensitivity; colour counterbalancing; common animation duration; process measures.</td></tr>
+      <tr><td class="k">Emotion induction</td><td>Induced states may be weak, short-lived, or different from real shopping emotions.</td><td>Manipulation checks; pilot criterion; re-induction; CACE analysis; dose-response; explicit limitation.</td></tr>
+      <tr><td class="k">Order and learning</td><td>Participants see six menus four times; they learn the menus and the product taxonomy.</td><td>Latin squares; practice; trial-position covariate; first-trial sensitivity; counterbalanced target sets.</td></tr>
+      <tr><td class="k">Fatigue</td><td>A 90-min session with 24 trials can produce fatigue, especially in the bored condition.</td><td>Breaks; neutral reset; pilot timing; fatigue rating; split-session follow-up if needed.</td></tr>
+      <tr><td class="k">Demand characteristics</td><td>Participants may guess the hypothesis and behave accordingly.</td><td>Broad cover story; no emotion labels in the UI; suspicion check; sensitivity analysis excluding guessers; sham control.</td></tr>
+      <tr><td class="k">Experimenter bias</td><td>The experimenter knows the condition and may unintentionally influence performance.</td><td>Standardised script; automated scoring; no performance feedback; second coder for qualitative data; blinded analysis where possible.</td></tr>
+      <tr><td class="k">Task/target confounds</td><td>Some targets are easier or more semantically transparent than others.</td><td>Unique attribute descriptions; difficulty balance; target rotation; target random intercept; pilot calibration.</td></tr>
+      <tr><td class="k">Carry-over</td><td>A frustrating block may affect the next block; a menu switch may affect the next trial.</td><td>Neutral reset; block order counterbalanced; period/sequence covariates; first-trial-after-switch analysis.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>16.2 Construct validity</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Emotion labels:</b> self-report measures the participant’s interpreted state, not a latent “true” emotion. The paper uses “self-reported emotional context” and avoids clinical language.</li>
+    <li><b>Induction:</b> a buggy search is a plausible frustration trigger, but it is not the same as real purchase frustration. The ambiguity task is a proxy for category confusion, not for all confusion.</li>
+    <li><b>Menu constructs:</b> “structure” is a bundle of geometry, breadth, depth, and persistence. The paper reports the bundle and uses mediation/sensitivity to decompose it; it does not claim to isolate a single dimension.</li>
+    <li><b>Outcomes:</b> success and time are objective but task-specific; usability and load are self-reported; engagement is inferred from self-report and behaviour. No single measure is treated as the whole construct.</li>
+    <li><b>Questionnaires:</b> SUS, UMUX-Lite, NASA-TLX, and SAM are established, but they were not designed for this exact context; pilot reliability and comprehension checks are required.</li>
+  </ul>
+
+  <h2>16.3 External validity</h2>
+  <table>
+    <thead><tr><th style="width:22%">Dimension</th><th style="width:38%">This study</th><th style="width:40%">Limit / future work</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Setting</td><td>Lab, desktop, 1920 × 1080, mouse/trackpad.</td><td>Real users browse on mobile, in noisy environments, with different goals. A mobile/field study is future work.</td></tr>
+      <tr><td class="k">Task</td><td>Known-item product finding with a 120-s cap; search disabled.</td><td>Real shopping includes search, browsing, price comparison, and purchase. Study 3 adds free browsing; a field study is needed for purchase behaviour.</td></tr>
+      <tr><td class="k">Sample</td><td>Adults, mostly university/online panel, English-speaking.</td><td>Cultural and age differences in menu familiarity and emotion expression; report demographics and avoid overgeneralising.</td></tr>
+      <tr><td class="k">Domain</td><td>Fictional watch store, 72 products, four departments.</td><td>Other domains have different taxonomy shapes, brand effects, and purchase stakes. Replicate in groceries, electronics, or travel.</td></tr>
+      <tr><td class="k">Stakes</td><td>No real money, no real purchase.</td><td>Real stakes may amplify frustration and change risk preferences; the induced states are mild by design.</td></tr>
+      <tr><td class="k">Time</td><td>One session, short trials.</td><td>Adaptation effects may change with learning over days; a longitudinal study is needed.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>16.4 Statistical conclusion validity</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Power:</b> the 6 × 4 omnibus is powered for medium effects; small effects will be inconclusive. The paper reports CIs and does not interpret a non-significant interaction as proof of no effect.</li>
+    <li><b>Multiplicity:</b> pre-registered families; Holm for focused contrasts; FDR for exploratory cells; all analyses labelled.</li>
+    <li><b>Model assumptions:</b> random-effects structure, linearity on the log scale, distributional assumptions; diagnostics and sensitivity models.</li>
+    <li><b>Missing data:</b> failures are outcomes, not missing; questionnaire missingness handled with multiple imputation as a sensitivity analysis.</li>
+    <li><b>Researcher degrees of freedom:</b> pre-registration, frozen analysis script, open data/code, no optional stopping.</li>
+    <li><b>Effect sizes:</b> odds ratios, geometric mean ratios, standardized differences, and precision; practical significance tied to the policy rule.</li>
+  </ul>
+
+  <h2>16.5 Falsification: what would prove the core idea wrong?</h2>
+  <table>
+    <thead><tr><th style="width:38%">Observation</th><th style="width:62%">Conclusion</th></tr></thead>
+    <tbody>
+      <tr><td class="k">No menu × state interaction, and one menu is best in every state.</td><td>Emotion-contingent structural adaptation is unnecessary in this domain. The paper reports a robust global menu and discusses boundary conditions.</td></tr>
+      <tr><td class="k">Interaction exists, but matched adaptation is not better than the static best menu.</td><td>The cell-level differences are too small or the switching costs are too high. Adaptation is notworth the disruption in practice.</td></tr>
+      <tr><td class="k">Matched and mismatched both beat static by the same amount.</td><td>The benefit is change/novelty/attention, not matching. The theoretical claim of affective fit is not supported.</td></tr>
+      <tr><td class="k">The estimator cannot beat the majority baseline.</td><td>The interaction-signal approach is not viable with these features; the paper reports the negative result and the features that would be needed.</td></tr>
+      <tr><td class="k">Users systematically revert or report disorientation.</td><td>Stability and control dominate performance; adaptation should be opt-in, not automatic.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <h4>The strongest version of the paper</h4>
+    <p class="small">The strongest version does not need every hypothesis to be confirmed. It needs a clean 6 × 4 matrix, a credible induction, a causal test with the right counterfactuals, and an honest estimator evaluation. A paper that says “matching helps for frustration but not for confusion, and the estimator is not yet accurate enough to deploy” is more useful than one that claims a universal win.</p>
+  </div>
+
+  <h2>16.6 Limitations to state explicitly</h2>
+  <ol class="small" style="padding-left:5mm">
+    <li>The induced emotions are mild and temporary; they are not clinical states or necessarily the emotions of real shopping.</li>
+    <li>“Menu structure” is a bundle; the study cannot isolate every visual or motor dimension.</li>
+    <li>The mega menu has a click advantage; the analysis treats it as part of the structure and adds a matched-depth sensitivity analysis.</li>
+    <li>The lab setting and fictional store limit ecological validity; search is disabled in the main task.</li>
+    <li>The sample is not representative; cultural and age differences are not tested.</li>
+    <li>The estimator is trained on a small, lab-generated dataset; its accuracy is an upper bound on what a real deployment could achieve without more data.</li>
+    <li>The study measures short-term adaptation; long-term learning, trust, and habituation are future work.</li>
+  </ol>
+</section>

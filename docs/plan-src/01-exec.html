@@ -1,0 +1,80 @@
+<!-- ================= 0 EXEC ================= -->
+<section class="section" id="exec">
+  <h1><span class="num">0</span> Executive summary</h1>
+
+  <p class="lead">The project asks a simple but surprisingly untested question: <b>if a user’s emotional context changes, should the navigation structure change with it?</b> Most e-commerce sites keep one menu architecture for everyone. Most adaptive-menu research changes item order, highlights, or recommendations inside a fixed structure. This project compares six genuinely different structures — horizontal bar, vertical sidebar, mega menu, fractal zoom, rounded-square icon grid, and radial lattice — under four experimentally induced emotional contexts, then tests whether switching structure on the basis of that mapping actually improves product finding.</p>
+
+  <div class="kpi">
+    <div><b>6</b><span>menu structures, same taxonomy and products</span></div>
+    <div><b>4</b><span>emotional contexts: happy, frustrated, confused, bored</span></div>
+    <div><b>24</b><span>cells in the core mapping design</span></div>
+    <div><b>3</b><span>linked studies: mapping → causal test → system</span></div>
+  </div>
+
+  <h2>0.1 The scientific gap</h2>
+  <p>Four literatures meet here but do not yet connect. Menu research shows that breadth, depth, layout, and visual format change search speed and errors (Miller, 1981; Kiger, 1984; Leuthold et al., 2011; Chiu &amp; Yang, 2024). Adaptive-interface research shows that personalisation can improve satisfaction and engagement, but also that reordering and switching create predictability and learning costs (Findlater &amp; McGrenere, 2004; Gajos et al., 2008; Lavie &amp; Meyer, 2010; Gaspar-Figueiredo et al., 2025). Emotion research shows that affect shapes information processing and search persistence (Russell, 1980; Schwarz &amp; Clore, 1983; Isen, 2001). Navigation research shows that disorientation and frustration are central failure modes (Lazar et al., 2003; Smith, 1996). What is missing is a controlled test that treats <b>whole menu structure</b> as the adaptive variable and <b>emotional context</b> as the moderator.</p>
+
+  <p>The existing protocol (v3.0) proposed four menus and four emotions. This plan extends it in five ways: (1) adds the rounded-square icon grid and the radial lattice, giving six structures that cover linear, panel, recursive-spatial, icon-grid, and radial geometries; (2) formalises the 6 × 4 design, randomisation, and target rotation; (3) replaces optimistic sample sizes with a simulation-based power analysis; (4) adds a causal test that separates <i>matching</i> from <i>mere switching</i>; and (5) adds an explicit estimator-error simulation so the end-to-end study can answer “how accurate must emotion inference be before adaptation pays off?”</p>
+
+  <h2>0.2 The four emotional contexts</h2>
+  <p>We keep <b>happiness / positive affect</b> and <b>frustration</b>, and add two states that are specifically diagnostic for navigation: <b>confusion / lostness</b> and <b>boredom / disengagement</b>. Together they span the two dimensions of the affect circumplex (valence and arousal) plus two states that matter uniquely for wayfinding: uncertainty about <i>where something is</i> (confusion) and low motivation to <i>keep looking</i> (boredom). Anxiety and curiosity were considered but rejected for the core design; §3.2 explains why.</p>
+
+  <h2>0.3 The six menus</h2>
+  <p>All six render the same four departments, three subcategories per department, six leaf styles per subcategory, and the same 72 fictional watches. The running example is <b>Sport &amp; Dive → Pro Diver 300m → Titanium Deep</b>.</p>
+  <table class="compact">
+    <thead><tr><th style="width:13%">Menu</th><th style="width:31%">Interaction</th><th style="width:10%">Clicks</th><th style="width:23%">What it stresses</th><th style="width:23%">Source status</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A. Horizontal bar</td><td>Top bar → dropdown → side flyout</td><td>3</td><td>Familiarity; sequential depth; narrow visible set</td><td>Chiu &amp; Yang (2024), SSRN preprint <span class="tag ok">verified</span></td></tr>
+      <tr><td class="k">B. Vertical sidebar</td><td>Persistent left tree; accordion expansion</td><td>3</td><td>Persistent overview; vertical scanning; spatial stability</td><td>Chiu &amp; Yang (2024), SSRN preprint <span class="tag ok">verified</span></td></tr>
+      <tr><td class="k">C. Mega menu</td><td>One panel shows 3 columns × 6 leaves</td><td>2</td><td>Breadth; all options visible; one fewer click</td><td>Protocol v3.0 baseline; standard pattern <span class="tag internal">internal</span></td></tr>
+      <tr><td class="k">D. Fractal tiles</td><td>Recursive 2 × 2 grid; zoom in/out; breadcrumb</td><td>3</td><td>Self-similar spatial memory; recursive depth</td><td>Sahraoui et al. (2025) <span class="tag ok">verified</span></td></tr>
+      <tr><td class="k">E. RS icon grid</td><td>Colour-coded rounded-square cards at each level</td><td>3</td><td>Visual salience; icon recognition; grid search</td><td>User brief; Chiossi CHI 2026 citation <span class="tag verify">unverified</span></td></tr>
+      <tr><td class="k">F. Radial lattice</td><td>4 compass sectors; L2/L3 nodes on outer rings</td><td>3</td><td>Motor efficiency; spatial anchors; radial scanning</td><td>Kim et al. (2022) <span class="tag ok">verified</span>; Collins CHI 2026 <span class="tag verify">unverified</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>What makes this a paper rather than a prototype demo</h4>
+    <p class="small">The paper does not assume “frustrated users need a sidebar.” Study 1 <i>estimates</i> the 6 × 4 mapping. Study 2 then freezes that mapping and tests whether using it beats (a) the best static menu and (b) a deliberately mismatched menu. Study 3 tests the complete system with a noisy estimator and a safe transition policy. A null result — for example, one menu wins everywhere, or switching costs cancel the gains — is a publishable finding because it answers the applied question “is emotion-contingent structural adaptation worth it?”</p>
+  </div>
+
+  <h2>0.4 The three studies at a glance</h2>
+  <table>
+    <thead><tr><th style="width:14%">Study</th><th style="width:30%">Question</th><th style="width:30%">Design</th><th style="width:26%">Output</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Pilot</td><td>Are the menus, tasks, and inductions understandable and tolerable?</td><td>N = 8–10; all six menus; all four inductions; think-aloud; timing</td><td>Refined protocol, task calibration, variance estimates for power</td></tr>
+      <tr><td class="k">Study 1<br>Mapping</td><td>Which menu works best in each emotional context? Is there a menu × context interaction?</td><td>N = 72 (full) or 48 (reduced); 6 menus × 4 states; 24 trials; within-subject; Latin-square counterbalancing</td><td>6 × 4 performance/experience matrix; posterior probabilities; frozen policy</td></tr>
+      <tr><td class="k">Study 2<br>Causal test</td><td>Does emotion-matched switching beat a static menu and a mismatched menu?</td><td>N = 80 (full) or 60 (reduced); 4 conditions × 4 states (static, matched, mismatched, sham); 16 trials; within-subject; known labels</td><td>Causal estimate of matching; switching-cost and disruption evidence</td></tr>
+      <tr><td class="k">Study 3<br>End-to-end</td><td>Does the system still help when the state estimate is imperfect?</td><td>N = 72; static vs hybrid adaptive; 8 trials + free browsing; participant-grouped estimator validation</td><td>Estimator accuracy/calibration; end-to-end benefit; break-even accuracy</td></tr>
+    </tbody>
+  </table>
+
+  <h2>0.5 Primary outcomes</h2>
+  <p><b>Performance:</b> task success (binary), completion time (log-transformed; censored at timeout), navigation errors, backtracking, category switches, click count, and path efficiency. <b>Experience:</b> perceived usability, cognitive load, perceived control, predictability, disorientation, satisfaction, and preference. <b>Adaptation:</b> switch acceptance, reversion, perceived disruption, trust, and the cost of the first trial after a switch. <b>Estimation:</b> macro-F1, balanced accuracy, per-class recall, confusion matrix, calibration, and decision-curve net benefit.</p>
+
+  <h2>0.6 Feasibility and decisions</h2>
+  <div class="cols2">
+    <div>
+      <h3>Full programme</h3>
+      <p class="small">N ≈ 234 across three studies; 6–9 months part-time; lab with a 1920 × 1080 desktop; optional eye tracker; ethics approval; one research assistant for counterbalancing and data checks.</p>
+      <h3>Reduced programme (recommended for a semester)</h3>
+      <p class="small">Pilot + Study 1 (N = 48) + Study 2 (N = 60). Drop Study 3 or run it as a small feasibility study (N = 24) without a deployable estimator. This still yields a complete paper: mapping + causal test + a simulation of estimator error.</p>
+      <h3>Minimum publishable unit</h3>
+      <p class="small">Pilot + Study 1 with N = 48 and a focused test of four pre-registered state-specific contrasts. This is enough for a CHI Extended Abstract or a thesis chapter, but the causal claim is weaker.</p>
+    </div>
+    <div>
+      <h3>What the plan deliberately does not do</h3>
+      <ul class="small" style="margin-top:0; padding-left:5mm">
+        <li>It does not use webcam, facial expression, or biometric “emotion detection.” Self-report anchors the state; interaction signals are treated as noisy evidence.</li>
+        <li>It does not assume that one menu is “best” before the data. Directional predictions are stated, but the mapping is estimated.</li>
+        <li>It does not change the menu mid-route. Switches happen at task boundaries, with an explanation and a keep-current option in Study 3.</li>
+        <li>It does not hide null results. A global winner, a failed induction, or a switching-cost null are all informative.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warnbox">
+    <h4>Three things to confirm before building</h4>
+    <p class="small"><b>(1) Timeline and sample access.</b> The full design needs ~234 participants; the reduced design ~118. If you cannot reach that, use Track A in §17 and pre-register a focused, underpowered-by-design study with precision reporting. <b>(2) Equipment.</b> Eye tracking is optional; the core plan uses interaction logs and self-report. <b>(3) Citation status.</b> The Chiossi et al. (CHI 2026) and Collins et al. (CHI 2026) references could not be verified. Menus E and F are defined operationally here; do not cite unverified claims in the paper.</p>
+  </div>
+</section>

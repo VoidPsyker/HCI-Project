@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Local placeholder for the happy induction clip</title>
+  <desc id="desc">A calm abstract sunrise over water, drawn locally. Replace with the approved clip before data collection.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="55%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#082f49"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <circle cx="480" cy="250" r="84" fill="#fffbeb" opacity="0.95"/>
+  <circle cx="480" cy="250" r="128" fill="#fef3c7" opacity="0.28" filter="url(#soft)"/>
+  <path d="M0 300 Q140 260 280 300 T560 300 T840 300 T1100 300 V540 H0 Z" fill="url(#water)"/>
+  <g stroke="#fef3c7" stroke-width="4" opacity="0.55">
+    <path d="M250 380 Q360 360 470 380 T690 380"/>
+    <path d="M170 430 Q290 405 410 430 T650 430"/>
+    <path d="M320 475 Q430 455 540 475 T760 475"/>
+  </g>
+  <g fill="#fffbeb" opacity="0.85">
+    <circle cx="180" cy="120" r="4"/>
+    <circle cx="760" cy="90" r="5"/>
+    <circle cx="840" cy="160" r="3"/>
+    <circle cx="120" cy="200" r="3"/>
+  </g>
+  <text x="60" y="500" fill="#ecfeff" font-family="Georgia, serif" font-size="22" opacity="0.8">A pleasant place to pause</text>
+  <text x="60" y="70" fill="#7c2d12" font-family="Arial, sans-serif" font-size="14" letter-spacing="3" opacity="0.8">LOCAL PLACEHOLDER</text>
+</svg>

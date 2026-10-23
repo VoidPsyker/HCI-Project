@@ -1,0 +1,217 @@
+<!-- ================= 7 PILOT ================= -->
+<section class="section" id="pilot">
+  <h1><span class="num">7</span> Pilot study</h1>
+
+  <p class="lead">The pilot is not a miniature version of Study 1. It is a <b>measurement and feasibility study</b> whose job is to make the main study interpretable: Are the menus usable? Do the inductions work? Are the tasks too easy or too hard? Is the session tolerable? Are the logs complete? The pilot data are not included in the confirmatory analysis.</p>
+
+  <h2>7.1 Goals and success criteria</h2>
+  <table>
+    <thead><tr><th style="width:22%">Goal</th><th style="width:40%">What is measured</th><th style="width:38%">Criterion to proceed</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Menu usability</td><td>Task success, time, errors, SUS, think-aloud comments, observed confusion.</td><td>Every menu has ≥ 80% success on practice tasks; no menu is unusable without a design fix; all targets reachable.</td></tr>
+      <tr><td class="k">Induction validity</td><td>Dominant-state check, intensity, credibility, distress rating.</td><td>≥ 60% intended dominant; mean intensity ≥ 5/7; no distress &gt; 6/10; induction ≤ 2.5 min.</td></tr>
+      <tr><td class="k">Task difficulty</td><td>Success, time, first-click correctness, verbal reports.</td><td>Overall success 75–90%; easy &gt; medium &gt; hard in the expected direction; no floor/ceiling.</td></tr>
+      <tr><td class="k">Timing and burden</td><td>Session length, trial length, fatigue ratings, breaks requested.</td><td>Session ≤ 100 min; trial median ≤ 45 s; fatigue not extreme.</td></tr>
+      <tr><td class="k">Instrument quality</td><td>Completion time, missingness, straight-lining, comprehension probes.</td><td>&lt; 5% missing; no item misunderstood by more than one participant.</td></tr>
+      <tr><td class="k">Technical reliability</td><td>Missing events, clock drift, rendering errors, frame rate.</td><td>100% of practice trials reconstructable; no unhandled errors; ≥ 50 fps.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7.2 Design and sample</h2>
+  <p>N = 8–10 participants (the reduced track can use 8). A within-subject walkthrough: all six menus, all four inductions, six practice trials, and a subset of main trials (e.g., 12 rather than 24) to test timing. Participants think aloud during the first pass and retrospectively after each block. The pilot uses the same consent, questionnaires, and debrief as Study 1, with additional open-ended probes.</p>
+
+  <h2>7.3 Procedure</h2>
+  <table>
+    <thead><tr><th style="width:12%">Time</th><th style="width:30%">Activity</th><th style="width:58%">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0–10</td><td>Consent, demographics, baseline affect, colour vision</td><td>Same forms as Study 1; add a “prior experience with menu types” item.</td></tr>
+      <tr><td class="k">10–20</td><td>Demo and think-aloud instructions</td><td>Explain that we are testing the website, not the participant; encourage candid comments.</td></tr>
+      <tr><td class="k">20–35</td><td>Menu walkthrough (A–F)</td><td>One practice task per menu; experimenter observes and notes confusion; no help unless the participant is stuck for 60 s.</td></tr>
+      <tr><td class="k">35–50</td><td>Induction block 1 + check + 3 trials</td><td>Counterbalance the induction order across pilot participants.</td></tr>
+      <tr><td class="k">50–65</td><td>Induction block 2 + check + 3 trials</td><td>Include a neutral reset and a fatigue rating.</td></tr>
+      <tr><td class="k">65–80</td><td>Induction block 3 + check + 3 trials</td><td>Probe whether the state feels credible and whether the task feels like a real shopping task.</td></tr>
+      <tr><td class="k">80–95</td><td>Induction block 4 + check + 3 trials</td><td>Stop early if distress; debrief immediately.</td></tr>
+      <tr><td class="k">95–110</td><td>Questionnaires and retrospective interview</td><td>SUS per menu, NASA-TLX, open-ended: what was confusing, what felt fast, what felt frustrating.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7.4 What the pilot changes</h2>
+  <p>The pilot can change the <b>implementation</b> and the <b>measurement</b>, but not the confirmatory hypotheses. Permitted changes: fix a menu bug; adjust hit-target size; clarify instructions; replace a task that is ambiguous; adjust the induction script; drop an unusable questionnaire item; recalibrate the session length. Changes that would alter the scientific question (e.g., dropping a menu, changing the four states after seeing results) require a protocol amendment and must be reported.</p>
+
+  <div class="keybox">
+    <h4>Pilot outputs</h4>
+    <ul class="small" style="margin:0; padding-left:5mm">
+      <li>A revised task bank with difficulty calibration (success and time by task).</li>
+      <li>Variance components for the power simulation: participant intercept SD, residual SD, target SD, menu×state interaction SD.</li>
+      <li>A manipulation-check report for each induction (dominant-state %, mean intensity, adverse events).</li>
+      <li>A technical QA report (missing events, frame rate, browser console errors).</li>
+      <li>A frozen protocol and analysis script for pre-registration.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 8 STUDY 1 ================= -->
+<section class="section" id="study1">
+  <h1><span class="num">8</span> Study 1 — the 6 × 4 mapping</h1>
+
+  <p class="lead">Study 1 is the empirical heart of the programme. It estimates how six menu structures perform and feel under four induced emotional contexts, and it produces the mapping that Study 2 tests causally. It is a within-subject experiment with 24 trials per participant, four emotion blocks, and six menus per block.</p>
+
+  <h2>8.1 Objective and pre-registered predictions</h2>
+  <p><b>Objective:</b> estimate the 6 × 4 matrix of performance and experience; test whether the relative ranking of menus depends on emotional context (H1); and derive a policy with explicit uncertainty. The directional expectations in Table 1.2 are used to pre-register four focused contrasts, but the omnibus interaction is the primary gate.</p>
+
+  <table>
+    <thead><tr><th style="width:16%">Focused contrast</th><th style="width:36%">Prediction</th><th style="width:48%">Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Frustration: C vs A</td><td>C (mega) faster and fewer errors than A (horizontal)</td><td>Fewer clicks and all options visible; directness under goal blockage.</td></tr>
+      <tr><td class="k">Confusion: B vs E</td><td>B (sidebar) lower disorientation than E (icon grid)</td><td>Persistent tree and explicit labels support a cognitive map; icons may be ambiguous.</td></tr>
+      <tr><td class="k">Boredom: E vs A</td><td>E higher engagement and faster than A</td><td>Visual salience and novelty restore arousal; A is familiar but dull.</td></tr>
+      <tr><td class="k">Happiness: C vs B</td><td>C faster than B</td><td>Broadened exploration and tolerance for density; fewer clicks.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8.2 Design</h2>
+  <table>
+    <thead><tr><th style="width:26%">Factor</th><th style="width:22%">Levels</th><th style="width:18%">Type</th><th style="width:34%">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Menu structure</td><td>A, B, C, D, E, F</td><td>Within-subject</td><td>Six menus per emotion block; order balanced by a 6 × 6 Latin square.</td></tr>
+      <tr><td class="k">Emotional context</td><td>Happy, frustrated, confused, bored</td><td>Within-subject</td><td>Four blocks; order balanced by a 4 × 4 Latin square; neutral reset between blocks.</td></tr>
+      <tr><td class="k">Task difficulty</td><td>Easy, medium, hard</td><td>Within-subject covariate</td><td>8 targets per level per participant; rotated across cells.</td></tr>
+      <tr><td class="k">Trial position</td><td>1–24</td><td>Covariate</td><td>Included to absorb fatigue/learning; not a primary factor.</td></tr>
+      <tr><td class="k">Target set</td><td>6 sets × 24 tasks</td><td>Between-participant rotation</td><td>Balances specific products across cells; target random intercept in the model.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Trials per participant:</b> 24 main trials (6 menus × 4 states), plus 6 practice trials (one per menu). Each trial has a 120-s cap; median expected 25–45 s. The session is ~90 min including consent, inductions, questionnaires, and debrief.</p>
+
+  <h2>8.3 Participants and sample size</h2>
+  <p><b>Target N = 72</b> for the full confirmatory study; <b>N = 48</b> for the reduced semester version. The full sample provides ~75% power to detect a small-to-medium omnibus interaction (f = 0.10) and &gt; 90% power for f = 0.15 under the assumptions in §13. The reduced sample is powered for f ≈ 0.15 and for the four focused contrasts if their effects are medium. The pilot updates the variance components before the final N is fixed.</p>
+
+  <p><b>Inclusion:</b> 18–65, fluent English, normal/corrected vision, able to use a mouse/trackpad, no prior participation in the pilot. <b>Exclusion (pre-registered):</b> incomplete logs for &gt; 10% of trials; &lt; 75% of trials completed; technical failure preventing menu use; prior participation. Colour-vision deficiency is recorded, not automatically excluded. Report a CONSORT-style flow diagram.</p>
+
+  <h2>8.4 Materials</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li>The six-menu prototype (§5), running locally at 1920 × 1080, full-screen, with search disabled.</li>
+    <li>72 product pages, 72 task descriptions, six balanced target sets, and six practice tasks.</li>
+    <li>Four induction scripts and media: comedy clip (happy), buggy search (frustrated), ambiguous categorisation (confused), repetitive price check (bored).</li>
+    <li>Neutral reset video (60 s nature footage) and a 2-min break timer.</li>
+    <li>Questionnaires: SAM valence/arousal, four discrete emotion items, NASA-TLX (raw), UMUX-Lite after each block, SUS after each menu, disorientation/control scale, demographics, suspicion check.</li>
+    <li>Headphones, consent forms, debrief sheet, and a stop-rule card for the experimenter.</li>
+  </ul>
+
+  <h2>8.5 Procedure</h2>
+  <table class="long">
+    <thead><tr><th style="width:8%">Min</th><th style="width:26%">Step</th><th style="width:66%">Detail</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0–12</td><td>Welcome, consent, screening</td><td>Information sheet, consent, demographics, baseline SAM and discrete emotions, colour-vision check, audio check. Emphasise voluntary participation and the right to stop.</td></tr>
+      <tr><td class="k">12–24</td><td>Instructions and practice</td><td>Cover story: “We are comparing website layouts for finding watches.” Explain the task, the 120-s limit, the disabled search, and the menu-specific interaction. One practice trial per menu (not analysed). Confirm understanding with a short quiz.</td></tr>
+      <tr><td class="k">24–36</td><td>Block 1: induction + check + 6 trials</td><td>2.5-min induction, 1-min manipulation check, 6 trials in a balanced menu order, 1-min post-block check, 2-min neutral reset. If the state has faded (intensity &lt; 4), re-induce briefly before the next trial.</td></tr>
+      <tr><td class="k">36–48</td><td>Block 2</td><td>Same structure with the next state in the Latin-square order.</td></tr>
+      <tr><td class="k">48–60</td><td>Block 3</td><td>Same; offer a longer break if requested.</td></tr>
+      <tr><td class="k">60–72</td><td>Block 4</td><td>Same; final post-block check.</td></tr>
+      <tr><td class="k">72–88</td><td>Questionnaires</td><td>SUS for each menu (order counterbalanced), NASA-TLX summary, disorientation/control, adaptation expectations, demographics, suspicion check.</td></tr>
+      <tr><td class="k">88–95</td><td>Debrief</td><td>Explain the inductions, the purpose, and the hypotheses; answer questions; provide support resources; thank and compensate.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8.6 Trial procedure (exact sequence)</h2>
+  <ol class="small" style="padding-left:5mm">
+    <li><b>Task screen (5 s or until “Start”):</b> the shopping goal is displayed in neutral language. The participant clicks “Start” when ready.</li>
+    <li><b>Navigation:</b> the menu appears with the store home page. The participant uses the menu to reach the product. Search is visibly disabled. The 120-s timer starts at “Start.”</li>
+    <li><b>Selection:</b> clicking a leaf opens the product detail page. The system checks the product ID. If correct, the trial ends with a neutral “Response recorded” message. If incorrect, the participant can continue; wrong leaves are logged but do not end the trial.</li>
+    <li><b>Timeout / give-up:</b> at 120 s, or if the participant presses “I can’t find it,” the trial ends with “Time is up. Moving on.” No performance feedback, praise, or criticism.</li>
+    <li><b>Inter-trial interval:</b> 3 s blank screen with a fixation cross, then the next task.</li>
+    <li><b>Check-in:</b> after trials 3 and 6 of each block, a 2-item micro-check (valence and arousal) appears; the full discrete-emotion check appears at the end of the block. This limits reactivity while providing trial-level anchors.</li>
+  </ol>
+
+  <p><b>Why neutral feedback?</b> Praise or error messages would induce additional emotion and contaminate the block. The product page itself is the success signal. The experimenter does not comment on performance during the session.</p>
+
+  <h2>8.7 Emotion block procedure</h2>
+  <table>
+    <thead><tr><th style="width:16%">Step</th><th style="width:44%">What happens</th><th style="width:40%">Why</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Baseline</td><td>SAM + four discrete items before the induction.</td><td>Establishes within-person change; detects carry-over.</td></tr>
+      <tr><td class="k">Induction</td><td>2.5-min scripted task or clip, standardised across participants.</td><td>Creates the context without using the navigation task itself.</td></tr>
+      <tr><td class="k">Manipulation check</td><td>SAM + discrete items; dominant-state rule applied.</td><td>Verifies the intended state; provides the label for analysis.</td></tr>
+      <tr><td class="k">Six trials</td><td>Menus in the balanced order; targets from the assigned set.</td><td>Estimates the 6 × 1 slice of the matrix for this state.</td></tr>
+      <tr><td class="k">Post-block check</td><td>SAM + discrete items + NASA-TLX + UMUX-Lite.</td><td>Measures fade, load, and usability; supports dose-response analysis.</td></tr>
+      <tr><td class="k">Reset</td><td>60-s neutral video + 2-min break; offer water.</td><td>Reduces carry-over between states.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>If the induction fails:</b> the trial block is retained in the intention-to-treat analysis (randomised state), and a complier-average causal effect (CACE) analysis uses only blocks where the intended state was dominant. This avoids dropping data based on a post-treatment variable. The failure rate is reported by state and induction order.</p>
+
+  <h2>8.8 Outcomes</h2>
+  <table>
+    <thead><tr><th style="width:18%">Construct</th><th style="width:34%">Measure</th><th style="width:18%">Timing</th><th style="width:30%">Role</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Task success</td><td>Correct product ID within 120 s</td><td>Per trial</td><td>Primary</td></tr>
+      <tr><td class="k">Completion time</td><td>Log ms to correct product page; censored at 120 s</td><td>Per trial</td><td>Primary</td></tr>
+      <tr><td class="k">Navigation errors</td><td>Wrong department/subcategory/leaf; backtrack; category switch</td><td>Per trial</td><td>Primary (composite) / secondary (components)</td></tr>
+      <tr><td class="k">Cognitive load</td><td>Raw NASA-TLX (6 items)</td><td>Per block</td><td>Primary</td></tr>
+      <tr><td class="k">Perceived usability</td><td>UMUX-Lite (2 items) per block; SUS (10 items) per menu at end</td><td>Block / end</td><td>Primary</td></tr>
+      <tr><td class="k">Disorientation / control</td><td>4-item scale (“I felt lost,” “I knew where I was,” “I could predict where to go,” “I felt in control”)</td><td>Per block</td><td>Primary</td></tr>
+      <tr><td class="k">Engagement / boredom</td><td>4-item short engagement scale; boredom item</td><td>Per block</td><td>Secondary</td></tr>
+      <tr><td class="k">Preference</td><td>Ranking of six menus; forced choice for each state</td><td>End</td><td>Secondary</td></tr>
+      <tr><td class="k">Process</td><td>Clicks, path efficiency, menu open/close, hover dwell, first-click correctness, search attempts</td><td>Per trial</td><td>Secondary / mediation</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8.9 Analysis plan</h2>
+  <p>The primary analysis is a set of mixed-effects models with menu, state, and their interaction as fixed effects, plus trial position, difficulty, and target set as covariates. Participant and target are crossed random intercepts. A random slope for menu by participant is included if the model converges and the random-effect structure is supported by a likelihood-ratio test; otherwise the simpler model is reported with a sensitivity analysis.</p>
+
+  <div class="formula">
+    <b>Success:</b> logit P(y<sub>ijk</sub> = 1) = β<sub>0</sub> + β<sub>menu(j)</sub> + β<sub>state(k)</sub> + β<sub>menu×state(jk)</sub> + β<sub>trial</sub> + β<sub>difficulty</sub> + u<sub>i</sub> + v<sub>target</sub><br>
+    <b>Time:</b> log(T<sub>ijk</sub>) = α<sub>0</sub> + α<sub>menu(j)</sub> + α<sub>state(k)</sub> + α<sub>menu×state(jk)</sub> + α<sub>trial</sub> + α<sub>difficulty</sub> + a<sub>i</sub> + b<sub>target</sub> + ε<sub>ijk</sub>
+  </div>
+
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Success</b> is analysed with a binomial GLMM (<code>glmer</code>, logit link). Report odds ratios with 95% CIs. The interaction is tested with a likelihood-ratio test against a model without the interaction; a parametric bootstrap provides a second p-value if the asymptotic test is questionable.</li>
+    <li><b>Time</b> is analysed with a linear mixed model on the log scale. Failures are right-censored at 120 s; a Cox frailty model (participant random effect) is the pre-registered sensitivity analysis. Report geometric means and percentage differences.</li>
+    <li><b>Errors</b> are counts; use a negative-binomial GLMM with an offset for opportunities. Report incidence-rate ratios.</li>
+    <li><b>Load, usability, disorientation</b> are analysed with LMMs (or ordinal models for individual items). Report estimated marginal means with 95% CIs.</li>
+    <li><b>Multiplicity:</b> the omnibus interaction is the gate. If it is not significant, the four focused contrasts are reported as exploratory with FDR-adjusted p-values. If it is significant, the four contrasts are tested with Holm correction and reported alongside the full matrix.</li>
+    <li><b>Effect sizes:</b> odds ratios, percentage-point differences in success, Cohen’s d<sub>z</sub> for within-subject time contrasts, and incidence-rate ratios. Report precision, not just p-values.</li>
+    <li><b>Model checks:</b> residual plots, overdispersion, singularity, influence diagnostics; report if a simpler random-effects structure was used.</li>
+    <li><b>Sensitivity:</b> exclude C (click-depth confound); analyse A/B/D/E/F only; per-protocol state labels; exclude participants who guessed the hypothesis; exclude the first trial of each block (learning); include input modality as a covariate.</li>
+  </ul>
+
+  <h2>8.10 From matrix to policy</h2>
+  <p>The output of Study 1 is not a single “best menu.” It is a 6 × 4 matrix with uncertainty. The policy is selected with a pre-registered, transparent rule:</p>
+  <ol class="small" style="padding-left:5mm">
+    <li><b>Guardrail:</b> for each state, retain menus whose success rate is within 5 percentage points of the best menu in that state (non-inferiority margin). If no menu is clearly best, use the global best menu for that state.</li>
+    <li><b>Efficiency:</b> among retained menus, choose the one with the shortest geometric mean completion time.</li>
+    <li><b>Errors:</b> if two menus are within 10% on time, choose the one with fewer navigation errors.</li>
+    <li><b>Experience:</b> if still tied, choose the higher UMUX-Lite / lower NASA-TLX.</li>
+    <li><b>Uncertainty:</b> require a posterior probability ≥ 0.90 that the chosen menu is best on the primary outcome, or a clear non-inferiority result. Otherwise default to the global best menu and flag the state as “no reliable adaptation.”</li>
+    <li><b>Simplicity:</b> if the chosen menu is within the guardrail of the global best, prefer the global best to avoid switching costs.</li>
+  </ol>
+
+  <p>A Bayesian hierarchical model (<code>brms</code>) with regularising priors on the 24 cell effects provides posterior probabilities and shrinks extreme cell estimates. The frequentist models remain the primary inferential analysis; the Bayesian model is used for policy selection and for communicating uncertainty. A utility-based sensitivity analysis (weights on success, time, errors, usability) checks whether the policy changes under reasonable alternative weights.</p>
+
+  <h2>8.11 Expected patterns and interpretation</h2>
+  <table>
+    <thead><tr><th style="width:34%">Pattern</th><th style="width:66%">Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">C wins in most states</td><td>Breadth and click savings dominate; the practical recommendation is a mega menu, and emotion-contingent structure adds little. This is a strong applied finding even if it weakens the adaptation story.</td></tr>
+      <tr><td class="k">Different winners in different states</td><td>The core hypothesis is supported; proceed to Study 2 with the state-specific policy. The size of the differences determines whether adaptation is worth the switching cost.</td></tr>
+      <tr><td class="k">E/F win only under boredom</td><td>Adaptation has a narrow, engagement-focused niche. The paper should frame it as a targeted intervention, not a universal policy.</td></tr>
+      <tr><td class="k">B wins under confusion</td><td>Persistence and explicit labels matter more than breadth. This supports wayfinding theory and has direct design implications.</td></tr>
+      <tr><td class="k">No differences</td><td>Either the task is too easy (ceiling), the induction is weak, or menu structure is robust to mild affect. Check manipulation and difficulty before interpreting as a null.</td></tr>
+      <tr><td class="k">Speed–accuracy trade-off</td><td>E/F may be faster but less accurate; C may be accurate but visually overwhelming. Report the trade-off rather than a single winner; the policy guardrail handles it.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8.12 Threats specific to Study 1</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Induction failure or fade:</b> manipulation checks, re-induction, CACE analysis, and a dose-response model using continuous ratings.</li>
+    <li><b>Demand characteristics:</b> broad cover story, no mention of “emotion and menus,” suspicion check, sensitivity analysis excluding guessers.</li>
+    <li><b>Order and learning:</b> Latin squares, practice trials, trial-position covariate, first-trial exclusion sensitivity.</li>
+    <li><b>Fatigue:</b> 90-min cap, breaks, pilot timing, fatigue rating; if fatigue is high, split into two sessions in a follow-up.</li>
+    <li><b>Menu confounds:</b> parity contract, click-depth mediation, matched-depth sensitivity, colour counterbalancing, animation control.</li>
+    <li><b>Task/target confounds:</b> unique targets, balanced difficulty, target rotation, crossed random effects.</li>
+    <li><b>Ceiling effects:</b> difficulty calibration in the pilot; if success &gt; 95% overall, increase difficulty or use time/errors as the primary outcome.</li>
+  </ul>
+
+  <h2>8.13 Deliverables</h2>
+  <p>A 6 × 4 matrix of success, time, errors, load, usability, and disorientation with 95% credible intervals; posterior probabilities for each menu being best in each state; a frozen policy table with a “no reliable adaptation” flag where appropriate; a fully reproducible dataset and analysis script; and a pre-registration update before Study 2.</p>
+</section>

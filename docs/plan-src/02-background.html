@@ -1,0 +1,97 @@
+<!-- ================= 1 BACKGROUND ================= -->
+<section class="section" id="background">
+  <h1><span class="num">1</span> Background and related work</h1>
+
+  <p class="lead">This project sits at the intersection of menu design, adaptive user interfaces, and affective computing. The literature is rich in each area, but the three are rarely combined in a single controlled experiment. This section summarises what is established, what the four supplied papers contribute, and where the present study adds new evidence.</p>
+
+  <h2>1.1 Menu structure is not a neutral container</h2>
+  <p>Decades of menu research show that the shape of a hierarchy changes search behaviour. The classic breadth–depth trade-off finds that broader, shallower menus are faster and less error-prone than deep, narrow ones, at least within the ranges tested (Miller, 1981; Kiger, 1984; Snowberry et al., 1983). Two-level menus often outperform deeper hierarchies (Parkinson et al., 1988), which is one reason the mega menu — a panel that exposes several levels at once — can be efficient (Li &amp; Nielsen, 2017). But breadth is not free: a panel with many links increases visual density and the number of distractors, and it can make category boundaries harder to parse.</p>
+
+  <p>Orientation matters too. Leuthold et al. (2011) used eye tracking to compare vertical, dynamic, and simple menus and found that vertical menus required less visual effort and produced faster, more successful navigation. Chiu and Yang (2024) extended this to e-commerce menu formats, comparing a horizontal main menu with a vertical local menu and a fully horizontal version. Their eye-tracking data showed that a horizontal main menu plus a vertical local menu improved visual efficiency and satisfaction relative to a dense, multi-category horizontal layout. The practical lesson is not “vertical is always better”; it is that <b>the fit between orientation, density, and task</b> matters, and that subjective and physiological measures can diverge.</p>
+
+  <p>Visual form also matters. Ahlström et al. (2010) showed that square menus can be faster than traditional hierarchical menus because they exploit the full 2D space and reduce pointing time. Radial menus exploit direction and distance in a different way, and Fitts’s law predicts that targets arranged around a central hub can be acquired quickly when the direction is known (Fitts, 1954). The rounded-square icon grid and the radial lattice in this study are not arbitrary novelties; they manipulate <b>spatial geometry</b>, <b>visual salience</b>, and <b>motor trajectory</b>, which are exactly the dimensions that menu research says should matter.</p>
+
+  <h2>1.2 Adaptive menus: benefits, costs, and the switching problem</h2>
+  <p>Adaptive menus change item order, prominence, or availability based on usage. Findlater and McGrenere (2004) compared static, adaptive, and adaptable menus and found that adaptation can help, but user control and awareness moderate the benefit. Gajos et al. (2008) showed that predictability and accuracy trade off: an adaptive interface that moves items can be faster in the moment but slower overall if users cannot predict where things are. Lavie and Meyer (2010) catalogue the benefits and costs of adaptive user interfaces, including the cost of re-learning and the risk of maladaptive changes. This is the core tension for the present project: <b>a structure that fits the current state may be better, but changing structure destroys spatial memory and imposes a transition cost.</b></p>
+
+  <p>The supplied RL paper (Gaspar-Figueiredo et al., 2025) is a useful counterpoint. It extends an RL-based adaptive-UI framework with individual human feedback: each participant ranks pairs of adaptation videos, a personalised reward modifier is trained, and a unique RL agent is trained for that participant. In a crossover study with 33 participants across an e-learning and a trip-planning domain, the adaptive interface with human feedback produced higher user satisfaction (estimated −0.97 for non-adaptive, p &lt; .001) and higher engagement (−0.23, p = .016) than the non-adaptive interface. The paper is important because it shows that <b>individualised feedback can make adaptation work</b>, and because it carefully separates adaptive from non-adaptive baselines. But it adapts layout, font size, density, theme, and widget type — not whole menu architectures — and it measures UX rather than product-finding performance. It also does not test whether the adaptation remains beneficial when the preference model is wrong, nor does it quantify switching costs.</p>
+
+  <p>The fractal menu paper (Sahraoui et al., 2025) contributes a different idea: use the entire display as a recursive, self-similar hierarchy. Each menu level is a rectangular area; selecting an area zooms into its children; selecting outside the area zooms out; a breadcrumb supports direct return. The authors engineer the menu with an L-system, validate it in a steel-mill checklist use case, and argue that self-similarity supports proprioceptive memory and orientation in deep hierarchies. Crucially, the paper is a <b>concept and engineering paper with a use-case validation</b>, not a controlled comparison. It explicitly says that empirical demonstration remains future work. The present study provides that empirical test, and adds the emotional moderator the fractal paper does not consider.</p>
+
+  <h2>1.3 Emotion, affect, and information seeking</h2>
+  <p>Emotion is not a single variable. The most widely used descriptive model is the valence–arousal circumplex: affective states vary in how pleasant they are and how activated they are (Russell, 1980). Mehrabian and Russell’s (1974) PAD model adds dominance, which is relevant to navigation because perceived control is a core part of the experience. Appraisal theories add cognitive structure: emotions arise from evaluations of goal relevance, goal congruence, agency, and certainty (Ortony et al., 1988). This matters because frustration, confusion, and boredom are not just points on a circle; they have different appraisals and different action tendencies.</p>
+
+  <p>Affect influences how people process information. Positive affect tends to broaden attention and increase exploratory behaviour (Isen, 2001), which may make a visually richer or more exploratory menu more acceptable. Negative affect narrows attention and increases vigilance, which may make a dense panel feel overwhelming. The affect-as-information account (Schwarz &amp; Clore, 1983) predicts that people may use their current feelings as a cue when judging an interface, so the same menu can be evaluated differently depending on mood. In navigation specifically, disorientation is a well-documented source of frustration (Lazar et al., 2003), and lostness has been operationalised as the mismatch between the user’s expected path and the actual path (Smith, 1996). Boredom is the mirror image: low arousal, low interest, and reduced exploration, which can lead to fast guessing or abandonment (O’Brien et al., 2018).</p>
+
+  <p>Consumer research adds a domain-specific taxonomy. Richins’ (1997) Consumption Emotions Set and Laros and Steenkamp’s (2005) hierarchical model distinguish positive and negative consumption emotions, including contentment, excitement, frustration, and disappointment. The present study uses a smaller, experimentally tractable set because repeated measurement of a large taxonomy is impractical. The four states are selected for their <b>theoretical distinctness</b>, <b>relevance to navigation</b>, and <b>measurability with brief self-report plus interaction signals</b>.</p>
+
+  <h2>1.4 The four supplied papers: what they do and do not establish</h2>
+  <table class="long">
+    <thead><tr><th style="width:20%">Paper</th><th style="width:31%">What it contributes</th><th style="width:27%">What it does not establish</th><th style="width:22%">How this plan uses it</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="k">Chiu &amp; Yang (2024)<br><span class="small">“Eyes Bring Out Effectiveness?” SSRN 4920862</span></td>
+        <td>Eye-tracking comparison of horizontal vs vertical menu formats in e-commerce; 39 participants; fixation duration, effective focus, revisit rate, SUS, satisfaction; argues for a horizontal main menu + vertical local menu.</td>
+        <td>One product domain (robot vacuum), a preprint not peer-reviewed, no emotional manipulation, no adaptive policy, no test of structural switching.</td>
+        <td>Motivates the horizontal bar (A), vertical sidebar (B), and mega menu (C); informs AOI definitions and the optional eye-tracking extension.</td>
+      </tr>
+      <tr>
+        <td class="k">Sahraoui et al. (2025)<br><span class="small">“Fractal Adaptive Menus,” EICS Companion ’25</span></td>
+        <td>Defines a recursive, self-similar menu; L-system engineering; zoom in/out; breadcrumb; steel-mill checklist use case; argues for proprioceptive memory in deep hierarchies.</td>
+        <td>No controlled comparison, no performance data against other menus, no emotional context, no user study with naive participants.</td>
+        <td>Provides the operational definition of menu D (fractal tiles) and the theoretical rationale for spatial memory.</td>
+      </tr>
+      <tr>
+        <td class="k">Gaspar-Figueiredo et al. (2025)<br><span class="small">“Integrating Human Feedback into an RL-Based Framework for AUIs,” EASE 2025</span></td>
+        <td>Personalised RL agents trained from pairwise human feedback; 33-participant crossover; QUIS and UES; adaptive &gt; non-adaptive on satisfaction and engagement; releases code and materials.</td>
+        <td>Adapts layout/density/theme/widgets, not menu architecture; no product-finding task; no emotion; no test of estimator error or switching cost.</td>
+        <td>Motivates the individualised, human-in-the-loop framing; informs the adaptation policy and the UX measures; provides a baseline logic for comparing adaptive vs static.</td>
+      </tr>
+      <tr>
+        <td class="k">Protocol v3.0<br><span class="small">“Emotional Adaptive Navigation — Revised Protocol”</span></td>
+        <td>Proposes four menus × four emotions; three studies (mapping, causal test, end-to-end); measurement and ethics plan; selection rule; preregistration checklist.</td>
+        <td>Four menus only; no RS grid or radial lattice; provisional sample sizes; no simulation-based power analysis; no formal menu-parity controls.</td>
+        <td>Provides the scientific skeleton. This document extends it to six menus and adds the design, power, and implementation detail needed to run it.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>1.5 Theoretical framework and why each menu might fit each state</h2>
+  <p>The study is informed by four mechanisms, each of which makes a different prediction. These are <b>predictions to test</b>, not assumptions baked into the design.</p>
+  <table>
+    <thead><tr><th style="width:18%">Mechanism</th><th style="width:39%">Claim</th><th style="width:43%">Design implication</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Cognitive load / breadth–depth</td><td>Working memory is limited; exposing more options at once reduces depth but increases visual search load. The optimum depends on the user’s state and the task.</td><td>Mega menu (C) should help when the user wants an overview; deep sequential menus (A, B) should help when the choice set is small and labels are clear.</td></tr>
+      <tr><td class="k">Wayfinding / spatial memory</td><td>Persistent spatial layouts support cognitive maps; recursive zoom and radial anchors may support proprioceptive memory; reordering destroys it.</td><td>Sidebar (B), fractal (D), and radial (F) should reduce lostness for users who can form a spatial map; switching between structures should impose a cost.</td></tr>
+      <tr><td class="k">Visual salience / affect</td><td>Colour, icons, and motion capture attention; positive affect may increase tolerance for richness, while frustration may make it distracting.</td><td>RS grid (E) and radial (F) may increase engagement and reduce boredom, but may increase errors under frustration or confusion.</td></tr>
+      <tr><td class="k">Motor efficiency / Fitts’s law</td><td>Target acquisition time depends on distance and target size; radial and grid layouts can reduce travel and exploit directional gestures.</td><td>Radial (F) and grid (E) should be fast when the target location is known; sequential menus (A, B) should be slower but more predictable.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Combining these mechanisms yields the directional expectations in Table 1.2. They are deliberately <b>not</b> the basis for the adaptive policy; the policy is derived from Study 1. They are used to pre-register focused contrasts and to interpret the pattern.</p>
+
+  <table>
+    <caption>Table 1.2 — Directional expectations (to be tested, not assumed)</caption>
+    <thead><tr><th style="width:15%">State</th><th style="width:29%">Most likely to benefit</th><th style="width:29%">Least likely to benefit</th><th style="width:27%">Mechanistic reason</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Happiness</td><td>C (mega), E (RS grid), F (radial)</td><td>B (sidebar) if it feels plodding</td><td>Broadened attention, openness to exploration, tolerance for visual richness.</td></tr>
+      <tr><td class="k">Frustration</td><td>C (mega), A (horizontal)</td><td>D (fractal), F (radial) if motion and spatial demands add load</td><td>Narrowed attention, desire for directness and control; fewer clicks and visible options reduce blockage.</td></tr>
+      <tr><td class="k">Confusion / lostness</td><td>B (sidebar), C (mega), D (fractal with breadcrumb)</td><td>E (RS grid) if icons are ambiguous; F if the ring is hard to parse</td><td>Need for a stable overview, clear labels, and a visible path back; spatial persistence supports a cognitive map.</td></tr>
+      <tr><td class="k">Boredom</td><td>E (RS grid), F (radial)</td><td>A (horizontal), B (sidebar) as “more of the same”</td><td>Under-stimulation; novelty, colour, and motion may restore engagement, at the cost of efficiency.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <h4>Why the mapping must be empirical</h4>
+    <p class="small">These predictions conflict in interesting ways. For example, under frustration, C is predicted to help because it reduces clicks, but it also presents 18 links at once, which may increase visual load. Under confusion, B is predicted to help because it is persistent, but a persistent tree can also be overwhelming. The study is designed to resolve these trade-offs, not to confirm a slogan.</p>
+  </div>
+
+  <h2>1.6 Contributions</h2>
+  <ol class="small" style="padding-left:5mm">
+    <li><b>Empirical:</b> the first 6 × 4 matrix of menu-structure performance and experience across experimentally induced emotional contexts, with uncertainty estimates.</li>
+    <li><b>Causal:</b> a test of whether emotion-matched structural switching beats a static best menu and a mismatched menu, separating matching from mere change.</li>
+    <li><b>Methodological:</b> a simulation-based power analysis for the 6 × 4 design, a menu-parity checklist, and a break-even accuracy analysis for emotion inference.</li>
+    <li><b>Applied:</b> a reusable open-source prototype and event schema for comparing heterogeneous menu architectures over one taxonomy.</li>
+    <li><b>Theoretical:</b> evidence on whether the benefit of adaptation is explained by cognitive load, spatial memory, perceived control, or visual engagement.</li>
+  </ol>
+</section>

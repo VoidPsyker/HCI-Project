@@ -1,0 +1,1229 @@
+{
+  "version": "1.0.0",
+  "products": [
+    {
+      "id": "dress.heritage.anthracite",
+      "leafId": "dress.heritage.anthracite",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "black",
+        "priceBand": "£420–£900"
+      },
+      "price": 712,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a black dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.heritage.bordeaux",
+      "leafId": "dress.heritage.bordeaux",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "brown",
+        "priceBand": "£420–£900"
+      },
+      "price": 451,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a brown dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.heritage.ivory-dial",
+      "leafId": "dress.heritage.ivory-dial",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "white",
+        "priceBand": "£420–£900"
+      },
+      "price": 773,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a white dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.heritage.moon-silver",
+      "leafId": "dress.heritage.moon-silver",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "automatic",
+        "water": 50,
+        "dial": "silver",
+        "priceBand": "£240–£420"
+      },
+      "price": 356,
+      "priceBand": "£240–£420",
+      "description": "38 mm automatic watch with a silver dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.heritage.onyx",
+      "leafId": "dress.heritage.onyx",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      },
+      "price": 573,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a blue dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.heritage.rose-gold",
+      "leafId": "dress.heritage.rose-gold",
+      "departmentId": "dress",
+      "subcategoryId": "dress.heritage",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "silver",
+        "priceBand": "£420–£900"
+      },
+      "price": 693,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a silver dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.black-tie",
+      "leafId": "dress.midnight.black-tie",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "black",
+        "priceBand": "£240–£420"
+      },
+      "price": 302,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a black dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.champagne",
+      "leafId": "dress.midnight.champagne",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "silver",
+        "priceBand": "£180–£240"
+      },
+      "price": 204,
+      "priceBand": "£180–£240",
+      "description": "38 mm quartz watch with a silver dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.deep-navy",
+      "leafId": "dress.midnight.deep-navy",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "leather",
+        "movement": "automatic",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£240–£420"
+      },
+      "price": 281,
+      "priceBand": "£240–£420",
+      "description": "40 mm automatic watch with a blue dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.graphite",
+      "leafId": "dress.midnight.graphite",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "grey",
+        "priceBand": "£420–£900"
+      },
+      "price": 648,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a grey dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.pearl-white",
+      "leafId": "dress.midnight.pearl-white",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "green",
+        "priceBand": "£420–£900"
+      },
+      "price": 822,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a green dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.midnight.sapphire",
+      "leafId": "dress.midnight.sapphire",
+      "departmentId": "dress",
+      "subcategoryId": "dress.midnight",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£240–£420"
+      },
+      "price": 350,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a blue dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.aurora",
+      "leafId": "dress.moonphase.aurora",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "champagne",
+        "priceBand": "£420–£900"
+      },
+      "price": 832,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a champagne dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.celestial-blue",
+      "leafId": "dress.moonphase.celestial-blue",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "leather",
+        "movement": "automatic",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£900+"
+      },
+      "price": 2405,
+      "priceBand": "£900+",
+      "description": "42 mm automatic watch with a blue dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.copper-brown",
+      "leafId": "dress.moonphase.copper-brown",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "brown",
+        "priceBand": "£240–£420"
+      },
+      "price": 262,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a brown dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.slate-grey",
+      "leafId": "dress.moonphase.slate-grey",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "grey",
+        "priceBand": "£240–£420"
+      },
+      "price": 269,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a grey dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.starlight",
+      "leafId": "dress.moonphase.starlight",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "orange",
+        "priceBand": "£420–£900"
+      },
+      "price": 626,
+      "priceBand": "£420–£900",
+      "description": "38 mm quartz watch with a orange dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "dress.moonphase.warm-silver",
+      "leafId": "dress.moonphase.warm-silver",
+      "departmentId": "dress",
+      "subcategoryId": "dress.moonphase",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "silver",
+        "priceBand": "£900+"
+      },
+      "price": 1381,
+      "priceBand": "£900+",
+      "description": "38 mm quartz watch with a silver dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "everyday.field.charcoal",
+      "leafId": "everyday.field.charcoal",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "blue",
+        "priceBand": "£900+"
+      },
+      "price": 2265,
+      "priceBand": "£900+",
+      "description": "38 mm quartz watch with a blue dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.field.khaki-canvas",
+      "leafId": "everyday.field.khaki-canvas",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "automatic",
+        "water": 100,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      },
+      "price": 195,
+      "priceBand": "£180–£240",
+      "description": "38 mm automatic watch with a brown dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.field.navy-weave",
+      "leafId": "everyday.field.navy-weave",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      },
+      "price": 227,
+      "priceBand": "£180–£240",
+      "description": "40 mm quartz watch with a blue dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.field.olive",
+      "leafId": "everyday.field.olive",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "green",
+        "priceBand": "£180–£240"
+      },
+      "price": 233,
+      "priceBand": "£180–£240",
+      "description": "38 mm quartz watch with a green dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.field.sandstone",
+      "leafId": "everyday.field.sandstone",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      },
+      "price": 199,
+      "priceBand": "£180–£240",
+      "description": "40 mm quartz watch with a grey dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.field.stone",
+      "leafId": "everyday.field.stone",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.field",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "grey",
+        "priceBand": "£900+"
+      },
+      "price": 1681,
+      "priceBand": "£900+",
+      "description": "38 mm quartz watch with a grey dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.urban.concrete-grey",
+      "leafId": "everyday.urban.concrete-grey",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "white",
+        "priceBand": "£180–£240"
+      },
+      "price": 191,
+      "priceBand": "£180–£240",
+      "description": "38 mm quartz watch with a white dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.urban.deep-teal",
+      "leafId": "everyday.urban.deep-teal",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "fabric",
+        "movement": "automatic",
+        "water": 100,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      },
+      "price": 189,
+      "priceBand": "£180–£240",
+      "description": "42 mm automatic watch with a blue dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.urban.ink-black",
+      "leafId": "everyday.urban.ink-black",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "black",
+        "priceBand": "£900+"
+      },
+      "price": 1006,
+      "priceBand": "£900+",
+      "description": "38 mm quartz watch with a black dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.urban.matte-white",
+      "leafId": "everyday.urban.matte-white",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "mesh",
+        "movement": "quartz",
+        "water": 50,
+        "dial": "white",
+        "priceBand": "£240–£420"
+      },
+      "price": 291,
+      "priceBand": "£240–£420",
+      "description": "40 mm quartz watch with a white dial, mesh strap and 50 m water resistance."
+    },
+    {
+      "id": "everyday.urban.soft-beige",
+      "leafId": "everyday.urban.soft-beige",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "champagne",
+        "priceBand": "£180–£240"
+      },
+      "price": 233,
+      "priceBand": "£180–£240",
+      "description": "38 mm quartz watch with a champagne dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.urban.steel-mesh",
+      "leafId": "everyday.urban.steel-mesh",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.urban",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "mesh",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "grey",
+        "priceBand": "£900+"
+      },
+      "price": 1063,
+      "priceBand": "£900+",
+      "description": "38 mm quartz watch with a grey dial, mesh strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.cream",
+      "leafId": "everyday.weekender.cream",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "white",
+        "priceBand": "£240–£420"
+      },
+      "price": 314,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a white dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.denim",
+      "leafId": "everyday.weekender.denim",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "hybrid",
+        "water": 100,
+        "dial": "blue",
+        "priceBand": "£900+"
+      },
+      "price": 1135,
+      "priceBand": "£900+",
+      "description": "38 mm hybrid watch with a blue dial, leather strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.moss",
+      "leafId": "everyday.weekender.moss",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "green",
+        "priceBand": "£240–£420"
+      },
+      "price": 384,
+      "priceBand": "£240–£420",
+      "description": "38 mm quartz watch with a green dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.ocean-stripe",
+      "leafId": "everyday.weekender.ocean-stripe",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "leather",
+        "movement": "solar",
+        "water": 100,
+        "dial": "blue",
+        "priceBand": "£900+"
+      },
+      "price": 1132,
+      "priceBand": "£900+",
+      "description": "38 mm solar watch with a blue dial, leather strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.rust",
+      "leafId": "everyday.weekender.rust",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      },
+      "price": 196,
+      "priceBand": "£180–£240",
+      "description": "38 mm quartz watch with a brown dial, fabric strap and 100 m water resistance."
+    },
+    {
+      "id": "everyday.weekender.sunset-clay",
+      "leafId": "everyday.weekender.sunset-clay",
+      "departmentId": "everyday",
+      "subcategoryId": "everyday.weekender",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "rubber",
+        "movement": "quartz",
+        "water": 100,
+        "dial": "orange",
+        "priceBand": "£180–£240"
+      },
+      "price": 204,
+      "priceBand": "£180–£240",
+      "description": "42 mm quartz watch with a orange dial, rubber strap and 100 m water resistance."
+    },
+    {
+      "id": "smart.connected.burgundy",
+      "leafId": "smart.connected.burgundy",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "leather",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "brown",
+        "priceBand": "£420–£900"
+      },
+      "price": 847,
+      "priceBand": "£420–£900",
+      "description": "42 mm hybrid watch with a brown dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.connected.cream",
+      "leafId": "smart.connected.cream",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "white",
+        "priceBand": "£420–£900"
+      },
+      "price": 807,
+      "priceBand": "£420–£900",
+      "description": "38 mm hybrid watch with a white dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.connected.heritage-black",
+      "leafId": "smart.connected.heritage-black",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "leather",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "black",
+        "priceBand": "£240–£420"
+      },
+      "price": 314,
+      "priceBand": "£240–£420",
+      "description": "44 mm hybrid watch with a black dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.connected.heritage-brown",
+      "leafId": "smart.connected.heritage-brown",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "leather",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "brown",
+        "priceBand": "£420–£900"
+      },
+      "price": 469,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a brown dial, leather strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.connected.slate",
+      "leafId": "smart.connected.slate",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "grey",
+        "priceBand": "£420–£900"
+      },
+      "price": 446,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a grey dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.connected.steel-blue",
+      "leafId": "smart.connected.steel-blue",
+      "departmentId": "smart",
+      "subcategoryId": "smart.connected",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£900+"
+      },
+      "price": 1551,
+      "priceBand": "£900+",
+      "description": "44 mm hybrid watch with a blue dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.black-sport",
+      "leafId": "smart.hybridactive.black-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "brown",
+        "priceBand": "£420–£900"
+      },
+      "price": 724,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a brown dial, rubber strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.blue-sport",
+      "leafId": "smart.hybridactive.blue-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£240–£420"
+      },
+      "price": 395,
+      "priceBand": "£240–£420",
+      "description": "44 mm hybrid watch with a blue dial, rubber strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.green-sport",
+      "leafId": "smart.hybridactive.green-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "green",
+        "priceBand": "£240–£420"
+      },
+      "price": 314,
+      "priceBand": "£240–£420",
+      "description": "44 mm hybrid watch with a green dial, rubber strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.grey-sport",
+      "leafId": "smart.hybridactive.grey-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "grey",
+        "priceBand": "£240–£420"
+      },
+      "price": 298,
+      "priceBand": "£240–£420",
+      "description": "44 mm hybrid watch with a grey dial, rubber strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.orange-sport",
+      "leafId": "smart.hybridactive.orange-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "hybrid",
+        "water": 100,
+        "dial": "orange",
+        "priceBand": "£240–£420"
+      },
+      "price": 285,
+      "priceBand": "£240–£420",
+      "description": "44 mm hybrid watch with a orange dial, rubber strap and 100 m water resistance."
+    },
+    {
+      "id": "smart.hybridactive.white-sport",
+      "leafId": "smart.hybridactive.white-sport",
+      "departmentId": "smart",
+      "subcategoryId": "smart.hybridactive",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "fabric",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "white",
+        "priceBand": "£420–£900"
+      },
+      "price": 492,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a white dial, fabric strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.forest",
+      "leafId": "smart.smartone.forest",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "green",
+        "priceBand": "£420–£900"
+      },
+      "price": 890,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a green dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.graphite",
+      "leafId": "smart.smartone.graphite",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "titanium",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "grey",
+        "priceBand": "£420–£900"
+      },
+      "price": 473,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a grey dial, titanium strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.midnight",
+      "leafId": "smart.smartone.midnight",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "black",
+        "priceBand": "£420–£900"
+      },
+      "price": 577,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a black dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.rose",
+      "leafId": "smart.smartone.rose",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      },
+      "price": 776,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a blue dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.silver",
+      "leafId": "smart.smartone.silver",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "silver",
+        "priceBand": "£420–£900"
+      },
+      "price": 582,
+      "priceBand": "£420–£900",
+      "description": "44 mm hybrid watch with a silver dial, steel strap and 50 m water resistance."
+    },
+    {
+      "id": "smart.smartone.titanium",
+      "leafId": "smart.smartone.titanium",
+      "departmentId": "smart",
+      "subcategoryId": "smart.smartone",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "titanium",
+        "movement": "hybrid",
+        "water": 50,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      },
+      "price": 836,
+      "priceBand": "£420–£900",
+      "description": "40 mm hybrid watch with a blue dial, titanium strap and 50 m water resistance."
+    },
+    {
+      "id": "sport.aqua.carbon-track",
+      "leafId": "sport.aqua.carbon-track",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£240–£420"
+      },
+      "price": 276,
+      "priceBand": "£240–£420",
+      "description": "44 mm automatic watch with a black dial, rubber strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.aqua.gulf-blue",
+      "leafId": "sport.aqua.gulf-blue",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      },
+      "price": 214,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a blue dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.aqua.night-dash",
+      "leafId": "sport.aqua.night-dash",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      },
+      "price": 200,
+      "priceBand": "£180–£240",
+      "description": "40 mm automatic watch with a black dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.aqua.regatta-white",
+      "leafId": "sport.aqua.regatta-white",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "white",
+        "priceBand": "£180–£240"
+      },
+      "price": 221,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a white dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.aqua.steel-grey",
+      "leafId": "sport.aqua.steel-grey",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      },
+      "price": 218,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a grey dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.aqua.sunset-orange",
+      "leafId": "sport.aqua.sunset-orange",
+      "departmentId": "sport",
+      "subcategoryId": "sport.aqua",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "orange",
+        "priceBand": "£180–£240"
+      },
+      "price": 236,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a orange dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.bronze-reef",
+      "leafId": "sport.prodiver.bronze-reef",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      },
+      "price": 193,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a brown dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.carbon-black",
+      "leafId": "sport.prodiver.carbon-black",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      },
+      "price": 195,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a black dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.midnight-lume",
+      "leafId": "sport.prodiver.midnight-lume",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      },
+      "price": 224,
+      "priceBand": "£180–£240",
+      "description": "38 mm automatic watch with a black dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.ocean-green",
+      "leafId": "sport.prodiver.ocean-green",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "green",
+        "priceBand": "£180–£240"
+      },
+      "price": 198,
+      "priceBand": "£180–£240",
+      "description": "44 mm automatic watch with a green dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.steel-blue",
+      "leafId": "sport.prodiver.steel-blue",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "titanium",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      },
+      "price": 804,
+      "priceBand": "£420–£900",
+      "description": "42 mm automatic watch with a blue dial, titanium strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.prodiver.titanium-deep",
+      "leafId": "sport.prodiver.titanium-deep",
+      "departmentId": "sport",
+      "subcategoryId": "sport.prodiver",
+      "attributes": {
+        "caseSize": 44,
+        "strap": "titanium",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£900+"
+      },
+      "price": 1302,
+      "priceBand": "£900+",
+      "description": "44 mm automatic watch with a black dial, titanium strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.trail.alpine-sand",
+      "leafId": "sport.trail.alpine-sand",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 40,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      },
+      "price": 201,
+      "priceBand": "£180–£240",
+      "description": "40 mm automatic watch with a brown dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.trail.ember-red",
+      "leafId": "sport.trail.ember-red",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "orange",
+        "priceBand": "£180–£240"
+      },
+      "price": 202,
+      "priceBand": "£180–£240",
+      "description": "38 mm automatic watch with a orange dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.trail.forest-green",
+      "leafId": "sport.trail.forest-green",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "fabric",
+        "movement": "automatic",
+        "water": 200,
+        "dial": "green",
+        "priceBand": "£240–£420"
+      },
+      "price": 416,
+      "priceBand": "£240–£420",
+      "description": "42 mm automatic watch with a green dial, fabric strap and 200 m water resistance."
+    },
+    {
+      "id": "sport.trail.granite-grey",
+      "leafId": "sport.trail.granite-grey",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      },
+      "price": 211,
+      "priceBand": "£180–£240",
+      "description": "38 mm automatic watch with a grey dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.trail.midnight-trail",
+      "leafId": "sport.trail.midnight-trail",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 42,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      },
+      "price": 208,
+      "priceBand": "£180–£240",
+      "description": "42 mm automatic watch with a black dial, steel strap and 300 m water resistance."
+    },
+    {
+      "id": "sport.trail.summit-blue",
+      "leafId": "sport.trail.summit-blue",
+      "departmentId": "sport",
+      "subcategoryId": "sport.trail",
+      "attributes": {
+        "caseSize": 38,
+        "strap": "steel",
+        "movement": "automatic",
+        "water": 300,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      },
+      "price": 225,
+      "priceBand": "£180–£240",
+      "description": "38 mm automatic watch with a blue dial, steel strap and 300 m water resistance."
+    }
+  ]
+}

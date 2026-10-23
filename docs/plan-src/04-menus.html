@@ -1,0 +1,375 @@
+<!-- ================= 4 MENUS ================= -->
+<section class="section" id="menus">
+  <h1><span class="num">4</span> The six menu structures</h1>
+
+  <p class="lead">The independent variable is <b>menu structure</b>, not a cosmetic theme. All six structures expose the same information architecture and the same products, but they differ in geometry, visible breadth, click depth, spatial persistence, and motor demands. This section defines each structure precisely enough to build it, then specifies the controls that keep the comparison fair.</p>
+
+  <h2>4.1 Shared information architecture</h2>
+  <p>The store is a fictional watch retailer with four departments, three subcategories per department, and six leaf styles per subcategory — 72 products in total. Every menu renders this same tree; only the presentation changes. The running example throughout is <b>Sport &amp; Dive → Pro Diver 300m → Titanium Deep</b>.</p>
+
+  <table class="compact">
+    <caption>Table 4.1 — Taxonomy used by all six menus</caption>
+    <thead><tr><th style="width:18%">Department (L1)</th><th style="width:26%">Subcategory (L2)</th><th style="width:56%">Leaf styles (L3) — six per subcategory</th></tr></thead>
+    <tbody>
+      <tr><td class="k" rowspan="3">Sport &amp; Dive</td><td>Pro Diver 300m</td><td>Titanium Deep · Steel Blue · Carbon Black · Ocean Green · Bronze Reef · Midnight Lume</td></tr>
+      <tr><td>Aqua Racer Chrono</td><td>Regatta White · Gulf Blue · Carbon Track · Sunset Orange · Steel Grey · Night Dash</td></tr>
+      <tr><td>Trail Master GMT</td><td>Alpine Sand · Forest Green · Granite Grey · Summit Blue · Ember Red · Midnight Trail</td></tr>
+      <tr><td class="k" rowspan="3">Dress &amp; Formal</td><td>Heritage Classic</td><td>Ivory Dial · Rose Gold · Anthracite · Moon Silver · Bordeaux · Onyx</td></tr>
+      <tr><td>Midnight Dress</td><td>Deep Navy · Black Tie · Sapphire · Graphite · Pearl White · Champagne</td></tr>
+      <tr><td>Artisan Moonphase</td><td>Celestial Blue · Warm Silver · Slate Grey · Aurora · Copper Brown · Starlight</td></tr>
+      <tr><td class="k" rowspan="3">Everyday &amp; Casual</td><td>Field Standard</td><td>Khaki Canvas · Olive · Stone · Sandstone · Charcoal · Navy Weave</td></tr>
+      <tr><td>Urban Minimal</td><td>Matte White · Concrete Grey · Ink Black · Soft Beige · Steel Mesh · Deep Teal</td></tr>
+      <tr><td>Weekender</td><td>Sunset Clay · Ocean Stripe · Cream · Moss · Denim · Rust</td></tr>
+      <tr><td class="k" rowspan="3">Smart &amp; Hybrid</td><td>Smart One</td><td>Graphite · Silver · Rose · Midnight · Titanium · Forest</td></tr>
+      <tr><td>Hybrid Active</td><td>Black Sport · Blue Sport · Green Sport · Orange Sport · White Sport · Grey Sport</td></tr>
+      <tr><td>Connected Classic</td><td>Heritage Black · Heritage Brown · Steel Blue · Cream · Slate · Burgundy</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">Product attributes for task descriptions: case size (38/40/42/44 mm), strap (steel, titanium, leather, rubber, mesh, fabric), movement (automatic, quartz, solar, hybrid), water resistance (50/100/200/300 m), dial colour, and price band. Each leaf style has a unique combination; target descriptions use two or three attributes rather than the exact product name to avoid label-matching.</p>
+
+  <h2>4.2 Operational definitions and wireframes</h2>
+  <p>The wireframes below are <b>interaction specifications</b>, not final visual designs. They show what is visible at each step, where the click targets are, and how the user moves between levels. The build must preserve these structural properties; the visual skin can be refined in the pilot as long as parity controls (§4.3) are respected.</p>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">A · Horizontal bar — top bar, dropdown L2, side flyout L3</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Horizontal bar wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <rect x="0" y="0" width="360" height="22" fill="#0f172a"/>
+        <text x="18" y="14" font-size="7.2" fill="#ffffff" font-weight="700">Sport &amp; Dive ▾</text>
+        <text x="84" y="14" font-size="7" fill="#cbd5e1">Dress</text>
+        <text x="124" y="14" font-size="7" fill="#cbd5e1">Everyday</text>
+        <text x="176" y="14" font-size="7" fill="#cbd5e1">Smart</text>
+        <text x="220" y="14" font-size="7" fill="#94a3b8">Search</text>
+        <rect x="6" y="22" width="112" height="88" fill="#ffffff" stroke="#94a3b8"/>
+        <rect x="6" y="24" width="112" height="18" fill="#ccfbf1"/>
+        <text x="11" y="36" font-size="6.4" fill="#0f172a" font-weight="700">Pro Diver 300m ▸</text>
+        <text x="11" y="52" font-size="6.2" fill="#334155">Aqua Racer Chrono</text>
+        <text x="11" y="70" font-size="6.2" fill="#334155">Trail Master GMT</text>
+        <text x="11" y="88" font-size="6.2" fill="#334155">Sport &amp; Dive home</text>
+        <rect x="118" y="40" width="128" height="120" fill="#ffffff" stroke="#94a3b8"/>
+        <text x="123" y="53" font-size="6.2" fill="#0f172a" font-weight="700">Pro Diver 300m</text>
+        <rect x="118" y="56" width="128" height="16" fill="#ccfbf1"/>
+        <text x="123" y="67" font-size="5.8" fill="#0f172a" font-weight="700">• Titanium Deep</text>
+        <text x="123" y="80" font-size="5.8" fill="#334155">• Steel Blue</text>
+        <text x="123" y="92" font-size="5.8" fill="#334155">• Carbon Black</text>
+        <text x="123" y="104" font-size="5.8" fill="#334155">• Ocean Green</text>
+        <text x="123" y="116" font-size="5.8" fill="#334155">• Bronze Reef</text>
+        <text x="123" y="128" font-size="5.8" fill="#334155">• Midnight Lume</text>
+        <text x="123" y="148" font-size="5.6" fill="#94a3b8">click to open product</text>
+        <rect x="0" y="168" width="360" height="42" fill="#f1f5f9"/>
+        <rect x="10" y="178" width="70" height="22" fill="#e2e8f0" rx="2"/>
+        <rect x="90" y="178" width="70" height="22" fill="#e2e8f0" rx="2"/>
+        <rect x="170" y="178" width="70" height="22" fill="#e2e8f0" rx="2"/>
+        <text x="252" y="192" font-size="6.6" fill="#64748b">Product content area</text>
+        <circle cx="9" cy="11" r="7" fill="#f59e0b"/><text x="9" y="13.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">1</text>
+        <circle cx="116" cy="34" r="7" fill="#f59e0b"/><text x="116" y="36.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">2</text>
+        <circle cx="242" cy="52" r="7" fill="#f59e0b"/><text x="242" y="54.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">3</text>
+      </svg>
+      <div class="wf-note">Click 1 opens the L2 dropdown; click 2 opens the L3 flyout; click 3 selects the leaf. Three clicks. Only one L2 and one L3 set are visible at a time. The flyout closes on outside click.</div>
+    </div>
+  </figure>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">B · Vertical sidebar — persistent left tree, nested accordion</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Vertical sidebar wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <rect x="0" y="0" width="128" height="210" fill="#f1f5f9" stroke="#cbd5e1"/>
+        <text x="8" y="14" font-size="7" fill="#0f172a" font-weight="700">Departments</text>
+        <text x="8" y="30" font-size="6.6" fill="#0f766e" font-weight="700">− Sport &amp; Dive</text>
+        <text x="16" y="44" font-size="6.2" fill="#0f766e" font-weight="700">▾ Pro Diver 300m</text>
+        <rect x="18" y="48" width="104" height="14" fill="#ccfbf1"/>
+        <text x="22" y="58" font-size="5.8" fill="#0f172a" font-weight="700">• Titanium Deep</text>
+        <text x="22" y="70" font-size="5.8" fill="#334155">• Steel Blue</text>
+        <text x="22" y="82" font-size="5.8" fill="#334155">• Carbon Black</text>
+        <text x="22" y="94" font-size="5.8" fill="#334155">• Ocean Green</text>
+        <text x="22" y="106" font-size="5.8" fill="#334155">• Bronze Reef</text>
+        <text x="22" y="118" font-size="5.8" fill="#334155">• Midnight Lume</text>
+        <text x="16" y="136" font-size="6.2" fill="#334155">▸ Aqua Racer Chrono</text>
+        <text x="16" y="152" font-size="6.2" fill="#334155">▸ Trail Master GMT</text>
+        <text x="8" y="176" font-size="6.4" fill="#334155">▸ Dress &amp; Formal</text>
+        <text x="8" y="192" font-size="6.4" fill="#334155">▸ Everyday &amp; Casual</text>
+        <text x="8" y="206" font-size="6.4" fill="#334155">▸ Smart &amp; Hybrid</text>
+        <rect x="136" y="10" width="214" height="190" fill="#f8fafc" stroke="#e2e8f0"/>
+        <rect x="146" y="22" width="90" height="54" fill="#e2e8f0" rx="2"/>
+        <rect x="246" y="22" width="94" height="54" fill="#e2e8f0" rx="2"/>
+        <rect x="146" y="86" width="194" height="70" fill="#e2e8f0" rx="2"/>
+        <text x="150" y="102" font-size="6.4" fill="#64748b">Product grid / content</text>
+        <circle cx="122" cy="30" r="7" fill="#f59e0b"/><text x="122" y="32.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">1</text>
+        <circle cx="122" cy="44" r="7" fill="#f59e0b"/><text x="122" y="46.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">2</text>
+        <circle cx="122" cy="58" r="7" fill="#f59e0b"/><text x="122" y="60.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">3</text>
+      </svg>
+      <div class="wf-note">The tree persists on the left. Click 1 expands the department, click 2 expands the subcategory, click 3 selects the leaf. Three clicks. The main content area is always visible, so the tree can be used as an overview.</div>
+    </div>
+  </figure>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">C · Mega menu — one panel, 3 columns, all L3 visible</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Mega menu wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <rect x="0" y="0" width="360" height="22" fill="#0f172a"/>
+        <text x="18" y="14" font-size="7.2" fill="#ffffff" font-weight="700">Sport &amp; Dive ▾</text>
+        <text x="84" y="14" font-size="7" fill="#cbd5e1">Dress</text>
+        <text x="124" y="14" font-size="7" fill="#cbd5e1">Everyday</text>
+        <text x="176" y="14" font-size="7" fill="#cbd5e1">Smart</text>
+        <rect x="0" y="22" width="360" height="126" fill="#ffffff" stroke="#94a3b8"/>
+        <text x="10" y="38" font-size="6.4" fill="#0f172a" font-weight="700">Pro Diver 300m</text>
+        <text x="130" y="38" font-size="6.4" fill="#0f172a" font-weight="700">Aqua Racer Chrono</text>
+        <text x="250" y="38" font-size="6.4" fill="#0f172a" font-weight="700">Trail Master GMT</text>
+        <rect x="8" y="44" width="108" height="14" fill="#ccfbf1"/>
+        <text x="12" y="54" font-size="5.6" fill="#0f172a" font-weight="700">Titanium Deep</text>
+        <text x="12" y="66" font-size="5.6" fill="#334155">Steel Blue</text>
+        <text x="12" y="78" font-size="5.6" fill="#334155">Carbon Black</text>
+        <text x="12" y="90" font-size="5.6" fill="#334155">Ocean Green</text>
+        <text x="12" y="102" font-size="5.6" fill="#334155">Bronze Reef</text>
+        <text x="12" y="114" font-size="5.6" fill="#334155">Midnight Lume</text>
+        <text x="132" y="54" font-size="5.6" fill="#334155">Regatta White</text>
+        <text x="132" y="66" font-size="5.6" fill="#334155">Gulf Blue</text>
+        <text x="132" y="78" font-size="5.6" fill="#334155">Carbon Track</text>
+        <text x="132" y="90" font-size="5.6" fill="#334155">Sunset Orange</text>
+        <text x="132" y="102" font-size="5.6" fill="#334155">Steel Grey</text>
+        <text x="132" y="114" font-size="5.6" fill="#334155">Night Dash</text>
+        <text x="252" y="54" font-size="5.6" fill="#334155">Alpine Sand</text>
+        <text x="252" y="66" font-size="5.6" fill="#334155">Forest Green</text>
+        <text x="252" y="78" font-size="5.6" fill="#334155">Granite Grey</text>
+        <text x="252" y="90" font-size="5.6" fill="#334155">Summit Blue</text>
+        <text x="252" y="102" font-size="5.6" fill="#334155">Ember Red</text>
+        <text x="252" y="114" font-size="5.6" fill="#334155">Midnight Trail</text>
+        <text x="8" y="136" font-size="5.6" fill="#64748b">All 3 subcategories and 18 leaf styles are visible at once.</text>
+        <rect x="0" y="160" width="360" height="50" fill="#f1f5f9"/>
+        <rect x="10" y="170" width="70" height="24" fill="#e2e8f0" rx="2"/>
+        <rect x="90" y="170" width="70" height="24" fill="#e2e8f0" rx="2"/>
+        <rect x="170" y="170" width="70" height="24" fill="#e2e8f0" rx="2"/>
+        <text x="252" y="184" font-size="6.6" fill="#64748b">Product content area</text>
+        <circle cx="9" cy="11" r="7" fill="#f59e0b"/><text x="9" y="13.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">1</text>
+        <circle cx="60" cy="52" r="7" fill="#f59e0b"/><text x="60" y="54.5" text-anchor="middle" font-size="6.4" fill="#ffffff" font-weight="700">2</text>
+        <text x="196" y="158" font-size="5.8" fill="#b45309" font-weight="700">2 clicks to leaf (one fewer than A/B/D/E/F)</text>
+      </svg>
+      <div class="wf-note">Click 1 opens the panel showing all three subcategories and all 18 leaf styles. Click 2 selects the leaf. Two clicks, but high visual density. This is the Protocol v3.0 baseline.</div>
+    </div>
+  </figure>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">D · Fractal / recursive tile menu — zoom into the parent tile</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Fractal tile menu wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <text x="8" y="14" font-size="6.4" fill="#64748b">Home &gt; Sport &amp; Dive &gt; Pro Diver 300m</text>
+        <text x="8" y="30" font-size="6.2" fill="#0f172a" font-weight="700">Level 1</text>
+        <text x="132" y="30" font-size="6.2" fill="#0f172a" font-weight="700">Level 2 (zoomed in)</text>
+        <text x="252" y="30" font-size="6.2" fill="#0f172a" font-weight="700">Level 3</text>
+        <rect x="8" y="36" width="108" height="96" fill="#f8fafc" stroke="#94a3b8"/>
+        <rect x="12" y="40" width="48" height="42" fill="#ccfbf1" stroke="#0f766e"/>
+        <text x="16" y="56" font-size="5.8" fill="#0f172a" font-weight="700">Sport &amp;</text>
+        <text x="16" y="65" font-size="5.8" fill="#0f172a" font-weight="700">Dive</text>
+        <text x="16" y="76" font-size="7" fill="#0f766e">⊞</text>
+        <rect x="64" y="40" width="48" height="42" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="68" y="60" font-size="5.8" fill="#334155">Dress</text>
+        <rect x="12" y="86" width="48" height="42" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="16" y="106" font-size="5.8" fill="#334155">Everyday</text>
+        <rect x="64" y="86" width="48" height="42" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="68" y="106" font-size="5.8" fill="#334155">Smart</text>
+        <path d="M118 84 L128 84" stroke="#b45309" stroke-width="1.4" marker-end="url(#arrowD)"/>
+        <rect x="130" y="36" width="108" height="96" fill="#f8fafc" stroke="#94a3b8"/>
+        <rect x="134" y="40" width="100" height="26" fill="#ccfbf1" stroke="#0f766e"/>
+        <text x="138" y="52" font-size="5.8" fill="#0f172a" font-weight="700">Pro Diver 300m</text>
+        <text x="138" y="61" font-size="5.6" fill="#0f766e">zoom ⊞</text>
+        <rect x="134" y="70" width="100" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="138" y="82" font-size="5.8" fill="#334155">Aqua Racer Chrono</text>
+        <rect x="134" y="100" width="100" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="138" y="112" font-size="5.8" fill="#334155">Trail Master GMT</text>
+        <path d="M240 84 L250 84" stroke="#b45309" stroke-width="1.4"/>
+        <rect x="252" y="36" width="100" height="96" fill="#f8fafc" stroke="#94a3b8"/>
+        <rect x="256" y="40" width="44" height="26" fill="#ccfbf1" stroke="#0f766e"/>
+        <text x="259" y="52" font-size="5.4" fill="#0f172a" font-weight="700">Titanium</text>
+        <text x="259" y="60" font-size="5.4" fill="#0f172a" font-weight="700">Deep</text>
+        <rect x="304" y="40" width="44" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="307" y="56" font-size="5.2" fill="#334155">Steel Blue</text>
+        <rect x="256" y="70" width="44" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="259" y="86" font-size="5.2" fill="#334155">Carbon</text>
+        <rect x="304" y="70" width="44" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="307" y="86" font-size="5.2" fill="#334155">Ocean</text>
+        <rect x="256" y="100" width="44" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="259" y="116" font-size="5.2" fill="#334155">Bronze</text>
+        <rect x="304" y="100" width="44" height="26" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="307" y="116" font-size="5.2" fill="#334155">Midnight</text>
+        <text x="8" y="150" font-size="5.8" fill="#64748b">Click a tile to zoom in; click outside the tile or use the breadcrumb to zoom out. The same rectangular layout recurs at every level.</text>
+        <text x="8" y="168" font-size="5.8" fill="#b45309" font-weight="700">3 clicks to leaf · recursive spatial layout · breadcrumb + zoom-out affordance</text>
+        <defs><marker id="arrowD" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#b45309"/></marker></defs>
+      </svg>
+      <div class="wf-note">Each parent tile occupies a rectangular area; selecting it zooms the viewport so its children fill the same geometric layout. Three clicks. Spatial self-similarity is the hypothesised memory advantage.</div>
+    </div>
+  </figure>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">E · Rounded-square (RS) visual icon-grid — colour-coded cards at each level</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Rounded square icon grid wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <text x="8" y="14" font-size="6.2" fill="#0f172a" font-weight="700">Level 1</text>
+        <text x="132" y="14" font-size="6.2" fill="#0f172a" font-weight="700">Level 2</text>
+        <text x="252" y="14" font-size="6.2" fill="#0f172a" font-weight="700">Level 3</text>
+        <rect x="8" y="22" width="108" height="120" fill="#f8fafc" stroke="#e2e8f0"/>
+        <rect x="14" y="28" width="46" height="42" rx="7" fill="#0f766e"/>
+        <circle cx="37" cy="45" r="8" fill="none" stroke="#ccfbf1" stroke-width="2"/>
+        <text x="18" y="62" font-size="5.4" fill="#ffffff" font-weight="700">Sport</text>
+        <rect x="64" y="28" width="46" height="42" rx="7" fill="#b45309"/>
+        <circle cx="87" cy="45" r="8" fill="none" stroke="#fde68a" stroke-width="2"/>
+        <text x="68" y="62" font-size="5.4" fill="#ffffff" font-weight="700">Dress</text>
+        <rect x="14" y="76" width="46" height="42" rx="7" fill="#1d4ed8"/>
+        <circle cx="37" cy="93" r="8" fill="none" stroke="#bfdbfe" stroke-width="2"/>
+        <text x="18" y="110" font-size="5.4" fill="#ffffff" font-weight="700">Everyday</text>
+        <rect x="64" y="76" width="46" height="42" rx="7" fill="#6d28d9"/>
+        <circle cx="87" cy="93" r="8" fill="none" stroke="#ddd6fe" stroke-width="2"/>
+        <text x="68" y="110" font-size="5.4" fill="#ffffff" font-weight="700">Smart</text>
+        <path d="M118 84 L128 84" stroke="#b45309" stroke-width="1.4"/>
+        <rect x="130" y="22" width="108" height="120" fill="#f8fafc" stroke="#e2e8f0"/>
+        <rect x="136" y="28" width="92" height="28" rx="6" fill="#0f766e"/>
+        <text x="141" y="45" font-size="5.4" fill="#ffffff" font-weight="700">Pro Diver 300m</text>
+        <rect x="136" y="62" width="92" height="28" rx="6" fill="#0d9488"/>
+        <text x="141" y="79" font-size="5.4" fill="#ffffff" font-weight="700">Aqua Racer</text>
+        <rect x="136" y="96" width="92" height="28" rx="6" fill="#14b8a6"/>
+        <text x="141" y="113" font-size="5.4" fill="#ffffff" font-weight="700">Trail Master</text>
+        <path d="M240 84 L250 84" stroke="#b45309" stroke-width="1.4"/>
+        <rect x="252" y="22" width="100" height="120" fill="#f8fafc" stroke="#e2e8f0"/>
+        <rect x="256" y="28" width="44" height="30" rx="6" fill="#0f766e"/>
+        <text x="259" y="43" font-size="5.2" fill="#ffffff" font-weight="700">Titanium</text>
+        <text x="259" y="51" font-size="5.2" fill="#ffffff" font-weight="700">Deep</text>
+        <rect x="304" y="28" width="44" height="30" rx="6" fill="#0d9488"/>
+        <text x="307" y="46" font-size="5.2" fill="#ffffff">Steel Blue</text>
+        <rect x="256" y="64" width="44" height="30" rx="6" fill="#14b8a6"/>
+        <text x="259" y="82" font-size="5.2" fill="#ffffff">Carbon</text>
+        <rect x="304" y="64" width="44" height="30" rx="6" fill="#2dd4bf"/>
+        <text x="307" y="82" font-size="5.2" fill="#0f172a">Ocean</text>
+        <rect x="256" y="100" width="44" height="30" rx="6" fill="#5eead4"/>
+        <text x="259" y="118" font-size="5.2" fill="#0f172a">Bronze</text>
+        <rect x="304" y="100" width="44" height="30" rx="6" fill="#99f6e4"/>
+        <text x="307" y="118" font-size="5.2" fill="#0f172a">Midnight</text>
+        <text x="8" y="158" font-size="5.8" fill="#64748b">Each level is a grid of large rounded-square cards with an icon, a label, and a category colour; type is not the only cue.</text>
+        <text x="8" y="176" font-size="5.8" fill="#b45309" font-weight="700">3 clicks · 4 → 3 → 6 cards · high visual salience · colour and icon redundancy</text>
+      </svg>
+      <div class="wf-note">Four large cards, then three subcategory cards, then six product cards. Three clicks. The design stresses icon recognition and colour-coded spatial grouping; it is expected to be engaging but potentially less precise under confusion.</div>
+    </div>
+  </figure>
+
+  <figure class="no-break">
+    <div class="wf-wrap">
+      <div class="wf-title">F · Radial / circular lattice — compass sectors, hub, outer rings</div>
+      <svg viewBox="0 0 360 210" width="100%" height="auto" role="img" aria-label="Radial lattice menu wireframe">
+        <rect x="0" y="0" width="360" height="210" fill="#ffffff"/>
+        <circle cx="180" cy="104" r="82" fill="none" stroke="#e2e8f0" stroke-dasharray="2 2"/>
+        <circle cx="180" cy="104" r="56" fill="none" stroke="#e2e8f0" stroke-dasharray="2 2"/>
+        <circle cx="180" cy="104" r="21" fill="#0f172a"/>
+        <text x="180" y="101" text-anchor="middle" font-size="6.2" fill="#ffffff" font-weight="700">HUB</text>
+        <text x="180" y="110" text-anchor="middle" font-size="5.2" fill="#99f6e4">back</text>
+        <circle cx="180" cy="24" r="12" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="180" y="27" text-anchor="middle" font-size="5.2" fill="#334155">Dress</text>
+        <circle cx="180" cy="184" r="12" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="180" y="187" text-anchor="middle" font-size="5.2" fill="#334155">Smart</text>
+        <circle cx="100" cy="104" r="14" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.4"/>
+        <text x="100" y="103" text-anchor="middle" font-size="5.2" fill="#0f172a" font-weight="700">Sport</text>
+        <text x="100" y="110" text-anchor="middle" font-size="5.2" fill="#0f172a" font-weight="700">&amp; Dive</text>
+        <circle cx="260" cy="104" r="12" fill="#e2e8f0" stroke="#94a3b8"/>
+        <text x="260" y="107" text-anchor="middle" font-size="5.2" fill="#334155">Everyday</text>
+        <line x1="112" y1="92" x2="146" y2="74" stroke="#0f766e" stroke-width="1"/>
+        <line x1="100" y1="118" x2="100" y2="150" stroke="#0f766e" stroke-width="1"/>
+        <line x1="112" y1="116" x2="146" y2="134" stroke="#0f766e" stroke-width="1"/>
+        <circle cx="148" cy="72" r="10" fill="#5eead4" stroke="#0f766e"/>
+        <text x="148" y="75" text-anchor="middle" font-size="4.8" fill="#0f172a" font-weight="700">L2·1</text>
+        <circle cx="100" cy="152" r="10" fill="#5eead4" stroke="#0f766e"/>
+        <text x="100" y="155" text-anchor="middle" font-size="4.8" fill="#0f172a" font-weight="700">L2·2</text>
+        <circle cx="148" cy="136" r="10" fill="#5eead4" stroke="#0f766e"/>
+        <text x="148" y="139" text-anchor="middle" font-size="4.8" fill="#0f172a" font-weight="700">L2·3</text>
+        <line x1="58" y1="64" x2="138" y2="66" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="54" y1="92" x2="90" y2="90" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="56" y1="124" x2="90" y2="118" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="58" y1="146" x2="88" y2="142" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="62" y1="170" x2="92" y2="160" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="72" y1="188" x2="98" y2="164" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+        <circle cx="52" cy="62" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="52" y="64.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">1</text>
+        <circle cx="44" cy="92" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="44" y="94.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">2</text>
+        <circle cx="46" cy="124" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="46" y="126.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">3</text>
+        <circle cx="50" cy="146" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="50" y="148.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">4</text>
+        <circle cx="56" cy="170" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="56" y="172.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">5</text>
+        <circle cx="72" cy="188" r="8" fill="#f59e0b" stroke="#ffffff"/>
+        <text x="72" y="190.5" text-anchor="middle" font-size="4.6" fill="#ffffff" font-weight="700">6</text>
+        <rect x="238" y="12" width="118" height="76" fill="#ffffff" opacity="0.95"/>
+        <text x="244" y="20" font-size="5.6" fill="#0f172a" font-weight="700">Legend</text>
+        <text x="244" y="32" font-size="5.2" fill="#334155">1–6  L3 leaf styles</text>
+        <text x="244" y="44" font-size="5.2" fill="#334155">L2·n  subcategory anchors</text>
+        <text x="244" y="56" font-size="5.2" fill="#334155">HUB  centre / back</text>
+        <text x="244" y="68" font-size="5.2" fill="#b45309" font-weight="700">1  select WEST sector</text>
+        <text x="244" y="80" font-size="5.2" fill="#b45309" font-weight="700">2 L2 anchor · 3 L3 leaf</text>
+        <text x="8" y="204" font-size="5.6" fill="#64748b">Departments sit at compass sectors; selecting one projects L2 anchors onto an inner ring and L3 leaves onto the outer ring.</text>
+      </svg>
+      <div class="wf-note">Four fixed sectors around a central hub. Selecting WEST (Sport &amp; Dive) projects three L2 anchors and then six L3 leaves onto the outer ring. Three clicks. The design trades list scanning for directional pointing and spatial anchoring. Adapted from Kim et al. (2022), who used a lattice of visual anchors for gaze; here the input is mouse/trackpad.</div>
+    </div>
+  </figure>
+
+  <h2>4.3 Parity and confound control</h2>
+  <p>The structures are intentionally different, so some confounds are intrinsic. The goal is not to make them identical — that would destroy the manipulation — but to ensure that every difference is either part of the construct or measured and modelled. Table 4.2 is the build contract.</p>
+
+  <table class="long">
+    <caption>Table 4.2 — What is held constant, what varies, and how it is handled</caption>
+    <thead><tr><th style="width:20%">Property</th><th style="width:34%">Control</th><th style="width:46%">Why / analysis consequence</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Taxonomy, labels, products</td><td>One JSON source of truth; all six menus read the same tree. Identical department, subcategory, and leaf labels.</td><td>Ensures the information is the same. A label-parity unit test fails the build if any menu has a missing or renamed node.</td></tr>
+      <tr><td class="k">Product content</td><td>Same product cards, prices, images, attributes, and detail pages after selection.</td><td>Outcome differences cannot be attributed to product information.</td></tr>
+      <tr><td class="k">Viewport and device</td><td>1920 × 1080, same browser build, same mouse, same zoom level, full-screen mode.</td><td>Removes screen-size and input-device variance. Log actual viewport and device.</td></tr>
+      <tr><td class="k">Typography and palette</td><td>Same font family, sizes, spacing scale, and 4-colour department palette across all menus. E uses larger colour areas; the palette itself is shared.</td><td>Prevents E from having a unique colour advantage. Colour-to-department mapping is counterbalanced across participants.</td></tr>
+      <tr><td class="k">Icons</td><td>Same icon set for each department and subcategory; icons are small in A–D/F and large in E.</td><td>Icon meaning is constant; icon <i>prominence</i> is part of E’s manipulation.</td></tr>
+      <tr><td class="k">Animation</td><td>180–220 ms ease-in-out for all transitions; respect <code>prefers-reduced-motion</code>; no decorative motion.</td><td>Prevents D/F from gaining a novelty advantage through animation. Motion type differs (zoom/rotate vs expand/fade), so perceived motion is a manipulation check.</td></tr>
+      <tr><td class="k">Hit targets</td><td>Minimum 44 × 44 px for every interactive element; 8 px minimum spacing.</td><td>Avoids a trivial motor advantage. F’s ring nodes must meet the same minimum.</td></tr>
+      <tr><td class="k">Click depth</td><td>A/B/D/E/F = 3 clicks; C = 2 clicks.</td><td>Click savings is a genuine property of the mega menu, not a bug. Clicks are logged and tested as a mediator. A matched-depth sensitivity analysis excludes C or adds a confirmation step in a follow-up.</td></tr>
+      <tr><td class="k">Visible breadth</td><td>A/B/D/E/F show 4 → 3 → 6 options; C shows 4 → 18 options.</td><td>Breadth is part of the construct. Log the number of visible options at each step and include it as a covariate/mediator.</td></tr>
+      <tr><td class="k">Persistence</td><td>B keeps the tree visible; A/C are transient; D/F replace the viewport; E replaces the grid.</td><td>Persistence is part of the construct (wayfinding). Measure perceived persistence and use it in mediation.</td></tr>
+      <tr><td class="k">Search</td><td>Search is visibly present but disabled with a neutral “search is unavailable in this session” message. Participants are asked to use the menu.</td><td>Forces menu use. A follow-up field study should allow search; in this experiment, search attempts are logged as a signal of menu failure.</td></tr>
+      <tr><td class="k">Breadcrumb</td><td>Present in D and F; present in A/B/C only after a department is selected; E shows a compact breadcrumb.</td><td>Breadcrumbs are part of the wayfinding affordance. Their presence is logged; a follow-up can isolate breadcrumb effects.</td></tr>
+      <tr><td class="k">Back behaviour</td><td>In-page “back” control plus browser back; both logged. No destructive navigation.</td><td>Prevents a menu from being penalised for a missing escape route.</td></tr>
+      <tr><td class="k">Loading</td><td>No artificial delays; all content preloaded; local server; 60 fps target.</td><td>Prevents network variance from masquerading as a menu effect.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>The click-depth problem — state it, do not hide it</h4>
+    <p class="small">The mega menu (C) reaches a leaf in two clicks; the other five need three. That is a real advantage of mega menus and a plausible reason frustrated users like them. But it means a C-vs-A difference cannot be attributed to “layout” alone. The analysis therefore reports (a) the raw structural comparison, (b) a mediation analysis with clicks as the mediator, and (c) a matched-depth sensitivity analysis on A/B/D/E/F only. If the C advantage disappears when clicks are equated, the paper says so. This is more honest than adding a fake third click to C and pretending the menus are equal.</p>
+  </div>
+
+  <h2>4.4 Why these six? Coverage of the design space</h2>
+  <table>
+    <thead><tr><th style="width:13%">Menu</th><th style="width:15%">Geometry</th><th style="width:14%">Breadth at choice</th><th style="width:14%">Persistence</th><th style="width:14%">Motor demand</th><th style="width:30%">Unique contribution</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A · Horizontal</td><td>Linear, top</td><td>Low (3)</td><td>Transient</td><td>Horizontal + vertical</td><td>The familiar e-commerce baseline; tests whether convention beats fit.</td></tr>
+      <tr><td class="k">B · Sidebar</td><td>Linear, left</td><td>Low–medium (3–9)</td><td>High</td><td>Vertical</td><td>Persistent overview; tests wayfinding and spatial stability.</td></tr>
+      <tr><td class="k">C · Mega</td><td>2D panel</td><td>High (18)</td><td>Transient</td><td>2D grid</td><td>Maximum breadth, minimum clicks; tests the breadth–depth trade-off.</td></tr>
+      <tr><td class="k">D · Fractal</td><td>Recursive 2D</td><td>Low–medium (3–6)</td><td>High (spatial)</td><td>2D zoom</td><td>Self-similar spatial memory; tests recursive wayfinding.</td></tr>
+      <tr><td class="k">E · RS grid</td><td>2D icon grid</td><td>Low–medium (3–6)</td><td>Medium</td><td>2D pointing</td><td>Visual salience and icon recognition; tests engagement vs precision.</td></tr>
+      <tr><td class="k">F · Radial</td><td>Polar</td><td>Low–medium (3–6)</td><td>Medium</td><td>Directional</td><td>Fitts’s-law efficiency and spatial anchors; tests a non-Cartesian layout.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4.5 Source status</h2>
+  <table>
+    <thead><tr><th style="width:18%">Menu</th><th style="width:34%">Source in the brief</th><th style="width:48%">Verification status and how it is used</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A, B</td><td>Paper P3: Chiu &amp; Yang (2024), SSRN 4920862</td><td><span class="tag ok">verified</span> The paper is a 2024 SSRN preprint by Tseng-Ping Chiu and Ya-Chun Yang. It compares horizontal and vertical menu formats with eye tracking. Cite it as a preprint, not as a peer-reviewed journal article.</td></tr>
+      <tr><td class="k">C</td><td>Protocol v3.0, page 5 baseline</td><td><span class="tag internal">internal</span> The mega menu is the protocol’s baseline, not an external paper. Cite the protocol as an internal planning document if needed; otherwise describe C as a standard mega-menu pattern (Li &amp; Nielsen, 2017).</td></tr>
+      <tr><td class="k">D</td><td>Sahraoui et al. (2025), ACM EICS Companion</td><td><span class="tag ok">verified</span> “Fractal Adaptive Menus: Concept, Engineering, and Use Case.” The paper is a concept/engineering paper with a use case; it does not report a controlled comparison. The plan supplies that test.</td></tr>
+      <tr><td class="k">E</td><td>Chiossi et al. (2026), ACM CHI</td><td><span class="tag verify">unverified</span> No matching paper was found in the folder or in public metadata searches. The design is therefore specified operationally in this plan. Do not attribute claims to Chiossi et al. until the PDF and DOI are confirmed. If the citation is real, add it before submission; if not, describe E as a design pattern inspired by square/icon menus (Ahlström et al., 2010).</td></tr>
+      <tr><td class="k">F</td><td>Kim et al. (2022), CHI; Collins et al. (2026), CHI</td><td><span class="tag ok">verified</span> Kim, Ham, Ahn, and Lee (2022), “Lattice Menu: A Low-Error Gaze-Based Marking Menu Utilizing Target-Assisted Gaze Gestures on a Lattice of Visual Anchors,” CHI ’22, DOI 10.1145/3491102.3501977. <span class="tag verify">unverified</span> The Collins et al. (2026) citation could not be confirmed; do not rely on it. F is adapted from the Kim et al. lattice from gaze to mouse.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warnbox">
+    <h4>Academic-integrity note</h4>
+    <p class="small">Two of the six menu attributions in the brief could not be verified. The plan keeps the designs because they are well-defined and testable, but it does <b>not</b> claim that Chiossi et al. or Collins et al. reported the effects described. Before submitting the paper, either obtain the PDFs and verify the claims or remove the attributions. The reference list marks both as “unverified — do not cite as evidence.”</p>
+  </div>
+</section>

@@ -1,0 +1,204 @@
+<!-- ================= 14 IMPLEMENTATION ================= -->
+<section class="section" id="implementation">
+  <h1><span class="num">14</span> Implementation plan</h1>
+
+  <p class="lead">This section is the build contract for the prototype. It assumes a small team (one developer plus one researcher) and a six-week build before the pilot. The goal is not a production e-commerce site; it is a controlled, reproducible instrument that can run six menu architectures over one taxonomy and produce analysis-ready logs.</p>
+
+  <h2>14.1 Architecture</h2>
+  <figure>
+    <svg viewBox="0 0 620 310" width="100%" height="auto" role="img" aria-label="System architecture">
+      <rect x="0" y="0" width="620" height="310" fill="#ffffff"/>
+      <!-- Browser -->
+      <rect x="16" y="24" width="210" height="220" rx="6" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.4"/>
+      <text x="26" y="42" font-size="10" fill="#0f172a" font-weight="700">Participant browser</text>
+      <rect x="28" y="54" width="186" height="34" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="38" y="75" font-size="8.5" fill="#334155">Experiment runner / timeline</text>
+      <rect x="28" y="96" width="186" height="34" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="38" y="117" font-size="8.5" fill="#334155">Menu renderers A–F</text>
+      <rect x="28" y="138" width="186" height="34" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="38" y="159" font-size="8.5" fill="#334155">Check-in / questionnaire UI</text>
+      <rect x="28" y="180" width="186" height="34" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="38" y="201" font-size="8.5" fill="#334155">Event buffer / offline queue</text>
+      <!-- API -->
+      <rect x="266" y="44" width="150" height="180" rx="6" fill="#fffbeb" stroke="#b45309" stroke-width="1.4"/>
+      <text x="276" y="62" font-size="10" fill="#0f172a" font-weight="700">API server</text>
+      <rect x="278" y="74" width="126" height="28" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="286" y="92" font-size="8.2" fill="#334155">Auth / session</text>
+      <rect x="278" y="108" width="126" height="28" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="286" y="126" font-size="8.2" fill="#334155">Randomisation</text>
+      <rect x="278" y="142" width="126" height="28" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="286" y="160" font-size="8.2" fill="#334155">Event ingestion</text>
+      <rect x="278" y="176" width="126" height="28" rx="3" fill="#ffffff" stroke="#94a3b8"/>
+      <text x="286" y="194" font-size="8.2" fill="#334155">Adaptation policy</text>
+      <!-- DB -->
+      <rect x="456" y="44" width="148" height="86" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.4"/>
+      <text x="466" y="62" font-size="10" fill="#0f172a" font-weight="700">PostgreSQL</text>
+      <text x="466" y="78" font-size="8" fill="#475569">participants · sessions</text>
+      <text x="466" y="92" font-size="8" fill="#475569">trials · events</text>
+      <text x="466" y="106" font-size="8" fill="#475569">questionnaires · audits</text>
+      <text x="466" y="120" font-size="8" fill="#475569">raw JSONL archive</text>
+      <!-- Analysis -->
+      <rect x="456" y="150" width="148" height="74" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.4"/>
+      <text x="466" y="168" font-size="10" fill="#0f172a" font-weight="700">Analysis</text>
+      <text x="466" y="184" font-size="8" fill="#475569">R / Python</text>
+      <text x="466" y="198" font-size="8" fill="#475569">models · figures</text>
+      <text x="466" y="212" font-size="8" fill="#475569">reproducible report</text>
+      <!-- Eye tracker -->
+      <rect x="16" y="258" width="210" height="34" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="3 2"/>
+      <text x="26" y="279" font-size="8.2" fill="#475569">Optional eye tracker (Tobii) → separate stream</text>
+      <!-- Arrows -->
+      <defs><marker id="ar" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#475569"/></marker></defs>
+      <line x1="216" y1="96" x2="264" y2="96" stroke="#475569" stroke-width="1.3" marker-end="url(#ar)"/>
+      <text x="222" y="88" font-size="7.5" fill="#475569">events, sequence</text>
+      <line x1="416" y1="96" x2="454" y2="96" stroke="#475569" stroke-width="1.3" marker-end="url(#ar)"/>
+      <text x="420" y="88" font-size="7.5" fill="#475569">writes</text>
+      <line x1="530" y1="130" x2="530" y2="148" stroke="#475569" stroke-width="1.3" marker-end="url(#ar)"/>
+      <line x1="226" y1="275" x2="266" y2="220" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="3 2" marker-end="url(#ar)"/>
+      <text x="230" y="250" font-size="7.2" fill="#64748b">optional</text>
+    </svg>
+    <figcaption><b>Figure 14.1 — Recommended architecture.</b> The browser owns rendering and timing; the server owns randomisation and ingestion; the database owns the audit trail; the analysis pipeline reads a versioned export. The eye tracker is optional and writes to a separate stream.</figcaption>
+  </figure>
+
+  <h2>14.2 Shared taxonomy and the renderer contract</h2>
+  <p>The single most important engineering decision is to make the taxonomy a <b>single source of truth</b>. Every menu renderer reads the same JSON tree and emits the same event vocabulary. A change to a label or a product must propagate to all six menus or fail the build.</p>
+
+  <pre><span class="k">export type</span> MenuId = <span class="s">"A"</span> | <span class="s">"B"</span> | <span class="s">"C"</span> | <span class="s">"D"</span> | <span class="s">"E"</span> | <span class="s">"F"</span>;
+
+<span class="k">export interface</span> MenuNode {
+  id: <span class="s">string</span>;                 <span class="c">// stable, e.g. "sport.prodiver.titanium"</span>
+  label: <span class="s">string</span>;
+  level: 1 | 2 | 3;
+  parentId: <span class="s">string</span> | <span class="k">null</span>;
+  productId?: <span class="s">string</span>;          <span class="c">// only for leaves</span>
+  colour?: <span class="s">string</span>;             <span class="c">// department colour token</span>
+  icon?: <span class="s">string</span>;               <span class="c">// icon name, same across menus</span>
+}
+
+<span class="k">export interface</span> MenuRendererProps {
+  menuId: MenuId;
+  nodes: MenuNode[];
+  visibleLevel: 1 | 2 | 3;
+  onOpen: (nodeId: <span class="s">string</span>) => <span class="k">void</span>;
+  onSelect: (nodeId: <span class="s">string</span>) => <span class="k">void</span>;
+  onBack: () => <span class="k">void</span>;
+  log: (event: LogEvent) => <span class="k">void</span>;
+  disabled?: <span class="s">boolean</span>;
+}
+
+<span class="k">export interface</span> MenuRenderer {
+  mount(el: HTMLElement, props: MenuRendererProps): <span class="k">void</span>;
+  update(props: Partial&lt;MenuRendererProps&gt;): <span class="k">void</span>;
+  destroy(): <span class="k">void</span>;
+}</pre>
+
+  <p>Each menu is a separate component that implements this contract. The runner mounts one renderer at a time and logs every open/select/back event with the same schema. The taxonomy package also exports a <code>validateTaxonomy()</code> function that checks: four departments; three L2 per L1; six L3 per L2; unique IDs; unique product descriptions; no orphan nodes.</p>
+
+  <h2>14.3 Randomisation service</h2>
+  <p>Randomisation is server-side and auditable. The service pre-generates balanced sequences from a seeded PRNG and assigns each participant to the next sequence in a stratified block. The client never chooses a condition. The audit table stores the sequence ID, block order, menu orders, target set, and a hash of the seed.</p>
+
+  <pre><span class="c">// Pseudocode — server-side assignment</span>
+sequences = generateBalancedDesign({
+  blockOrders: latinSquare(4),      <span class="c">// ABCD, BCDA, CDAB, DABC</span>
+  menuOrders: latinSquare(6),       <span class="c">// 6 × 6</span>
+  targetSets: 6,
+  seed: CONFIG.seed
+});
+
+onJoin(participant):
+  stratum = stratify(participant.gender, participant.shoppingFrequency)
+  seq = nextUnused(sequences, stratum)
+  audit(participant.id, seq.id, hash(CONFIG.seed))
+  return seq</pre>
+
+  <p>Balance checks run nightly: each block order, menu position, and target set should be used with approximately equal frequency. If a stratum is exhausted, generate a new block rather than reusing sequences. Any deviation is logged and reported in the paper’s supplementary materials.</p>
+
+  <h2>14.4 Adaptation engine</h2>
+  <p>The engine is deliberately conservative. It runs at task boundaries, uses a calibrated posterior, and abstains when uncertain. The pseudocode below is the specification for Study 3; Study 2 uses a frozen policy with known labels and no estimator.</p>
+
+  <pre>onTaskBoundary(participant, currentMenu):
+  features = extractFeatures(participant.recentTrials)
+  prior = participant.blockCheckin          <span class="c">// 1-item state prior</span>
+  posterior = estimator.predict(features, prior)
+  state = argmax(posterior)
+  confidence = max(posterior)
+
+  <span class="k">if</span> confidence &lt; 0.70:
+      log(<span class="s">"no_adaptation"</span>, reason=<span class="s">"low_confidence"</span>)
+      <span class="k">return</span> currentMenu
+
+  target = policy[state]
+  gain = expectedUtility(target, state) - expectedUtility(currentMenu, state)
+
+  <span class="k">if</span> gain &lt; MIN_GAIN <span class="k">or</span> dwell &lt; 2 <span class="k">or</span> recentSwitch:
+      log(<span class="s">"no_adaptation"</span>, reason=<span class="s">"guardrail"</span>)
+      <span class="k">return</span> currentMenu
+
+  showBanner(target, reason=<span class="s">"support_current_task"</span>)
+  <span class="k">if</span> user.keepsCurrent:
+      log(<span class="s">"adaptation_rejected"</span>)
+      <span class="k">return</span> currentMenu
+
+  log(<span class="s">"adaptation_accepted"</span>, state, confidence, gain)
+  <span class="k">return</span> target</pre>
+
+  <p>The engine logs every decision, including abstentions. This is essential for the analysis: a system that adapts rarely but well is different from one that adapts often and badly, even if their average task performance is similar.</p>
+
+  <h2>14.5 Testing strategy</h2>
+  <table class="compact long">
+    <thead><tr><th style="width:18%">Test level</th><th style="width:44%">What is tested</th><th style="width:38%">Tool / gate</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Unit</td><td>Taxonomy validation; route uniqueness; scoring functions; feature extraction; policy guardrails.</td><td>Vitest/Jest; 100% coverage of scoring and policy code.</td></tr>
+      <tr><td class="k">Integration</td><td>Every menu × every target path; event log reconstruction; questionnaire submission; check-in flow.</td><td>Playwright; 432 paths (6 × 72) in nightly run; a 24-path smoke suite on every commit.</td></tr>
+      <tr><td class="k">Visual</td><td>Screenshots of each menu at each level; no clipping; hit targets ≥ 44 px; focus states.</td><td>Playwright screenshots; manual review; pixel diff with tolerance.</td></tr>
+      <tr><td class="k">Timing</td><td>Event order; <code>performance.now()</code> monotonicity; frame rate; transition duration.</td><td>Instrumented test run; 60 fps target; no long tasks &gt; 50 ms during a trial.</td></tr>
+      <tr><td class="k">Data</td><td>Schema validation; duplicate event IDs; missing <code>trial_end</code>; clock skew; export checksum.</td><td>Zod/JSON Schema at ingestion; nightly data-quality report.</td></tr>
+      <tr><td class="k">Randomisation</td><td>Balance of block orders, menu positions, target sets; no duplicate condition per state.</td><td>Audit script; chi-square balance report.</td></tr>
+      <tr><td class="k">Accessibility</td><td>Keyboard path; focus trap; ARIA roles; contrast; reduced motion.</td><td>axe-core; manual NVDA/VoiceOver smoke test; keyboard-only walkthrough.</td></tr>
+      <tr><td class="k">Load</td><td>20 concurrent sessions; ingestion latency; DB connections.</td><td>k6/Artillery; local lab server; error rate &lt; 0.1%.</td></tr>
+      <tr><td class="k">Pilot dry run</td><td>Full session with two lab members; timing; confusion; data export.</td><td>Sign-off checklist; freeze the build.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>14.6 Deployment, security, and data handling</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Lab deployment:</b> a wired local server, Chrome/Edge kiosk mode, full-screen 1920 × 1080, no internet during a trial. The database runs on the same machine or a local network host; daily encrypted backups to a separate drive.</li>
+    <li><b>Cloud option:</b> a managed Postgres (EU region) and a static front end behind authentication; a data-processing agreement; no third-party analytics or advertising scripts.</li>
+    <li><b>Security:</b> HTTPS, content-security policy, no third-party scripts, rate limiting, parameterised queries, least-privilege DB roles, secrets in environment variables only (never in the repo).</li>
+    <li><b>Privacy:</b> pseudonymous participant IDs; no names, emails, or IP addresses in the research dataset; a separate encrypted key linking IDs to consent forms; retention according to ethics approval (e.g., 5 years) and deletion thereafter.</li>
+    <li><b>Audit:</b> every randomisation and adaptation decision is written to an append-only audit table; the raw event stream is archived as JSONL with a checksum.</li>
+  </ul>
+
+  <h2>14.7 Accessibility implementation</h2>
+  <table>
+    <thead><tr><th style="width:22%">Requirement</th><th style="width:78%">Implementation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Keyboard</td><td>Tab/Shift+Tab to move; Enter/Space to activate; Esc to close; arrow keys within grids/rings; focus returns to the trigger after close.</td></tr>
+      <tr><td class="k">ARIA</td><td>Navigation landmarks; <code>aria-expanded</code>, <code>aria-haspopup</code>, <code>aria-current</code>; labelled nodes; live region for the transition banner.</td></tr>
+      <tr><td class="k">Focus</td><td>Visible 2-px focus ring with 3:1 contrast; focus trap only inside modal-like panels; no focus loss on re-render.</td></tr>
+      <tr><td class="k">Contrast</td><td>Text ≥ 4.5:1; UI components ≥ 3:1; colour never the sole carrier of meaning (labels + icons).</td></tr>
+      <tr><td class="k">Motion</td><td><code>prefers-reduced-motion</code> disables zoom/rotate transitions; instant state change; no autoplay audio.</td></tr>
+      <tr><td class="k">Input modality</td><td>Mouse/trackpad is the confirmatory standard; keyboard is supported and logged; a keyboard-only session can be run separately.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>14.8 Reproducibility package</h2>
+  <p>Use a monorepo with <code>apps/web</code>, <code>apps/api</code>, <code>packages/taxonomy</code>, <code>packages/analysis</code>, and <code>docs/</code>. Commit lockfiles, a Docker Compose file, a <code>.env.example</code> (no secrets), and a README that a new researcher can follow from a fresh clone to a running local session. Version the taxonomy and store its hash with every session. Archive the analysis script and a session-info file with the manuscript; deposit the anonymised data and materials in a repository with a DOI if ethics allow.</p>
+
+  <h2>14.9 Build schedule</h2>
+  <table>
+    <thead><tr><th style="width:10%">Week</th><th style="width:44%">Deliverable</th><th style="width:46%">Exit criterion</th></tr></thead>
+    <tbody>
+      <tr><td class="k">1</td><td>Repo, taxonomy JSON, task bank, wireframes, event schema, CI.</td><td>Taxonomy validation passes; 72 products and 72 tasks generated; schema documented.</td></tr>
+      <tr><td class="k">2</td><td>A/B/C renderers, experiment runner, event logging, local questionnaire flow.</td><td>All three menus reach every target; logs reconstruct paths.</td></tr>
+      <tr><td class="k">3</td><td>D/E/F renderers, transitions, accessibility pass, visual regression.</td><td>All six menus pass the parity checklist; keyboard path works.</td></tr>
+      <tr><td class="k">4</td><td>Randomisation service, backend ingestion, check-in UI, exports.</td><td>Balance audit passes; export checksum matches raw log.</td></tr>
+      <tr><td class="k">5</td><td>Adaptation engine, estimator stub, policy guardrails, study-specific flows.</td><td>Study 1/2/3 dry runs complete; no missing events.</td></tr>
+      <tr><td class="k">6</td><td>Pilot dry run, bug fixes, freeze, documentation.</td><td>Two lab members complete the full protocol; sign-off.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>Build risk register</h4>
+    <p class="small"><b>Custom geometry takes longer than expected:</b> prototype D/F in week 1 with static SVG before wiring interactions. <b>Browser performance:</b> test 60 fps early; avoid heavy DOM for the mega panel. <b>Data loss:</b> offline queue plus nightly backup; test a network drop. <b>Randomisation bug:</b> server-side audit and a dry-run balance check. <b>Accessibility debt:</b> keyboard tests from week 2, not at the end. <b>Estimator leakage:</b> freeze the pipeline and use participant-grouped CV; no Study 3 outcomes in training.</p>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+{
+  "name": "meridian-timepieces-pilot",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Functional pilot instrument for the Emotion-Contingent Navigation study",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c cyan,green \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm run dev -w @meridian/server",
+    "dev:web": "npm run dev -w @meridian/web",
+    "build": "npm run validate -w @meridian/taxonomy && npm run build -w @meridian/web && npm run build -w @meridian/server",
+    "start": "npm run start -w @meridian/server",
+    "seed": "npm run seed -w @meridian/server",
+    "test": "npm run test -w @meridian/taxonomy && npm run test -w @meridian/scoring && npm run test -w @meridian/server && npm run test -w @meridian/web",
+    "test:coverage": "npm run test:coverage -w @meridian/scoring",
+    "test:e2e": "playwright test",
+    "test:e2e:full": "playwright test --grep @full",
+    "export": "npm run export -w @meridian/server",
+    "audit:balance": "npm run audit:balance -w @meridian/server",
+    "validate": "npm run validate -w @meridian/taxonomy"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.54.1",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "concurrently": "^9.1.2",
+    "jsdom": "^26.1.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

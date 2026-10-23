@@ -1,0 +1,886 @@
+{
+  "version": "1.0.0",
+  "tasks": [
+    {
+      "id": "T01",
+      "targetId": "sport.prodiver.steel-blue",
+      "description": "Titanium dive watch, 300 m, deep blue dial",
+      "difficulty": "Easy",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.prodiver",
+        "strap": "titanium",
+        "water": 300,
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T02",
+      "targetId": "sport.prodiver.titanium-deep",
+      "description": "Lightweight titanium dive watch, 300 m, black dial",
+      "difficulty": "Medium",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.prodiver",
+        "strap": "titanium",
+        "water": 300,
+        "dial": "black"
+      }
+    },
+    {
+      "id": "T03",
+      "targetId": "sport.trail.forest-green",
+      "description": "42 mm automatic trail watch, green dial, fabric strap",
+      "difficulty": "Medium",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.trail",
+        "caseSize": 42,
+        "movement": "automatic",
+        "dial": "green",
+        "strap": "fabric"
+      }
+    },
+    {
+      "id": "T04",
+      "targetId": "dress.heritage.ivory-dial",
+      "description": "Rose-gold dress watch, ivory dial, leather strap",
+      "difficulty": "Easy",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.heritage",
+        "dial": "white",
+        "strap": "leather"
+      }
+    },
+    {
+      "id": "T05",
+      "targetId": "dress.midnight.deep-navy",
+      "description": "Black-tie watch, deep navy dial, 40 mm",
+      "difficulty": "Medium",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.midnight",
+        "dial": "blue",
+        "caseSize": 40
+      }
+    },
+    {
+      "id": "T06",
+      "targetId": "dress.moonphase.celestial-blue",
+      "description": "Moonphase complication, celestial blue dial",
+      "difficulty": "Hard",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.moonphase",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T07",
+      "targetId": "everyday.field.khaki-canvas",
+      "description": "38 mm field watch, khaki canvas strap, automatic",
+      "difficulty": "Easy",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.field",
+        "caseSize": 38,
+        "strap": "fabric",
+        "movement": "automatic"
+      }
+    },
+    {
+      "id": "T08",
+      "targetId": "everyday.urban.matte-white",
+      "description": "Minimalist watch, matte white dial, steel mesh strap",
+      "difficulty": "Medium",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.urban",
+        "dial": "white",
+        "strap": "mesh"
+      }
+    },
+    {
+      "id": "T09",
+      "targetId": "everyday.weekender.sunset-clay",
+      "description": "Weekend watch, sunset clay dial, rubber strap",
+      "difficulty": "Hard",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.weekender",
+        "dial": "orange",
+        "strap": "rubber"
+      }
+    },
+    {
+      "id": "T10",
+      "targetId": "smart.smartone.graphite",
+      "description": "Graphite smartwatch, titanium case, 44 mm",
+      "difficulty": "Medium",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.smartone",
+        "strap": "titanium",
+        "caseSize": 44
+      }
+    },
+    {
+      "id": "T11",
+      "targetId": "smart.hybridactive.orange-sport",
+      "description": "Hybrid sport watch, orange accent, rubber strap",
+      "difficulty": "Hard",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.hybridactive",
+        "dial": "orange",
+        "strap": "rubber"
+      }
+    },
+    {
+      "id": "T12",
+      "targetId": "smart.connected.burgundy",
+      "description": "Connected classic, burgundy leather strap, 42 mm",
+      "difficulty": "Hard",
+      "canonical": true,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.connected",
+        "strap": "leather",
+        "caseSize": 42,
+        "dial": "brown"
+      }
+    },
+    {
+      "id": "T13",
+      "targetId": "sport.prodiver.carbon-black",
+      "description": "Find a watch with a 44 mm, black dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T14",
+      "targetId": "sport.prodiver.ocean-green",
+      "description": "Find a watch with a 44 mm, green dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "green",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T15",
+      "targetId": "dress.heritage.moon-silver",
+      "description": "Find a watch with a 38 mm, automatic, silver dial.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "movement": "automatic",
+        "dial": "silver"
+      }
+    },
+    {
+      "id": "T16",
+      "targetId": "sport.prodiver.bronze-reef",
+      "description": "Find a watch with a 44 mm, brown dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T17",
+      "targetId": "sport.prodiver.midnight-lume",
+      "description": "Find a watch with a 38 mm, black dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T18",
+      "targetId": "sport.aqua.carbon-track",
+      "description": "Find a watch with a 44 mm, black dial, rubber strap.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "dial": "black"
+      }
+    },
+    {
+      "id": "T19",
+      "targetId": "everyday.urban.steel-mesh",
+      "description": "Find a watch with a 38 mm, grey dial, mesh strap.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "strap": "mesh",
+        "dial": "grey"
+      }
+    },
+    {
+      "id": "T20",
+      "targetId": "sport.aqua.sunset-orange",
+      "description": "Find a watch with a 44 mm, orange dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "orange",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T21",
+      "targetId": "sport.aqua.gulf-blue",
+      "description": "Find a watch with a 44 mm, blue dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T22",
+      "targetId": "sport.aqua.regatta-white",
+      "description": "Find a watch with a 44 mm, white dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "white",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T23",
+      "targetId": "sport.aqua.steel-grey",
+      "description": "Find a watch with a 44 mm, grey dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T24",
+      "targetId": "dress.heritage.rose-gold",
+      "description": "Find a watch with a 38 mm, silver dial, price £420–£900.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "silver",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T25",
+      "targetId": "smart.smartone.titanium",
+      "description": "Find a watch with a hybrid, blue dial, titanium strap.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "strap": "titanium",
+        "movement": "hybrid",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T26",
+      "targetId": "everyday.field.olive",
+      "description": "Find a watch with a 38 mm, green dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "green",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T27",
+      "targetId": "dress.heritage.anthracite",
+      "description": "Find a watch with a 38 mm, black dial, price £420–£900.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "black",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T28",
+      "targetId": "dress.heritage.bordeaux",
+      "description": "Find a watch with a 38 mm, brown dial, price £420–£900.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "brown",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T29",
+      "targetId": "dress.heritage.onyx",
+      "description": "Find a watch with a 38 mm, blue dial, price £420–£900.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T30",
+      "targetId": "smart.hybridactive.green-sport",
+      "description": "Find a watch with a 44 mm, green dial, rubber strap.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "dial": "green"
+      }
+    },
+    {
+      "id": "T31",
+      "targetId": "sport.aqua.night-dash",
+      "description": "Find a watch with a 40 mm, black dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 40,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T32",
+      "targetId": "everyday.field.sandstone",
+      "description": "Find a watch with a quartz, grey dial, price £180–£240.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "movement": "quartz",
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T33",
+      "targetId": "everyday.field.stone",
+      "description": "Find a watch with a 38 mm, grey dial, fabric strap.",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "dial": "grey"
+      }
+    },
+    {
+      "id": "T34",
+      "targetId": "dress.midnight.black-tie",
+      "description": "Find a watch with a 38 mm, black dial, price £240–£420.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "black",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T35",
+      "targetId": "everyday.urban.soft-beige",
+      "description": "Find a watch with a 38 mm, champagne dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "champagne",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T36",
+      "targetId": "everyday.field.charcoal",
+      "description": "Find a watch with a 38 mm, blue dial, fabric strap.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T37",
+      "targetId": "everyday.field.navy-weave",
+      "description": "Find a watch with a quartz, blue dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "movement": "quartz",
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T38",
+      "targetId": "smart.hybridactive.grey-sport",
+      "description": "Find a watch with a 44 mm, grey dial, rubber strap.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "dial": "grey"
+      }
+    },
+    {
+      "id": "T39",
+      "targetId": "smart.smartone.silver",
+      "description": "Find a watch with a 44 mm, silver dial, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "silver",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T40",
+      "targetId": "sport.trail.granite-grey",
+      "description": "Find a watch with a 38 mm, grey dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "grey",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T41",
+      "targetId": "sport.trail.summit-blue",
+      "description": "Find a watch with a 38 mm, blue dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T42",
+      "targetId": "dress.midnight.champagne",
+      "description": "Find a watch with a 38 mm, silver dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "silver",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T43",
+      "targetId": "everyday.urban.concrete-grey",
+      "description": "Find a watch with a 38 mm, white dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "white",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T44",
+      "targetId": "dress.midnight.graphite",
+      "description": "Find a watch with a 38 mm, grey dial, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "grey",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T45",
+      "targetId": "dress.midnight.pearl-white",
+      "description": "Find a watch with a 38 mm, green dial, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "green",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T46",
+      "targetId": "dress.midnight.sapphire",
+      "description": "Find a watch with a 38 mm, blue dial, price £240–£420.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "blue",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T47",
+      "targetId": "everyday.urban.ink-black",
+      "description": "Find a watch with a 38 mm, black dial, fabric strap.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "strap": "fabric",
+        "dial": "black"
+      }
+    },
+    {
+      "id": "T48",
+      "targetId": "smart.hybridactive.white-sport",
+      "description": "Find a watch with a 44 mm, white dial, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "white",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T49",
+      "targetId": "smart.hybridactive.black-sport",
+      "description": "Find a watch with a 44 mm, rubber strap, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T50",
+      "targetId": "sport.trail.ember-red",
+      "description": "Find a watch with a 38 mm, orange dial, price £180–£240.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "orange",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T51",
+      "targetId": "dress.moonphase.warm-silver",
+      "description": "Find a watch with a 38 mm, silver dial, price £900+.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "silver",
+        "priceBand": "£900+"
+      }
+    },
+    {
+      "id": "T52",
+      "targetId": "smart.smartone.forest",
+      "description": "Find a watch with a 44 mm, green dial, price £420–£900.",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "green",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T53",
+      "targetId": "smart.smartone.midnight",
+      "description": "Find a watch with a 44 mm, black dial, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "black",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T54",
+      "targetId": "smart.smartone.rose",
+      "description": "Find a watch with a 44 mm, blue dial, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "blue",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T55",
+      "targetId": "sport.trail.alpine-sand",
+      "description": "Find a watch with a 40 mm, brown dial, price £180–£240.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 40,
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T56",
+      "targetId": "sport.trail.midnight-trail",
+      "description": "Find a watch with a 42 mm, black dial, price £180–£240.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 42,
+        "dial": "black",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T57",
+      "targetId": "smart.hybridactive.blue-sport",
+      "description": "Find a watch with a 44 mm, blue dial, rubber strap.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "rubber",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T58",
+      "targetId": "dress.moonphase.copper-brown",
+      "description": "Find a watch with a 38 mm, brown dial, price £240–£420.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "brown",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T59",
+      "targetId": "dress.moonphase.slate-grey",
+      "description": "Find a watch with a 38 mm, grey dial, price £240–£420.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "grey",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T60",
+      "targetId": "everyday.urban.deep-teal",
+      "description": "Find a watch with a 42 mm, blue dial, price £180–£240.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 42,
+        "dial": "blue",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T61",
+      "targetId": "dress.moonphase.aurora",
+      "description": "Find a watch with a 38 mm, champagne dial, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "champagne",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T62",
+      "targetId": "everyday.weekender.cream",
+      "description": "Find a watch with a 38 mm, white dial, price £240–£420.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "white",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T63",
+      "targetId": "everyday.weekender.moss",
+      "description": "Find a watch with a 38 mm, green dial, price £240–£420.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "green",
+        "priceBand": "£240–£420"
+      }
+    },
+    {
+      "id": "T64",
+      "targetId": "dress.moonphase.starlight",
+      "description": "Find a watch with a 38 mm, orange dial, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "dial": "orange",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T65",
+      "targetId": "everyday.weekender.rust",
+      "description": "Find a watch with a quartz, brown dial, price £180–£240.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "movement": "quartz",
+        "dial": "brown",
+        "priceBand": "£180–£240"
+      }
+    },
+    {
+      "id": "T66",
+      "targetId": "everyday.weekender.denim",
+      "description": "Find a watch with a 38 mm, hybrid, blue dial.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "movement": "hybrid",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T67",
+      "targetId": "everyday.weekender.ocean-stripe",
+      "description": "Find a watch with a 38 mm, solar, blue dial.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 38,
+        "movement": "solar",
+        "dial": "blue"
+      }
+    },
+    {
+      "id": "T68",
+      "targetId": "smart.connected.heritage-black",
+      "description": "Find a watch with a 44 mm, black dial, leather strap.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "leather",
+        "dial": "black"
+      }
+    },
+    {
+      "id": "T69",
+      "targetId": "smart.connected.heritage-brown",
+      "description": "Find a watch with a 44 mm, brown dial, leather strap.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "strap": "leather",
+        "dial": "brown"
+      }
+    },
+    {
+      "id": "T70",
+      "targetId": "smart.connected.steel-blue",
+      "description": "Find a watch with a 44 mm, blue dial, price £900+.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "caseSize": 44,
+        "dial": "blue",
+        "priceBand": "£900+"
+      }
+    },
+    {
+      "id": "T71",
+      "targetId": "smart.connected.cream",
+      "description": "Find a watch with a white dial, steel strap, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "strap": "steel",
+        "dial": "white",
+        "priceBand": "£420–£900"
+      }
+    },
+    {
+      "id": "T72",
+      "targetId": "smart.connected.slate",
+      "description": "Find a watch with a grey dial, steel strap, price £420–£900.",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "strap": "steel",
+        "dial": "grey",
+        "priceBand": "£420–£900"
+      }
+    }
+  ]
+}

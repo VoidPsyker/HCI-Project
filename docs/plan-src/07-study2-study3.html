@@ -1,0 +1,237 @@
+<!-- ================= 9 STUDY 2 ================= -->
+<section class="section" id="study2">
+  <h1><span class="num">9</span> Study 2 — causal test of adaptation</h1>
+
+  <p class="lead">Study 1 can show that menus differ across states. It cannot show that <b>using</b> that mapping helps. Study 2 freezes the mapping and tests the causal claim against three counterfactuals: the best static menu, a deliberately mismatched menu, and a sham switch that changes nothing but announces a change.</p>
+
+  <h2>9.1 Objective and logic</h2>
+  <p>The core comparison is <b>matched vs static</b>. If the matched condition is better, the mapping has applied value. But a gain could come from mere change, novelty, or attention to the interface rather than from matching. The <b>mismatched</b> condition controls for change without fit; the <b>sham</b> condition controls for the announcement of change without any actual change. The four conditions form a 2 × 2 logic:</p>
+
+  <table>
+    <thead><tr><th style="width:22%">Condition</th><th style="width:22%">Menu changes?</th><th style="width:26%">Change is matched to state?</th><th style="width:30%">What a gain would mean</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Static</td><td>No</td><td>—</td><td>Baseline: the best single menu.</td></tr>
+      <tr><td class="k">Matched</td><td>Yes</td><td>Yes</td><td>Fit + change. The target effect.</td></tr>
+      <tr><td class="k">Mismatched</td><td>Yes</td><td>No</td><td>Change without fit. If it also helps, the effect is novelty/attention.</td></tr>
+      <tr><td class="k">Sham</td><td>No (banner only)</td><td>—</td><td>Announcement without change. If it helps, the effect is demand/attention.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9.2 Design</h2>
+  <table>
+    <thead><tr><th style="width:24%">Factor</th><th style="width:24%">Levels</th><th style="width:16%">Type</th><th style="width:36%">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Adaptation condition</td><td>Static, matched, mismatched, sham</td><td>Within-subject</td><td>Four conditions per state; order balanced by a 4 × 4 Latin square.</td></tr>
+      <tr><td class="k">Emotional context</td><td>Happy, frustrated, confused, bored</td><td>Within-subject</td><td>Four blocks; block order balanced across participants.</td></tr>
+      <tr><td class="k">Trial</td><td>1 per condition per state</td><td>Within-subject</td><td>16 main trials; 4 practice trials; ~70 min.</td></tr>
+      <tr><td class="k">Target set</td><td>4 sets × 16 tasks</td><td>Between-participant rotation</td><td>Balances products across conditions and states.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Why four conditions rather than two?</b> A two-condition test (matched vs static) would be cheaper, but it would leave the most important alternative explanation — “any change helps” — untested. The mismatched and sham conditions are the difference between a convincing causal paper and a demo. If resources are tight, the sham condition can be dropped first; the mismatched condition is essential.</p>
+
+  <h2>9.3 Conditions in detail</h2>
+  <table class="long">
+    <thead><tr><th style="width:14%">Condition</th><th style="width:30%">Menu shown</th><th style="width:28%">Transition message</th><th style="width:28%">Participant control</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Static</td><td>The global best menu from Study 1, held constant across all four states.</td><td>“The interface will remain the same for this task.”</td><td>No switch; a “dislike” button is available and logged.</td></tr>
+      <tr><td class="k">Matched</td><td>The Study 1 policy menu for the current state. If the policy flags “no reliable adaptation,” the static menu is used and the trial is marked concordant.</td><td>“The interface will adjust to support the current task.”</td><td>No revert in Study 2 (to isolate the effect); a “dislike” button is logged.</td></tr>
+      <tr><td class="k">Mismatched</td><td>A menu assigned by a pre-registered derangement of the state→menu mapping: happy→bored’s menu, frustrated→happy’s menu, confused→frustrated’s menu, bored→confused’s menu. If the deranged menu equals static or matched, shift to the next menu in a fixed order.</td><td>“The interface will adjust to support the current task.” (Same wording as matched.)</td><td>Same as matched.</td></tr>
+      <tr><td class="k">Sham</td><td>The static menu, unchanged. A brief banner and a 400-ms highlight animation suggest an adjustment, but the layout is identical.</td><td>“The interface will adjust to support the current task.”</td><td>Same as matched.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>Handling concordance</h4>
+    <p class="small">If the frozen policy selects the same menu as the static baseline for a state, matched and static are identical in that state. That state is <b>concordant</b> and is excluded from the matched-vs-static contrast; it is still analysed descriptively. The paper reports the number of discordant states. If fewer than two states are discordant, H2 cannot be tested and the paper reports the mapping plus the mismatched/sham results as the causal evidence. Do not secretly change the static baseline after seeing the data.</p>
+  </div>
+
+  <h2>9.4 Participants and sample size</h2>
+  <p><b>Target N = 80</b> (full) or <b>N = 60</b> (reduced). The full sample provides ~90% power for a standardized matched-vs-static difference of d = 0.40 on the condition mean, and ~75% for d = 0.30, assuming a within-participant correlation of .50 across the four state observations. The reduced sample is powered for d ≈ 0.40. The pilot/Study 1 variance estimates replace these assumptions before the final N is fixed. Inclusion and exclusion criteria are the same as Study 1, with no overlap of participants.</p>
+
+  <h2>9.5 Procedure</h2>
+  <table class="long">
+    <thead><tr><th style="width:8%">Min</th><th style="width:26%">Step</th><th style="width:66%">Detail</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0–10</td><td>Consent, demographics, baseline</td><td>Same screening as Study 1; baseline affect; explain that the interface may change between tasks.</td></tr>
+      <tr><td class="k">10–20</td><td>Instructions and practice</td><td>Four practice trials, one per condition, using neutral practice targets. Explain the transition banner and the “dislike” button. Do not disclose the matching hypothesis.</td></tr>
+      <tr><td class="k">20–32</td><td>Block 1: induction + 4 trials</td><td>2.5-min induction, 1-min check, then four trials (static, matched, mismatched, sham) in a balanced order. Each trial begins with a 5-s transition screen. Post-block check + NASA-TLX + UMUX-Lite.</td></tr>
+      <tr><td class="k">32–44</td><td>Block 2</td><td>Next state in the Latin-square order; neutral reset before the block.</td></tr>
+      <tr><td class="k">44–56</td><td>Block 3</td><td>Same.</td></tr>
+      <tr><td class="k">56–68</td><td>Block 4</td><td>Same; final post-block check.</td></tr>
+      <tr><td class="k">68–78</td><td>Questionnaires and debrief</td><td>Perceived change, understanding, control, trust, disruption, preference; suspicion check; debrief.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Trial sequence:</b> task instruction (5 s) → transition screen (5 s; condition-specific wording) → menu appears → participant finds the product (120-s cap) → neutral feedback → 3-s inter-trial interval. The transition screen is the only place where the condition is announced. The menu itself is visible immediately after.</p>
+
+  <h2>9.6 Outcomes and contrasts</h2>
+  <table>
+    <thead><tr><th style="width:18%">Outcome</th><th style="width:38%">Measure</th><th style="width:44%">Contrast / decision rule</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Task success</td><td>Correct product within 120 s</td><td>Matched vs static: non-inferiority margin 5 pp; matched vs mismatched: superiority; matched vs sham: superiority.</td></tr>
+      <tr><td class="k">Completion time</td><td>Log ms to correct product; censored at 120 s</td><td>Matched vs static: superiority (faster); matched vs mismatched: superiority; report geometric mean ratio.</td></tr>
+      <tr><td class="k">Navigation errors</td><td>Wrong branch/leaf, backtrack, category switch</td><td>Matched vs static and vs mismatched: fewer errors; negative-binomial model.</td></tr>
+      <tr><td class="k">Cognitive load</td><td>NASA-TLX after each block</td><td>Matched vs static: lower load; matched vs mismatched: lower load.</td></tr>
+      <tr><td class="k">Disorientation / control</td><td>4-item scale after each block</td><td>Matched vs static: less disorientation; matched vs mismatched: less disorientation.</td></tr>
+      <tr><td class="k">Switching cost</td><td>First trial after a change vs stable trial</td><td>Switch cost &gt; 0 on time/errors; test whether it is offset by the matched gain.</td></tr>
+      <tr><td class="k">Perceived disruption</td><td>3 items: noticed, understood, disruptive</td><td>Matched vs sham: does the change feel disruptive even when it helps?</td></tr>
+      <tr><td class="k">Trust / acceptance</td><td>4 items; “dislike” clicks</td><td>Matched vs static: trust and acceptance; mismatched vs matched: lower trust.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9.7 Analysis</h2>
+  <p>The primary model is a mixed-effects model with condition, state, and condition × state as fixed effects, plus period, sequence, and target set as covariates. Participant and target are crossed random intercepts. Planned contrasts are matched vs static, matched vs mismatched, matched vs sham, and static vs mismatched. The matched-vs-static success contrast is a non-inferiority test with a 5-percentage-point margin; time and errors are superiority tests. Report the full condition × state matrix even if the interaction is not significant.</p>
+
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Carry-over:</b> include period and sequence; test condition × period; if carry-over is present, analyse only the first period or use a washout model.</li>
+    <li><b>Concordance:</b> exclude concordant states from the matched-vs-static contrast; report the number of discordant states and the per-state results.</li>
+    <li><b>Per-protocol:</b> if a participant clicks “dislike” or does not attend to the transition, the trial remains in the ITT analysis; a per-protocol analysis excludes trials with no detectable menu inspection.</li>
+    <li><b>Mediation:</b> test whether the matched effect is mediated by switching cost, perceived disruption, cognitive load, and disorientation. Use bootstrapped indirect effects with 5,000 resamples.</li>
+    <li><b>Equivalence:</b> if matched and static are statistically indistinguishable, report an equivalence test against a pre-specified margin (5 pp success; 10% time) rather than claiming “no difference.”</li>
+    <li><b>Bayesian:</b> a hierarchical model with regularising priors provides the posterior probability that matched &gt; static and that matched &gt; mismatched; use it for interpretation, not for p-hacking.</li>
+  </ul>
+
+  <h2>9.8 Interpretation scenarios</h2>
+  <table>
+    <thead><tr><th style="width:34%">Pattern</th><th style="width:66%">Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Matched &gt; static, matched &gt; mismatched, matched &gt; sham</td><td>Strong evidence for emotion-contingent structural adaptation. The effect is not mere change or announcement.</td></tr>
+      <tr><td class="k">Matched &gt; static, but mismatched ≈ matched</td><td>Change/novelty/attention drives the gain; matching is not necessary. The practical recommendation is to vary the interface, not to personalise it.</td></tr>
+      <tr><td class="k">Matched ≈ static, matched &gt; mismatched</td><td>Matching helps relative to a bad fit, but the static best menu is already good enough. Adaptation has little practical value.</td></tr>
+      <tr><td class="k">Matched &lt; static</td><td>Switching costs and disruption dominate. The policy should be “keep the stable best menu” unless the state is extreme and the gain is large.</td></tr>
+      <tr><td class="k">Sham ≈ matched</td><td>Demand/announcement effects. The study cannot claim a structural benefit; redesign the control and report the null.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9.9 Threats specific to Study 2</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Demand characteristics:</b> the transition banner makes the manipulation obvious. Use a broad cover story, do not disclose the matching hypothesis, and include a suspicion check; the sham condition helps quantify announcement effects.</li>
+    <li><b>Condition visibility:</b> participants can see which menu appears. That is unavoidable; the question is whether they can infer the hypothesis. The post-experiment interview probes this.</li>
+    <li><b>Concordance:</b> matched and static may coincide; pre-register the handling and report the number of discordant states.</li>
+    <li><b>Carry-over:</b> a menu change in one trial may affect the next. Use a neutral reset between conditions and include period/sequence; the first-trial-after-switch analysis quantifies the cost.</li>
+    <li><b>Learning:</b> four conditions × four states means participants see 16 menus changes. Practice and counterbalancing reduce learning; the trial-position covariate absorbs the rest.</li>
+    <li><b>No revert:</b> Study 2 removes revert to isolate the causal effect. This is a deliberate limitation; Study 3 restores user control. The ethics protocol must explain that the change is temporary and the participant can stop at any time.</li>
+  </ul>
+
+  <h2>9.10 Deliverables</h2>
+  <p>A causal estimate of matched vs static, matched vs mismatched, and matched vs sham; a switching-cost estimate; a mediation model; a condition × state matrix; and a policy recommendation that states when adaptation is worth the disruption and when it is not.</p>
+</section>
+
+<!-- ================= 10 STUDY 3 ================= -->
+<section class="section" id="study3">
+  <h1><span class="num">10</span> Study 3 — end-to-end system with an imperfect estimator</h1>
+
+  <p class="lead">Study 2 uses known, induced states. A real system must infer the state from noisy signals. Study 3 tests whether the adaptation still helps when the state estimate is uncertain, and it identifies the accuracy at which adaptation stops paying for itself.</p>
+
+  <h2>10.1 Objective and design logic</h2>
+  <p>The study compares a <b>static</b> condition (the global best menu) with a <b>hybrid adaptive</b> condition that uses a frozen estimator, a confidence threshold, and a safe transition policy. The estimator is trained on Study 1 and validated with participant-grouped cross-validation; it is not trained on Study 3 outcomes. The design is a within-subject crossover: four emotion blocks, each with one static trial and one hybrid trial in counterbalanced order, plus a short free-browsing task. This yields paired comparisons within each state while keeping the session under 75 minutes.</p>
+
+  <table>
+    <thead><tr><th style="width:24%">Factor</th><th style="width:24%">Levels</th><th style="width:16%">Type</th><th style="width:36%">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">System condition</td><td>Static, hybrid adaptive</td><td>Within-subject</td><td>ABBA/BAAB order within each state; 8 main trials.</td></tr>
+      <tr><td class="k">Emotional context</td><td>Happy, frustrated, confused, bored</td><td>Within-subject</td><td>Four blocks; block order Latin-square balanced.</td></tr>
+      <tr><td class="k">Free browsing</td><td>5 min per condition</td><td>Within-subject</td><td>Exploratory task with no single correct target; measures engagement and product views.</td></tr>
+      <tr><td class="k">Estimator</td><td>Frozen model from Study 1</td><td>Between-session</td><td>No outcome leakage; calibration on held-out participants.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.2 The estimator</h2>
+  <p>The estimator predicts the participant’s <b>self-reported dominant state</b> at the start of a task, using (a) the block-level self-report check-in and (b) interaction features from the previous task. This is a realistic “hybrid” system: it asks once, then updates from behaviour. It does not use webcam, facial expression, or physiological sensors.</p>
+
+  <table class="long">
+    <thead><tr><th style="width:20%">Feature family</th><th style="width:44%">Examples</th><th style="width:36%">Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Temporal</td><td>Time since last click, pause duration, trial elapsed time, time to first click, idle ratio.</td><td>Confusion and boredom produce different pause patterns; frustration produces rapid clicking.</td></tr>
+      <tr><td class="k">Click / motor</td><td>Click count, click rate, repeated clicks on the same element, dead clicks, mouse speed, acceleration, curvature, distance travelled, entropy.</td><td>Frustration is associated with fast, repetitive, less precise pointing; boredom with long idle periods.</td></tr>
+      <tr><td class="k">Navigation</td><td>Backtracks, category switches, menu open/close count, depth reached, path length, first-click correctness, search attempts.</td><td>Confusion is the signature of inefficient wayfinding; happiness may show more exploration.</td></tr>
+      <tr><td class="k">Task / context</td><td>Task difficulty, target department, menu condition, trial number, previous state, block order.</td><td>Controls for task-driven variation; prevents the model from learning the task instead of the state.</td></tr>
+      <tr><td class="k">Self-report</td><td>SAM valence/arousal, four discrete items at block start and random micro-checks.</td><td>Anchors the label; provides a prior for the first trial; not available continuously.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Model:</b> a penalised multinomial logistic regression (L2, class-balanced) is the primary model because it is interpretable and calibratable. Gradient boosting (XGBoost/LightGBM) is a secondary model to check for non-linear gains. The label is the four states plus a <code>mixed</code> class; the model outputs a probability distribution. Calibration is checked with reliability diagrams and the Brier score; temperature scaling is fitted on held-out folds only.</p>
+
+  <p><b>Validation:</b> leave-one-participant-out cross-validation on Study 1. Report macro-F1, balanced accuracy, per-class recall, the confusion matrix, and calibration. Compare with a majority-class baseline and with an “oracle” model that knows the induced state. The gap between the estimator and the oracle is the inference cost.</p>
+
+  <h2>10.3 Transition policy</h2>
+  <p>A prediction is not an instruction. The system changes the menu only when five conditions hold:</p>
+  <ol class="small" style="padding-left:5mm">
+    <li><b>Confidence:</b> the calibrated probability of the predicted state is ≥ 0.70 (tuned on Study 1, frozen before Study 3).</li>
+    <li><b>Expected gain:</b> the predicted utility gain of the target menu over the current menu exceeds a pre-registered minimal meaningful gain (e.g., 5% of the current expected utility).</li>
+    <li><b>Dwell:</b> the current menu has been used for at least two trials, so the system does not oscillate.</li>
+    <li><b>Boundary:</b> the switch happens between tasks, not mid-route.</li>
+    <li><b>User control:</b> the banner offers “Keep current” and “Switch back”; a revert is logged and respected for the rest of the block.</li>
+  </ol>
+
+  <p>If confidence is below threshold or the model sees an out-of-distribution feature pattern, the system keeps the current menu and logs “no adaptation.” This fallback is a feature, not a failure: a system that abstains when uncertain is safer than one that always switches.</p>
+
+  <h2>10.4 Participants and sample size</h2>
+  <p><b>N = 72</b> (full) or <b>N = 24–48</b> (feasibility). The full sample gives ~80% power for a paired difference of d = 0.35 on the hybrid-vs-static condition mean and a 95% CI half-width of about ±0.06 for a macro-F1 near .55 (assuming four check-ins per participant). The reduced sample is a feasibility study, not a confirmatory estimator evaluation; report precision and do not overclaim. Inclusion/exclusion are the same as Study 1, with no overlap.</p>
+
+  <h2>10.5 Procedure</h2>
+  <table class="long">
+    <thead><tr><th style="width:8%">Min</th><th style="width:26%">Step</th><th style="width:66%">Detail</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0–10</td><td>Consent, baseline, instructions</td><td>Explain that the interface may adapt; the participant can keep the current layout or switch back. Demonstrate the banner on a practice task.</td></tr>
+      <tr><td class="k">10–18</td><td>Practice</td><td>Two practice trials (static and hybrid) with neutral targets; verify that the estimator’s check-in and banner are understood.</td></tr>
+      <tr><td class="k">18–30</td><td>Block 1: happy</td><td>Induction + check; static trial and hybrid trial in ABBA order; 2-min free browse; post-block questionnaires.</td></tr>
+      <tr><td class="k">30–42</td><td>Block 2: frustrated</td><td>Same structure; neutral reset between blocks.</td></tr>
+      <tr><td class="k">42–54</td><td>Block 3: confused</td><td>Same.</td></tr>
+      <tr><td class="k">54–66</td><td>Block 4: bored</td><td>Same.</td></tr>
+      <tr><td class="k">66–78</td><td>Questionnaires and debrief</td><td>Trust, perceived intelligence, control, disruption, preference, open-ended interview; debrief including how the estimator works.</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Free browsing:</b> “Browse the store for five minutes and look at any watches you would consider buying. There is no correct answer.” Measures: products viewed, categories explored, time to first product view, depth of exploration, self-reported engagement, and satisfaction. The static and hybrid free-browse sessions are counterbalanced. This tests whether adaptation helps exploration, not just known-item search.</p>
+
+  <h2>10.6 Outcomes</h2>
+  <table>
+    <thead><tr><th style="width:22%">Level</th><th style="width:38%">Measures</th><th style="width:40%">Purpose</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Estimator</td><td>Macro-F1, balanced accuracy, per-class recall, confusion matrix, Brier score, calibration slope, expected calibration error.</td><td>Does the system know the state? Where does it fail?</td></tr>
+      <tr><td class="k">Navigation</td><td>Success, time, errors, backtracks, path efficiency, switch cost.</td><td>Does adaptation improve the task?</td></tr>
+      <tr><td class="k">Experience</td><td>NASA-TLX, UMUX-Lite, disorientation, trust, perceived intelligence, control, satisfaction.</td><td>Does adaptation feel helpful or disruptive?</td></tr>
+      <tr><td class="k">Adaptation behaviour</td><td>Switch offered, accepted, reverted, ignored; confidence at switch; reason; time since last switch.</td><td>Is the policy stable and acceptable?</td></tr>
+      <tr><td class="k">Free browsing</td><td>Products viewed, categories explored, time to first product, engagement, satisfaction.</td><td>Does adaptation help exploration?</td></tr>
+      <tr><td class="k">Break-even</td><td>Simulated utility under confusion matrices of varying accuracy.</td><td>How accurate must the estimator be?</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.7 Analysis</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Estimator:</b> participant-grouped cross-validation; report the mean and 95% CI across folds; compare with the majority baseline and the oracle. A model that cannot beat the baseline by a meaningful margin is reported as a failure, not hidden.</li>
+    <li><b>System effect:</b> paired mixed-effects models with condition, state, and condition × state; participant and target random intercepts; period and sequence covariates. Primary contrast: hybrid vs static on success (non-inferiority) and time/errors (superiority).</li>
+    <li><b>Confidence stratification:</b> split hybrid trials into high-confidence and low-confidence predictions; test whether the benefit is concentrated in high-confidence trials. This is the key mechanism test.</li>
+    <li><b>Switch cost:</b> compare the first trial after an accepted switch with stable trials; estimate the cost and the number of trials needed to recover.</li>
+    <li><b>Break-even simulation:</b> use the Study 1 6 × 4 matrix as the ground truth. Generate synthetic predictions with confusion matrices at 40%, 55%, 70%, 85%, and 100% accuracy; apply the same confidence/hysteresis policy; compute expected success, time, and utility. Plot utility against accuracy and identify the break-even point where hybrid = static. This can be done without new participants and is a standalone contribution.</li>
+    <li><b>Decision curve:</b> net benefit of adaptation across confidence thresholds; choose the threshold that maximises net benefit on calibration data, then freeze it for Study 3.</li>
+    <li><b>Qualitative:</b> interview data on trust, notice, and perceived intelligence; thematic analysis; use quotes to illustrate, not to replace the quantitative test.</li>
+  </ul>
+
+  <h2>10.8 Interpretation scenarios</h2>
+  <table>
+    <thead><tr><th style="width:34%">Pattern</th><th style="width:66%">Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">High estimator accuracy; hybrid &gt; static; close to oracle</td><td>The system works end-to-end. The paper can recommend deployment with a confidence threshold and user control.</td></tr>
+      <tr><td class="k">High accuracy but hybrid ≈ static</td><td>Switching costs or task-boundary friction erase the gain. The bottleneck is the transition policy, not the estimator.</td></tr>
+      <tr><td class="k">Low accuracy; hybrid ≈ static or worse</td><td>The estimator is the bottleneck. Report the break-even accuracy and the features that would be needed to reach it.</td></tr>
+      <tr><td class="k">High revert rate</td><td>Users prefer stability or do not trust the system. The design recommendation is opt-in adaptation, not automatic switching.</td></tr>
+      <tr><td class="k">Benefit only in free browsing</td><td>Adaptation supports exploration but not known-item search. This is a useful boundary condition.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.9 Threats specific to Study 3</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Overfitting / leakage:</b> participant-grouped CV, frozen model, no use of Study 3 outcomes for training; report the exact feature pipeline and seeds.</li>
+    <li><b>Small N for a 5-class classifier:</b> report CIs and per-class support; collapse rare classes if necessary; do not report a single accuracy without the confusion matrix.</li>
+    <li><b>Self-report reactivity:</b> check-ins at block boundaries and random micro-checks, not after every click; report whether the check-in itself changed behaviour.</li>
+    <li><b>Switching cost / novelty:</b> ABBA order, stable-trial comparison, sham-like static banner, and a first-trial-after-switch analysis.</li>
+    <li><b>Demand:</b> participants may try to “help” the adaptation by acting frustrated. The cover story and the behavioural feature set make this difficult, but the suspicion check and a sensitivity analysis excluding guessers are needed.</li>
+    <li><b>Deployment:</b> lab-only, short session, fictional store; external validity is limited. A field study is future work.</li>
+  </ul>
+
+  <h2>10.10 Deliverables</h2>
+  <p>A validated estimator with calibration and confusion matrix; a hybrid-vs-static effect estimate; a switch-cost estimate; a break-even accuracy curve; a transition-policy specification; and an open, reproducible pipeline that maps event logs to state probabilities and adaptation decisions.</p>
+</section>

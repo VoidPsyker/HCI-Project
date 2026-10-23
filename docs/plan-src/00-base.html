@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Emotion-Contingent Navigation — Experimental Plan</title>
+<style>
+  @page {
+    size: A4;
+    margin: 21mm 17mm 19mm 17mm;
+    @top-left {
+      content: "Emotion-Contingent Navigation";
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 7.4pt;
+      color: #64748b;
+      letter-spacing: .02em;
+    }
+    @top-right {
+      content: "Research plan · v1.0 · 23 Oct 2026";
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 7.4pt;
+      color: #64748b;
+    }
+    @bottom-left {
+      content: "Planning draft — verify citations before submission";
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 7pt;
+      color: #94a3b8;
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 7.4pt;
+      color: #475569;
+    }
+  }
+  @page cover {
+    margin: 0;
+    @top-left { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Inter", Arial, sans-serif;
+    font-size: 9.7pt;
+    line-height: 1.52;
+    color: #1e293b;
+  }
+  p { margin: 0 0 7px 0; text-align: justify; }
+  h1, h2, h3, h4 { color: #0f172a; line-height: 1.22; page-break-after: avoid; }
+  h1 {
+    font-size: 21pt;
+    margin: 0 0 4mm 0;
+    padding-bottom: 3mm;
+    border-bottom: 2.2px solid #0f766e;
+    letter-spacing: -.015em;
+  }
+  h1 .num { color: #0f766e; }
+  h2 { font-size: 13.2pt; margin: 6mm 0 2.2mm 0; color: #0f766e; }
+  h3 { font-size: 10.8pt; margin: 4mm 0 1.5mm 0; }
+  h4 { font-size: 9.8pt; margin: 3mm 0 1mm 0; color: #334155; }
+  .section { page-break-before: always; }
+  .no-break, .keep-together { page-break-inside: avoid; }
+  .small { font-size: 8.2pt; line-height: 1.42; }
+  .tiny { font-size: 7.2pt; line-height: 1.35; }
+  .muted { color: #64748b; }
+  .accent { color: #0f766e; }
+  .amber { color: #b45309; }
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .mt0 { margin-top: 0; }
+  .mb0 { margin-bottom: 0; }
+  .lead {
+    font-size: 10.8pt;
+    line-height: 1.55;
+    color: #334155;
+    margin: 0 0 5mm 0;
+  }
+  strong { color: #0f172a; }
+  a { color: #0f766e; text-decoration: none; }
+
+  /* Cover */
+  .cover {
+    page: cover;
+    width: 210mm;
+    height: 297mm;
+    background: linear-gradient(145deg, #062f2c 0%, #0f766e 48%, #0b4f4a 100%);
+    color: #f8fafc;
+    padding: 22mm 20mm 18mm 20mm;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover:before {
+    content: "";
+    position: absolute;
+    width: 150mm; height: 150mm;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+    right: -55mm; top: -60mm;
+  }
+  .cover:after {
+    content: "";
+    position: absolute;
+    width: 95mm; height: 95mm;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 50%;
+    left: -35mm; bottom: -30mm;
+  }
+  .cover-kicker {
+    font-size: 8pt;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #99f6e4;
+    margin-bottom: 8mm;
+    font-weight: 600;
+  }
+  .cover h1 {
+    color: #ffffff;
+    border: none;
+    font-size: 30pt;
+    line-height: 1.12;
+    margin: 0 0 5mm 0;
+    max-width: 160mm;
+    padding: 0;
+    letter-spacing: -.02em;
+  }
+  .cover-sub {
+    font-size: 13pt;
+    line-height: 1.45;
+    color: #ccfbf1;
+    max-width: 155mm;
+    margin-bottom: 10mm;
+  }
+  .cover-desc {
+    font-size: 9.2pt;
+    line-height: 1.55;
+    color: #e2e8f0;
+    max-width: 140mm;
+    border-left: 3px solid #5eead4;
+    padding-left: 5mm;
+  }
+  .cover-meta {
+    position: absolute;
+    left: 20mm; bottom: 18mm;
+    max-width: 100mm;
+    font-size: 8pt;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+  .cover-meta b { color: #ffffff; }
+  .cover-icons {
+    position: absolute;
+    right: 18mm;
+    bottom: 18mm;
+    display: grid;
+    grid-template-columns: repeat(3, 20mm);
+    gap: 3mm;
+  }
+  .cover-icons div {
+    height: 20mm;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 2mm;
+    background: rgba(255,255,255,.06);
+    color: #ccfbf1;
+    font-size: 6.5pt;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 2mm;
+  }
+
+  /* TOC */
+  .toc h1 { margin-bottom: 6mm; }
+  .toc-list { list-style: none; padding: 0; margin: 0; }
+  .toc-list li { margin: 0 0 2.1mm 0; font-size: 9.6pt; }
+  .toc-list li.l2 { margin-left: 7mm; font-size: 8.9pt; color: #475569; }
+  .toc-list a { color: #1e293b; display: flex; align-items: baseline; }
+  .toc-list a .t { white-space: nowrap; }
+  .toc-list a .dots {
+    flex: 1;
+    border-bottom: 1px dotted #cbd5e1;
+    margin: 0 2.5mm;
+    transform: translateY(-1mm);
+  }
+  .toc-list a .pg {
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+  .toc-list .tocnum { flex: 0 0 9mm; color: #0f766e; font-weight: 700; }
+
+  /* Boxes */
+  .callout, .keybox, .warnbox, .note {
+    padding: 3.2mm 4mm;
+    border-radius: 2mm;
+    margin: 3mm 0 4mm 0;
+    page-break-inside: avoid;
+  }
+  .callout { background: #f0fdfa; border-left: 4px solid #0f766e; }
+  .keybox { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #b45309; }
+  .warnbox { background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #b91c1c; }
+  .note { background: #f8fafc; border: 1px solid #e2e8f0; }
+  .callout h4, .keybox h4, .warnbox h4, .note h4 { margin-top: 0; }
+  .callout p:last-child, .keybox p:last-child, .warnbox p:last-child, .note p:last-child { margin-bottom: 0; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2.5mm 0 4mm 0;
+    font-size: 8.1pt;
+    line-height: 1.35;
+    page-break-inside: avoid;
+  }
+  table.long { page-break-inside: auto; }
+  thead { display: table-header-group; }
+  th {
+    background: #0f766e;
+    color: #ffffff;
+    text-align: left;
+    padding: 2mm 2.2mm;
+    font-weight: 600;
+    vertical-align: bottom;
+    border: 1px solid #0f766e;
+  }
+  td {
+    padding: 1.7mm 2.2mm;
+    border: 1px solid #dbe4e8;
+    vertical-align: top;
+  }
+  tr { page-break-inside: avoid; }
+  tbody tr:nth-child(even) td { background: #f7fafb; }
+  td.k { font-weight: 600; color: #0f172a; background: #f1f5f9; }
+  table.compact { font-size: 7.7pt; }
+  table.compact td, table.compact th { padding: 1.3mm 1.8mm; }
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-size: 8.2pt;
+    color: #475569;
+    padding-bottom: 1.5mm;
+    font-weight: 600;
+  }
+
+  /* Figures */
+  figure { margin: 3mm 0 5mm 0; page-break-inside: avoid; }
+  figcaption {
+    font-size: 8.1pt;
+    color: #475569;
+    margin-top: 1.5mm;
+    line-height: 1.4;
+  }
+  figcaption b { color: #0f172a; }
+  .fig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .fig-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; }
+  .chart { width: 100%; height: auto; }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    font-size: 6.8pt;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: .7mm 1.6mm;
+    border-radius: 1mm;
+    font-weight: 700;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .tag.ok { background: #dcfce7; color: #166534; }
+  .tag.verify { background: #fef3c7; color: #92400e; }
+  .tag.internal { background: #e0f2fe; color: #075985; }
+  .tag.risk { background: #fee2e2; color: #991b1b; }
+
+  /* Two-column layouts */
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .cols2 > div { min-width: 0; }
+  .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
+  .cols3 > div { min-width: 0; }
+
+  /* Definition list */
+  dl { margin: 2mm 0 4mm 0; }
+  dt { font-weight: 700; color: #0f172a; margin-top: 2mm; }
+  dd { margin: 0 0 1mm 0; color: #334155; }
+
+  /* Code */
+  code, .mono {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 7.8pt;
+    background: #f1f5f9;
+    padding: .5mm 1mm;
+    border-radius: .8mm;
+    color: #0f172a;
+  }
+  pre {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 7.2pt;
+    line-height: 1.45;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 3.5mm 4mm;
+    border-radius: 2mm;
+    overflow: hidden;
+    white-space: pre-wrap;
+    page-break-inside: avoid;
+    margin: 2mm 0 4mm 0;
+  }
+  pre .c { color: #94a3b8; }
+  pre .k { color: #5eead4; }
+  pre .s { color: #fcd34d; }
+
+  /* Formula */
+  .formula {
+    font-family: "Cambria Math", Georgia, serif;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 2.5mm 3mm;
+    border-radius: 1.5mm;
+    margin: 2mm 0 3mm 0;
+    font-size: 9pt;
+    text-align: center;
+  }
+
+  /* Timeline / Gantt */
+  .gantt { width: 100%; border-collapse: collapse; font-size: 7.6pt; }
+  .gantt th { background: #0f172a; border-color: #0f172a; }
+  .gantt td { height: 8mm; padding: 1mm; }
+  .bar { height: 4.2mm; border-radius: 1mm; background: #0f766e; }
+  .bar.amber { background: #b45309; }
+  .bar.light { background: #5eead4; }
+  .bar.gray { background: #94a3b8; }
+
+  /* Wireframes */
+  .wf-wrap { border: 1px solid #cbd5e1; border-radius: 2mm; padding: 2mm; background: #fbfdfd; }
+  .wf-title { font-size: 7.5pt; font-weight: 700; color: #0f172a; margin-bottom: 1mm; }
+  .wf-note { font-size: 6.6pt; color: #64748b; margin-top: 1mm; line-height: 1.3; }
+  svg text { font-family: "Segoe UI", Arial, sans-serif; }
+
+  /* Matrix */
+  .matrix {
+    display: grid;
+    grid-template-columns: 26mm repeat(4, 1fr);
+    gap: 1.2mm;
+    font-size: 7.4pt;
+  }
+  .matrix div {
+    padding: 1.5mm 1.8mm;
+    border: 1px solid #dbe4e8;
+    background: #ffffff;
+    border-radius: 1mm;
+    line-height: 1.25;
+  }
+  .matrix .h { background: #0f766e; color: #fff; font-weight: 700; border-color: #0f766e; }
+  .matrix .rh { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+
+  /* Footer note on cover */
+  .cover-footnote {
+    position: absolute;
+    left: 20mm; right: 20mm; bottom: 8mm;
+    font-size: 6.8pt;
+    color: #cbd5e1;
+    border-top: 1px solid rgba(255,255,255,.25);
+    padding-top: 2.5mm;
+  }
+
+  .kpi {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3mm;
+    margin: 3mm 0 5mm 0;
+  }
+  .kpi div {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid #0f766e;
+    padding: 3mm;
+    border-radius: 1.5mm;
+  }
+  .kpi b { display: block; font-size: 15pt; color: #0f766e; line-height: 1.1; }
+  .kpi span { font-size: 7.6pt; color: #475569; }
+
+  /* References */
+  .refs { font-size: 8.15pt; line-height: 1.38; }
+  .refs p {
+    margin: 0 0 2.1mm 0;
+    padding-left: 6mm;
+    text-indent: -6mm;
+    text-align: left;
+  }
+  .refs .unverified {
+    background: #fffbeb;
+    border-left: 3px solid #b45309;
+    padding: 2mm 3mm;
+    margin: 3mm 0;
+    text-indent: 0;
+    padding-left: 3mm;
+  }
+  .appendix h2 { margin-top: 5mm; }
+  .appendix h3 { margin-top: 3.5mm; }
+  .checklist { font-size: 8.4pt; line-height: 1.45; }
+  .checklist li { margin-bottom: 1.2mm; }
+  .script {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #0f766e;
+    padding: 3mm 3.5mm;
+    margin: 2mm 0 3mm 0;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    page-break-inside: avoid;
+  }
+  .script b { color: #0f766e; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<section class="cover">
+  <div class="cover-kicker">Research protocol · experimental design · implementation blueprint</div>
+  <h1>Emotion-Contingent Navigation</h1>
+  <div class="cover-sub">A preregistered plan for comparing six menu structures across four emotional contexts — and for testing whether switching structure actually helps.</div>
+  <div class="cover-desc">
+    This document turns the emotional adaptive navigation idea into a testable programme: a pilot, a 6 × 4 mapping study, a causal adaptation study, and an end-to-end system evaluation with an imperfect emotion estimator. It includes the full protocol, measures, analysis plan, sample-size rationale, prototype architecture, ethics, and a paper outline.
+  </div>
+  <div class="cover-icons">
+    <div>A · Horizontal</div><div>B · Sidebar</div><div>C · Mega</div>
+    <div>D · Fractal</div><div>E · RS grid</div><div>F · Radial</div>
+  </div>
+  <div class="cover-meta">
+    <b>Version 1.0</b> · 23 October 2026<br>
+    Prepared for the HCI research project · 2026<br>
+    Status: planning draft — ethics approval and pilot required before data collection
+  </div>
+  <div class="cover-footnote">
+    Built from the four supplied papers, the existing protocol v3.0, and the six-menu brief. Citations marked <span class="tag verify">verify</span> could not be confirmed from the folder or public metadata and must not be presented as established evidence.
+  </div>
+</section>
+
+<!-- ================= TOC ================= -->
+<section class="section toc">
+  <h1>Contents</h1>
+  <ul class="toc-list">
+    <li><a href="#exec"><span class="tocnum">0</span><span class="t">Executive summary</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#background"><span class="tocnum">1</span><span class="t">Background and related work</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#questions"><span class="tocnum">2</span><span class="t">Research questions and hypotheses</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#emotions"><span class="tocnum">3</span><span class="t">The four emotional contexts</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#menus"><span class="tocnum">4</span><span class="t">The six menu structures</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#platform"><span class="tocnum">5</span><span class="t">Platform, product taxonomy, and task bank</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#design"><span class="tocnum">6</span><span class="t">Study design overview</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#pilot"><span class="tocnum">7</span><span class="t">Pilot study</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#study1"><span class="tocnum">8</span><span class="t">Study 1 — the 6 × 4 mapping</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#study2"><span class="tocnum">9</span><span class="t">Study 2 — causal test of adaptation</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#study3"><span class="tocnum">10</span><span class="t">Study 3 — end-to-end system</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#measures"><span class="tocnum">11</span><span class="t">Measures and instruments</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#analysis"><span class="tocnum">12</span><span class="t">Analysis plan</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#power"><span class="tocnum">13</span><span class="t">Sample size and power</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#implementation"><span class="tocnum">14</span><span class="t">Implementation plan</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#ethics"><span class="tocnum">15</span><span class="t">Ethics, privacy, and risk</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#validity"><span class="tocnum">16</span><span class="t">Validity, limitations, and falsification</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#timeline"><span class="tocnum">17</span><span class="t">Timeline, milestones, and deliverables</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#paper"><span class="tocnum">18</span><span class="t">Paper outline and publication plan</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#conclusion"><span class="tocnum">19</span><span class="t">Conclusion</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#references"><span class="tocnum">20</span><span class="t">References</span><span class="dots"></span><span class="pg"></span></a></li>
+    <li><a href="#appendix"><span class="tocnum">A</span><span class="t">Appendices</span><span class="dots"></span><span class="pg"></span></a></li>
+  </ul>
+  <div class="note" style="margin-top:8mm">
+    <h4>How to use this document</h4>
+    <p class="small">Sections 1–6 define the scientific logic. Sections 7–10 are the three study protocols. Sections 11–13 specify measurement and analysis. Sections 14–17 cover build, ethics, validity, and schedule. Section 18 gives the paper skeleton. The appendices contain task examples, questionnaire items, induction scripts, the event schema, randomisation matrices, and analysis code skeletons. If you have limited time, read <b>§0, §2, §3, §4, §8, §9, §13</b>, then use <b>Track A/B/C</b> in §17.</p>
+  </div>
+</section>
+
+<!-- APPEND_MARKER -->
+</body>
+</html>

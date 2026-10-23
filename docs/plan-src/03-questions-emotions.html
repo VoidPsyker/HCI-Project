@@ -1,0 +1,177 @@
+<!-- ================= 2 QUESTIONS ================= -->
+<section class="section" id="questions">
+  <h1><span class="num">2</span> Research questions and hypotheses</h1>
+
+  <p class="lead">The programme asks one overarching question and four specific ones. Each specific question maps onto a study and a pre-registered primary outcome. The hypotheses are directional where theory supports it and exploratory where it does not.</p>
+
+  <h2>2.1 Overarching question</h2>
+  <div class="callout">
+    <p style="margin:0"><b>Which e-commerce navigation structure best supports product finding in each of four emotional contexts, and does adapting the structure to that empirically derived mapping improve performance and experience compared with a static or mismatched structure?</b></p>
+  </div>
+
+  <h2>2.2 Specific questions</h2>
+  <table>
+    <thead><tr><th style="width:8%">ID</th><th style="width:44%">Question</th><th style="width:20%">Study</th><th style="width:28%">Primary evidence</th></tr></thead>
+    <tbody>
+      <tr><td class="k">RQ1</td><td>Do the six menu structures differ in task success, completion time, navigation errors, backtracking, cognitive load, and perceived usability?</td><td>Study 1</td><td>Main effects of menu; estimated marginal means</td></tr>
+      <tr><td class="k">RQ2</td><td>Does the relative advantage of the structures change across emotional contexts — i.e., is there a menu × context interaction?</td><td>Study 1</td><td>Interaction test; 6 × 4 matrix; focused contrasts</td></tr>
+      <tr><td class="k">RQ3</td><td>Does an emotion-matched adaptive policy outperform a static best-menu policy, a mismatched policy, and a sham-switching control?</td><td>Study 2</td><td>Planned contrasts on success, time, errors, load, disorientation</td></tr>
+      <tr><td class="k">RQ4</td><td>Can interaction signals predict self-reported emotional context above a majority-class baseline, and does end-to-end adaptation remain beneficial when the estimate is imperfect?</td><td>Study 3</td><td>Participant-grouped validation; macro-F1; calibration; static vs hybrid</td></tr>
+      <tr><td class="k">RQ5</td><td>Are the effects of menu structure mediated by cognitive load, perceived control, and wayfinding/lostness?</td><td>Study 1 &amp; 2</td><td>Mediation models; process measures</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.3 Hypotheses</h2>
+  <table class="long">
+    <thead><tr><th style="width:7%">ID</th><th style="width:41%">Hypothesis</th><th style="width:27%">Operationalisation</th><th style="width:25%">Decision rule</th></tr></thead>
+    <tbody>
+      <tr><td class="k">H1</td><td>Menu structure and emotional context interact: the rank order of menus differs across at least some contexts.</td><td>Menu × context interaction in the mixed-effects model for log completion time and success.</td><td>Likelihood-ratio test p &lt; .05 (or Bayes factor &gt; 3) <i>and</i> a meaningful spread in at least two state-specific contrasts.</td></tr>
+      <tr><td class="k">H2</td><td>A policy that selects the Study 1 best-supported menu will improve task performance relative to the best static menu.</td><td>Matched vs static contrast in Study 2.</td><td>Superiority on time/errors with non-inferiority on success (margin 5 percentage points).</td></tr>
+      <tr><td class="k">H3</td><td>Emotion-matched adaptation will outperform emotion-mismatched adaptation.</td><td>Matched vs mismatched contrast.</td><td>Superiority on the primary composite; direction consistent across at least three of four states.</td></tr>
+      <tr><td class="k">H4</td><td>Mere switching (sham) will not reproduce the matched advantage; if it does, the effect is novelty/attention, not matching.</td><td>Matched vs sham contrast (optional arm).</td><td>Matched &gt; sham on the primary outcome; if not, reinterpret as a change effect.</td></tr>
+      <tr><td class="k">H5</td><td>Interaction signals will predict self-reported state above the majority-class baseline, but with meaningful uncertainty.</td><td>Participant-grouped cross-validation; macro-F1 and balanced accuracy.</td><td>Macro-F1 &gt; baseline + .10 with 95% CI excluding baseline; report confusion matrix and calibration.</td></tr>
+      <tr><td class="k">H6</td><td>End-to-end benefits will be smaller than the known-label (oracle) benefit and will depend on estimator confidence and transition stability.</td><td>Study 3 vs Study 2; confidence-stratified analysis.</td><td>Hybrid &gt; static on at least one primary outcome, but hybrid &lt; matched (known labels); benefit increases with confidence.</td></tr>
+      <tr><td class="k">H7</td><td>Switching imposes a measurable cost: the first trial after a structure change will be slower and more error-prone than a stable trial.</td><td>Switch trial vs stable trial within Study 2/3.</td><td>Switch cost &gt; 0 on log time or errors, with 95% CI excluding zero.</td></tr>
+      <tr><td class="k">H8</td><td>Cognitive load, perceived control, and lostness will mediate the effect of menu structure on performance.</td><td>Mediation with bootstrapped indirect effects.</td><td>Indirect effect 95% CI excludes zero; report proportion mediated.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.4 Primary and secondary outcomes</h2>
+  <div class="cols2">
+    <div>
+      <h3>Primary (confirmatory)</h3>
+      <ul class="small" style="padding-left:5mm">
+        <li><b>Task success</b> — correct product detail page within 120 s.</li>
+        <li><b>Completion time</b> — log-transformed; failures censored at 120 s.</li>
+        <li><b>Navigation errors</b> — wrong branch, wrong product, invalid transition.</li>
+        <li><b>Cognitive load</b> — NASA-TLX after each block.</li>
+        <li><b>Perceived usability</b> — UMUX-Lite after each block; SUS at the end.</li>
+        <li><b>Disorientation / control</b> — 4-item scale after each block.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Secondary (exploratory / mechanism)</h3>
+      <ul class="small" style="padding-left:5mm">
+        <li>Backtracking, category switches, clicks, path efficiency.</li>
+        <li>Menu open/close count; hover/focus dwell; search attempts (if enabled).</li>
+        <li>Perceived predictability, trust, satisfaction, preference ranking.</li>
+        <li>Switch acceptance, reversion, perceived disruption.</li>
+        <li>Eye tracking (optional): time to first fixation, fixation count, scanpath, AOI transitions.</li>
+        <li>Individual differences: domain expertise, online shopping frequency, need for cognition.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2.5 What would count as failure — and why it is still informative</h2>
+  <table>
+    <thead><tr><th style="width:38%">Observed pattern</th><th style="width:62%">Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">No menu × context interaction; one menu wins everywhere</td><td>Emotion-contingent structural adaptation is unnecessary in this domain. The applied recommendation is a stable global menu; the theoretical claim is that menu structure is robust to mild emotional context.</td></tr>
+      <tr><td class="k">Interaction present, but matched adaptation does not beat static</td><td>Switching costs, task variation, or insufficient policy precision offset the cell-level gains. This is a boundary condition, not a failed study.</td></tr>
+      <tr><td class="k">Matched beats static, but mismatched also beats static</td><td>The benefit is change/novelty/attention, not matching. The sham control and the direction of the mismatch effect distinguish these.</td></tr>
+      <tr><td class="k">Matched works with known labels but not with the estimator</td><td>The bottleneck is inference or transition policy. The break-even accuracy analysis says how much better the estimator must be.</td></tr>
+      <tr><td class="k">Users frequently revert or report disorientation</td><td>User control and structural stability may outweigh performance. The design recommendation is to keep the current layout and offer adaptation as an option, not a default.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>Pre-registration rule</h4>
+    <p class="small">The primary outcome, the 6 × 4 interaction test, the four state-specific focused contrasts, the Study 2 contrasts, and the policy-selection rule must be frozen before confirmatory data collection. Exploratory analyses are labelled as such. The mapping is frozen after Study 1 and must not be revised after looking at Study 2 outcomes.</p>
+  </div>
+</section>
+
+<!-- ================= 3 EMOTIONS ================= -->
+<section class="section" id="emotions">
+  <h1><span class="num">3</span> The four emotional contexts</h1>
+
+  <p class="lead">Emotion is treated as an experimental context, not as a clinical state and not as something that can be read directly from clicks. The four contexts are chosen because they are distinct, relevant to navigation, and measurable with brief self-report plus behavioural evidence. The system estimates <b>self-reported context</b>, not “true emotion.”</p>
+
+  <h2>3.1 The four states and why they fit</h2>
+  <table class="long">
+    <thead><tr><th style="width:15%">State</th><th style="width:22%">Operational definition</th><th style="width:23%">Induction (mild, reversible)</th><th style="width:20%">Behavioural signals (noisy)</th><th style="width:20%">Why it matters for menus</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="k">Happiness / positive affect</td>
+        <td>Participant reports positive valence and a good mood after a brief positive experience; moderate arousal.</td>
+        <td>90-s amusing video clip + a positive “you found a great deal” scenario; or a success-feedback task. Pilot to select the stronger induction.</td>
+        <td>More direct choices, fewer reversals, longer exploration, higher tolerance for visual richness.</td>
+        <td>Tests whether positive affect broadens exploration and makes richer menus (E, F, C) more acceptable.</td>
+      </tr>
+      <tr>
+        <td class="k">Frustration</td>
+        <td>Participant reports irritation or frustration after a mild, controlled goal blockage; high arousal, negative valence.</td>
+        <td>90-s “buggy search” task: valid queries return “No results,” the filter resets, and a neutral message appears. Capped at three attempts; no personal failure feedback.</td>
+        <td>Repeated clicks, rapid reversals, repeated menu open/close, pauses after failure, higher click rate.</td>
+        <td>Tests whether frustration narrows attention and favours direct, low-click, high-visibility structures (C, A).</td>
+      </tr>
+      <tr>
+        <td class="k">Confusion / lostness</td>
+        <td>Participant reports uncertainty about where a product belongs or which path to choose; negative/neutral valence, moderate arousal.</td>
+        <td>90-s ambiguous categorisation task: place a product into one of four overlapping categories with no definitions or feedback.</td>
+        <td>Long pauses, category switching, backtracking, repeated menu inspection, inconsistent paths.</td>
+        <td>Tests whether confusion favours a stable overview and a visible path back (B, C, D with breadcrumb).</td>
+      </tr>
+      <tr>
+        <td class="k">Boredom / disengagement</td>
+        <td>Participant reports low interest or under-stimulation after a repetitive, low-challenge task; low arousal, negative/neutral valence.</td>
+        <td>90-s repetitive catalogue task: verify the price of 30 identical watch straps, one by one, with no variation.</td>
+        <td>Long idle gaps, unusually fast guesses, reduced exploration, lower engagement ratings, early exits.</td>
+        <td>Tests whether boredom favours novel, colourful, or spatially engaging menus (E, F) over familiar lists (A, B).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3.2 Why these two extra states — and why not anxiety or curiosity</h2>
+  <p>The brief asked for two additional emotions beyond happiness and frustration. The recommendation is <b>confusion/lostness</b> and <b>boredom/disengagement</b>. The rationale is that they are the two states most directly implicated in navigation failure and in the engagement literature, and they occupy different quadrants of the affect space:</p>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Confusion</b> is the cognitive-affective signature of wayfinding failure. It is the state that menu structure is most obviously supposed to fix, and it is measurable through backtracking, category switching, and self-report.</li>
+    <li><b>Boredom</b> is the low-arousal, low-engagement state that a visually rich or spatially novel menu might repair. It is the natural counterpart to confusion: one is “I don’t know where it is,” the other is “I don’t care enough to keep looking.”</li>
+    <li>Together with happiness (positive, moderate arousal) and frustration (negative, high arousal), they cover the valence × arousal space and add a motivational dimension that a pure circumplex misses.</li>
+  </ul>
+
+  <table>
+    <caption>Table 3.2 — Alternatives considered and why they are not in the core design</caption>
+    <thead><tr><th style="width:18%">Alternative</th><th style="width:42%">Why it is attractive</th><th style="width:40%">Why it is not a core state</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Anxiety</td><td>High-arousal negative state; relevant to purchase decisions and risk.</td><td>Overlaps with frustration; harder to induce ethically and to distinguish behaviourally; better treated as a moderator or a future extension.</td></tr>
+      <tr><td class="k">Curiosity / interest</td><td>Positive, high-arousal; directly relevant to exploratory browsing.</td><td>Overlaps with happiness and is difficult to induce independently of the task; could be a fifth state in a follow-up.</td></tr>
+      <tr><td class="k">Sadness</td><td>Low-arousal negative; distinct from boredom in appraisal.</td><td>Less tied to menu structure; inducing sadness in a shopping study raises ethical and demand-characteristic concerns.</td></tr>
+      <tr><td class="k">Delight</td><td>Positive, high-arousal; relevant to aesthetic menus.</td><td>Transient and hard to measure reliably; more of an evaluation reaction than a stable context.</td></tr>
+      <tr><td class="k">Cognitive load</td><td>Central to menu performance.</td><td>Not an emotion; treated as a mediator and measured with NASA-TLX.</td></tr>
+      <tr><td class="k">Stress</td><td>Physiological, measurable.</td><td>Broad and non-specific; ethical and equipment burden; weak mapping to menu geometry.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.3 Measurement model: self-report anchors, behavioural evidence, no mind-reading</h2>
+  <p>Each state is measured in three ways. First, <b>self-report</b> is the primary label: a 9-point SAM valence and arousal rating (Bradley &amp; Lang, 1994) plus four discrete 7-point items (happy, frustrated, confused, bored). Second, <b>behavioural signals</b> are logged continuously and used as noisy features for the estimator. Third, <b>manipulation checks</b> verify that the induction produced the intended state. The system never claims to detect emotion from behaviour alone; it predicts the self-reported context under the tested conditions.</p>
+
+  <p>State labels are derived with a pre-registered rule. The intended state is the label if (a) the corresponding discrete item is the highest of the four and (b) it is rated ≥ 5 on the 7-point scale. If the highest item is below 5 or two items are tied, the trial is labelled <b>mixed/neutral</b> and analysed separately. This avoids forcing every participant into a category and makes induction failure visible.</p>
+
+  <h2>3.4 Induction protocol</h2>
+  <p>All inductions are mild, short, and reversible. They are embedded before a block of six navigation trials, not during a trial. A neutral reset (60-s nature video or a simple filler task) separates blocks. The order of blocks is counterbalanced with a Latin square. The full scripts are in Appendix C.</p>
+
+  <table>
+    <thead><tr><th style="width:14%">State</th><th style="width:26%">Cover story</th><th style="width:22%">Materials</th><th style="width:19%">Manipulation check</th><th style="width:19%">Stop rule / debrief</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Happiness</td><td>“Before the next set, we’ll show a short clip from a comedy show used in mood research.”</td><td>90-s validated amusing clip; headphones; volume fixed; no brand content.</td><td>SAM valence ≥ 6; happy item ≥ 5; arousal 4–7.</td><td>If distress &gt; 6/10, stop; debrief that the clip was for mood, not evaluation.</td></tr>
+      <tr><td class="k">Frustration</td><td>“The site’s search is being tested and may be unreliable; please try up to three times.”</td><td>Buggy search: valid query returns “No results,” filter resets; neutral error copy; 90 s cap.</td><td>Frustration item ≥ 5; SAM valence ≤ 4; arousal ≥ 5.</td><td>Stop after 3 attempts; immediate debrief; no mention of participant error; offer break.</td></tr>
+      <tr><td class="k">Confusion</td><td>“We’re checking how people categorise a new product; there is no right answer.”</td><td>Four overlapping categories, no definitions, no feedback; 90 s.</td><td>Confusion item ≥ 5; SAM valence ≤ 5; arousal 4–6.</td><td>Reveal the ambiguity; explain the purpose; offer break.</td></tr>
+      <tr><td class="k">Boredom</td><td>“Please verify the prices of these identical straps for the catalogue.”</td><td>30 identical items; repetitive clicking; no variation; 90 s.</td><td>Boredom item ≥ 5; SAM arousal ≤ 4; valence ≤ 5.</td><td>Stop at 90 s; debrief; offer a stimulating break.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="keybox">
+    <h4>Pilot criteria for a usable induction</h4>
+    <p class="small">An induction is retained only if, in the pilot (N = 8–10): (1) at least 60% of participants label the intended state as dominant; (2) mean intensity is ≥ 5/7; (3) fewer than 20% report a different state as dominant; (4) no participant reports distress above 6/10; (5) the induction takes ≤ 2.5 min including the check. If an induction fails, revise the script or replace it before the main study; do not proceed with a weak manipulation.</p>
+  </div>
+
+  <h2>3.5 Carry-over, reactivity, and demand characteristics</h2>
+  <p>Emotional states can carry over between blocks, and repeated self-report can make participants aware of the hypothesis. Three controls address this. First, a neutral reset and a 2-min break separate blocks. Second, the purpose of the study is described broadly as “how people find products in different website layouts,” not as “we are testing whether emotion changes menu choice.” Third, the post-experiment suspicion check asks what participants thought the study was about; participants who correctly guess the adaptation hypothesis are retained but the analysis is repeated without them as a sensitivity check.</p>
+
+  <p>Order effects are handled by counterbalancing the four emotion blocks across participants using a Latin square (four sequences: ABCD, BCDA, CDAB, DABC). Within each block, the six menus are presented in a second Latin square (six positions). The combination yields 24 sequences; participants are assigned randomly with stratification by gender and prior online-shopping frequency. Trial position is included as a covariate in the analysis.</p>
+
+  <div class="warnbox">
+    <h4>What this study does not claim</h4>
+    <p class="small">It does not diagnose emotion, measure clinical anxiety or depression, or infer emotion from facial expression. It does not claim that the induced states are identical to real shopping emotions. It tests whether <i>mild, experimentally induced, self-reported contexts</i> moderate the relative performance of menu structures. That is a narrower and more defensible claim.</p>
+  </div>
+</section>

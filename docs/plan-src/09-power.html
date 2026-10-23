@@ -1,0 +1,169 @@
+<!-- ================= 13 POWER ================= -->
+<section class="section" id="power">
+  <h1><span class="num">13</span> Sample size and power</h1>
+
+  <p class="lead">The sample sizes in this plan come from a Monte Carlo simulation of the actual design, not from a rule of thumb. The simulation shows something important: a 6 × 4 within-subject interaction has 15 numerator degrees of freedom, so it is much harder to detect than a two-condition comparison. The plan is powered for a medium interaction, and it uses four focused contrasts to recover power for the specific predictions.</p>
+
+  <h2>13.1 Simulation assumptions</h2>
+  <table>
+    <thead><tr><th style="width:30%">Assumption</th><th style="width:24%">Value</th><th style="width:46%">Justification / sensitivity</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Design</td><td>6 menus × 4 states, 24 trials per participant</td><td>One observation per cell; the participant intercept induces the within-subject correlation.</td></tr>
+      <tr><td class="k">Participant intercept SD</td><td>0.50 (log-time units)</td><td>Moderate individual differences; varied in sensitivity analysis from 0.3 to 0.8.</td></tr>
+      <tr><td class="k">Residual SD</td><td>1.00</td><td>Scales the interaction effect; f is defined relative to this SD.</td></tr>
+      <tr><td class="k">Interaction effect SD (f)</td><td>0.08–0.15</td><td>A 0.10 effect is roughly a 10% shift in the cell mean; 0.15 is a 15% shift. Pilot/Study 1 estimates replace these values.</td></tr>
+      <tr><td class="k">Sphericity</td><td>Assumed; sensitivity with ε = 0.7</td><td>Repeated-measures designs often violate sphericity; the mixed model with random slopes is more robust, but power falls.</td></tr>
+      <tr><td class="k">Alpha</td><td>.05, two-sided</td><td>Primary interaction; focused contrasts use Holm correction.</td></tr>
+      <tr><td class="k">Replications</td><td>1,200 per cell</td><td>Monte Carlo error ≈ ±.014 at power = .80; adequate for planning.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>13.2 Study 1 — omnibus interaction (time outcome)</h2>
+  <table>
+    <caption>Table 13.1 — Power to detect the 6 × 4 interaction (Monte Carlo, 1,200 replications)</caption>
+    <thead><tr><th style="width:18%">Interaction SD (f)</th><th>N = 24</th><th>N = 36</th><th>N = 48</th><th>N = 60</th><th>N = 72</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0.06 (very small)</td><td>.09</td><td>.12</td><td>.19</td><td>.24</td><td>.28</td></tr>
+      <tr><td class="k">0.08 (small)</td><td>.17</td><td>.22</td><td>.32</td><td>.42</td><td>.49</td></tr>
+      <tr><td class="k">0.10 (small–medium)</td><td>.25</td><td>.38</td><td>.51</td><td>.63</td><td>.75</td></tr>
+      <tr><td class="k">0.12 (medium)</td><td>.32</td><td>.58</td><td>.74</td><td>.83</td><td>.90</td></tr>
+      <tr><td class="k">0.15 (medium–large)</td><td>.54</td><td>.81</td><td>.92</td><td>.97</td><td>.99</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Reading the table.</b> N = 48 is powered for f ≈ 0.15 (92%) but not for f = 0.10 (51%). N = 72 is powered for f ≈ 0.12 (90%) and gives 75% for f = 0.10. If the true interaction is small, even N = 72 will often produce an inconclusive result; the paper must report the CI and not claim “no effect.” This is why the design also pre-registers four focused contrasts.</p>
+
+  <h2>13.3 Study 1 — focused contrasts</h2>
+  <p>A focused contrast compares two menus within one state (e.g., C vs A under frustration). It has 1 df and much more power than the 15-df omnibus. The table below is a paired-comparison approximation: d is the standardized difference between the two cell means, with a within-participant correlation of .50. It is illustrative; the exact power depends on the correlation and the number of trials per cell.</p>
+
+  <table>
+    <caption>Table 13.2 — Approximate power for a focused two-menu contrast within one state</caption>
+    <thead><tr><th style="width:18%">Standardized difference (d)</th><th>N = 48</th><th>N = 60</th><th>N = 72</th><th>N = 80</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0.25 (small)</td><td>.39</td><td>.48</td><td>.55</td><td>.59</td></tr>
+      <tr><td class="k">0.30 (small–medium)</td><td>.52</td><td>.62</td><td>.70</td><td>.76</td></tr>
+      <tr><td class="k">0.40 (medium)</td><td>.77</td><td>.86</td><td>.92</td><td>.94</td></tr>
+      <tr><td class="k">0.50 (medium–large)</td><td>.93</td><td>.97</td><td>.98</td><td>.99</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">The focused contrasts are secondary to the omnibus gate. If the omnibus is not significant, they are reported as exploratory with FDR correction. They are still useful: a strong C-vs-A effect under frustration can be a publishable finding even if the full 6 × 4 interaction is not significant.</p>
+
+  <h2>13.4 Study 2 — matched vs static</h2>
+  <table>
+    <caption>Table 13.3 — Power for the matched-vs-static paired contrast (simulation, 8,000 replications, correlation .50)</caption>
+    <thead><tr><th style="width:18%">Standardized difference (d)</th><th>N = 48</th><th>N = 60</th><th>N = 72</th><th>N = 80</th></tr></thead>
+    <tbody>
+      <tr><td class="k">0.25</td><td>.39</td><td>.48</td><td>.55</td><td>.59</td></tr>
+      <tr><td class="k">0.30</td><td>.52</td><td>.62</td><td>.70</td><td>.76</td></tr>
+      <tr><td class="k">0.40</td><td>.77</td><td>.86</td><td>.92</td><td>.94</td></tr>
+      <tr><td class="k">0.50</td><td>.93</td><td>.97</td><td>.98</td><td>.99</td></tr>
+    </tbody>
+  </table>
+
+  <p>N = 80 gives 94% power for d = 0.40 and 76% for d = 0.30. N = 60 gives 86% for d = 0.40 but only 62% for d = 0.30. If the expected effect is small, the reduced design is underpowered; the paper should say so and report the precision. Do not add participants after looking at the effect (optional stopping); fix N in the pre-registration.</p>
+
+  <h2>13.5 Study 3 — estimator precision</h2>
+  <table>
+    <caption>Table 13.4 — Expected 95% CI half-width for a macro-F1 near .55, assuming four check-ins per participant</caption>
+    <thead><tr><th style="width:18%">N</th><th>State estimates</th><th>SE (approx.)</th><th>95% CI half-width</th></tr></thead>
+    <tbody>
+      <tr><td class="k">24</td><td>96</td><td>.051</td><td>±.100</td></tr>
+      <tr><td class="k">48</td><td>192</td><td>.036</td><td>±.070</td></tr>
+      <tr><td class="k">72</td><td>288</td><td>.029</td><td>±.057</td></tr>
+      <tr><td class="k">96</td><td>384</td><td>.025</td><td>±.050</td></tr>
+    </tbody>
+  </table>
+
+  <p>These intervals are approximate and assume independent check-ins; in reality, check-ins within a participant are correlated, so the effective sample size is smaller. The estimator analysis reports participant-grouped cross-validation and cluster-bootstrap CIs, not a naive binomial interval. The table is for planning, not for inference.</p>
+
+  <h2>13.6 Sample-size ladder</h2>
+  <table class="long">
+    <thead><tr><th style="width:12%">Track</th><th style="width:24%">What you get</th><th style="width:20%">N (plus 20% buffer)</th><th style="width:20%">Timeline</th><th style="width:24%">Main limitation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A · Minimum</td><td>Pilot + Study 1 only; focused contrasts; descriptive matrix.</td><td>8 + 48 = 56 (recruit ~68)</td><td>8–10 weeks</td><td>No causal test; omnibus underpowered for small effects.</td></tr>
+      <tr><td class="k">B · Recommended semester</td><td>Pilot + Study 1 (N=48) + Study 2 (N=60).</td><td>10 + 48 + 60 = 118 (recruit ~142)</td><td>12–16 weeks</td><td>Study 1 powered for f ≈ .15; Study 2 for d ≈ .40.</td></tr>
+      <tr><td class="k">C · Full paper</td><td>Pilot + Study 1 (N=72) + Study 2 (N=80) + Study 3 (N=72).</td><td>10 + 72 + 80 + 72 = 234 (recruit ~281)</td><td>6–9 months</td><td>Recruitment and lab time; estimator N still modest.</td></tr>
+      <tr><td class="k">C+ · Eye tracking</td><td>Full paper plus a 24-participant eye-tracking extension.</td><td>234 + 24 = 258 (recruit ~310)</td><td>7–10 months</td><td>Equipment, calibration, and gaze-data ethics.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">The buffer is 20% for attrition, technical failure, and pre-registered exclusions. It is not a licence to replace participants whose results are inconvenient. If recruitment is slower than expected, reduce the design (e.g., 6 × 2 states) rather than running an underpowered 6 × 4 and interpreting a null as evidence of no effect.</p>
+
+  <h2>13.7 Power figure</h2>
+  <figure>
+    <svg viewBox="0 0 620 320" width="100%" height="auto" role="img" aria-label="Power curves for the 6 by 4 interaction">
+      <rect x="0" y="0" width="620" height="320" fill="#ffffff"/>
+      <!-- grid -->
+      <line x1="60" y1="285" x2="520" y2="285" stroke="#94a3b8" stroke-width="1"/>
+      <line x1="60" y1="50" x2="60" y2="285" stroke="#94a3b8" stroke-width="1"/>
+      <g stroke="#e2e8f0" stroke-width="1">
+        <line x1="60" y1="238" x2="520" y2="238"/>
+        <line x1="60" y1="191" x2="520" y2="191"/>
+        <line x1="60" y1="144" x2="520" y2="144"/>
+        <line x1="60" y1="97" x2="520" y2="97"/>
+        <line x1="60" y1="50" x2="520" y2="50"/>
+      </g>
+      <!-- 80% line -->
+      <line x1="60" y1="97" x2="520" y2="97" stroke="#b45309" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <text x="524" y="100" font-size="9" fill="#b45309">80%</text>
+      <!-- vertical markers -->
+      <line x1="290" y1="50" x2="290" y2="285" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"/>
+      <line x1="520" y1="50" x2="520" y2="285" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="286" y="44" font-size="9" fill="#64748b" text-anchor="middle">reduced N=48</text>
+      <text x="516" y="44" font-size="9" fill="#64748b" text-anchor="middle">full N=72</text>
+      <!-- axes labels -->
+      <text x="290" y="312" font-size="10" fill="#475569" text-anchor="middle">Participants (N)</text>
+      <text x="18" y="168" font-size="10" fill="#475569" text-anchor="middle" transform="rotate(-90 18 168)">Power</text>
+      <g font-size="9" fill="#64748b">
+        <text x="45" y="288" text-anchor="end">0</text>
+        <text x="45" y="241" text-anchor="end">.2</text>
+        <text x="45" y="194" text-anchor="end">.4</text>
+        <text x="45" y="147" text-anchor="end">.6</text>
+        <text x="45" y="100" text-anchor="end">.8</text>
+        <text x="45" y="53" text-anchor="end">1.0</text>
+      </g>
+      <g font-size="9" fill="#64748b" text-anchor="middle">
+        <text x="60" y="300">24</text>
+        <text x="175" y="300">36</text>
+        <text x="290" y="300">48</text>
+        <text x="405" y="300">60</text>
+        <text x="520" y="300">72</text>
+      </g>
+      <!-- f=.08 -->
+      <polyline points="60,245.8 175,232.8 290,209.3 405,187.2 520,170.8" fill="none" stroke="#94a3b8" stroke-width="2.4"/>
+      <g fill="#94a3b8"><circle cx="60" cy="245.8" r="3.4"/><circle cx="175" cy="232.8" r="3.4"/><circle cx="290" cy="209.3" r="3.4"/><circle cx="405" cy="187.2" r="3.4"/><circle cx="520" cy="170.8" r="3.4"/></g>
+      <!-- f=.10 -->
+      <polyline points="60,227.0 175,195.5 290,165.2 405,136.7 520,108.8" fill="none" stroke="#b45309" stroke-width="2.4"/>
+      <g fill="#b45309"><circle cx="60" cy="227.0" r="3.4"/><circle cx="175" cy="195.5" r="3.4"/><circle cx="290" cy="165.2" r="3.4"/><circle cx="405" cy="136.7" r="3.4"/><circle cx="520" cy="108.8" r="3.4"/></g>
+      <!-- f=.12 -->
+      <polyline points="60,209.3 175,149.4 290,110.6 405,90.7 520,74.4" fill="none" stroke="#0f766e" stroke-width="2.4"/>
+      <g fill="#0f766e"><circle cx="60" cy="209.3" r="3.4"/><circle cx="175" cy="149.4" r="3.4"/><circle cx="290" cy="110.6" r="3.4"/><circle cx="405" cy="90.7" r="3.4"/><circle cx="520" cy="74.4" r="3.4"/></g>
+      <!-- f=.15 -->
+      <polyline points="60,157.2 175,95.6 290,68.6 405,56.8 520,51.4" fill="none" stroke="#0f172a" stroke-width="2.4"/>
+      <g fill="#0f172a"><circle cx="60" cy="157.2" r="3.4"/><circle cx="175" cy="95.6" r="3.4"/><circle cx="290" cy="68.6" r="3.4"/><circle cx="405" cy="56.8" r="3.4"/><circle cx="520" cy="51.4" r="3.4"/></g>
+      <!-- legend -->
+      <g font-size="9" fill="#334155">
+        <line x1="360" y1="24" x2="382" y2="24" stroke="#94a3b8" stroke-width="2.4"/><text x="386" y="27">f = .08</text>
+        <line x1="430" y1="24" x2="452" y2="24" stroke="#b45309" stroke-width="2.4"/><text x="456" y="27">f = .10</text>
+        <line x1="500" y1="24" x2="522" y2="24" stroke="#0f766e" stroke-width="2.4"/><text x="526" y="27">f = .12</text>
+        <line x1="360" y1="38" x2="382" y2="38" stroke="#0f172a" stroke-width="2.4"/><text x="386" y="41">f = .15</text>
+      </g>
+    </svg>
+    <figcaption><b>Figure 13.1 — Power to detect the 6 × 4 interaction (time outcome).</b> Monte Carlo simulation, 1,200 replications per point; participant intercept SD = 0.5, residual SD = 1.0; f is the SD of the interaction effects. The vertical dashed lines mark the reduced (N = 48) and full (N = 72) Study 1 samples. A 6 × 4 interaction has 15 numerator df, so even the full sample is powered for a medium, not a small, interaction. The focused contrasts in Table 13.2 recover power for specific predictions.</figcaption>
+  </figure>
+
+  <h2>13.8 If you cannot reach the target N</h2>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Reduce the state factor:</b> run a 6 × 2 design (happy vs frustrated) with N = 48; this halves the trials and increases power per cell. Treat the other two states as a separate exploratory study.</li>
+    <li><b>Use focused contrasts:</b> pre-register two or three state-specific comparisons rather than the omnibus; report the omnibus as descriptive.</li>
+    <li><b>Add trials per cell:</b> two targets per cell (48 trials) or a second session; this increases precision but raises fatigue and cost. Model the additional targets as a random effect.</li>
+    <li><b>Multi-site:</b> run the same protocol at two labs with a shared pre-registration and a site random effect.</li>
+    <li><b>Be honest:</b> report the achieved precision and label the study as underpowered for small effects. A well-reported inconclusive result is more valuable than an overclaimed significant one.</li>
+  </ul>
+
+  <div class="keybox">
+    <h4>The one-sentence sample-size story</h4>
+    <p class="small">For a semester project, <b>N = 48 in Study 1 and N = 60 in Study 2</b> is the practical minimum for a credible paper, powered for medium effects; for a full paper, use <b>N = 72 and N = 80</b> and add Study 3. Do not run the full 6 × 4 with N = 24 and interpret a null interaction as evidence that emotion does not matter.</p>
+  </div>
+</section>

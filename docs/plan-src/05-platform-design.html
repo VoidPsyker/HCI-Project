@@ -1,0 +1,243 @@
+<!-- ================= 5 PLATFORM ================= -->
+<section class="section" id="platform">
+  <h1><span class="num">5</span> Platform, product taxonomy, and task bank</h1>
+
+  <p class="lead">The experiment needs a controlled storefront, a task generator, and an event log precise enough to reconstruct every path. This section specifies the product set, the task design, the success criteria, the logging schema, and the build-versus-reuse choices. The goal is a platform that a second researcher can reproduce from a repository and a seed.</p>
+
+  <h2>5.1 The fictional store</h2>
+  <p>The store is called <b>Meridian Timepieces</b> (fictional; no real brand, logo, or trademark). It sells 72 watches across four departments. Product images are either generated 3D renders or licensed stock images with brands removed; all prices are fictional. The visual design is deliberately clean and consistent across conditions: white background, slate text, teal accent, four department colours used as redundant cues. The same product detail page is used after a correct selection in every menu, so the post-selection experience cannot explain differences.</p>
+
+  <table class="compact">
+    <thead><tr><th style="width:22%">Attribute</th><th style="width:78%">Values used in the task bank</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Department</td><td>Sport &amp; Dive; Dress &amp; Formal; Everyday &amp; Casual; Smart &amp; Hybrid</td></tr>
+      <tr><td class="k">Subcategory</td><td>Three per department (see Table 4.1)</td></tr>
+      <tr><td class="k">Leaf style</td><td>Six per subcategory; unique name and image</td></tr>
+      <tr><td class="k">Case size</td><td>38, 40, 42, 44 mm</td></tr>
+      <tr><td class="k">Strap</td><td>Steel, titanium, leather, rubber, mesh, fabric</td></tr>
+      <tr><td class="k">Movement</td><td>Automatic, quartz, solar, hybrid</td></tr>
+      <tr><td class="k">Water resistance</td><td>50, 100, 200, 300 m</td></tr>
+      <tr><td class="k">Dial colour</td><td>Blue, black, green, white, grey, brown, silver, champagne, orange</td></tr>
+      <tr><td class="k">Price band</td><td>£180–£240; £240–£420; £420–£900; £900+</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">Each leaf style is assigned a unique attribute vector. A build-time test checks that every target description maps to exactly one product; if two products share the same description, the task is rejected and regenerated. This prevents ambiguous “find the blue watch” tasks from contaminating the design.</p>
+
+  <h2>5.2 Task design</h2>
+  <p>The primary task is <b>known-item product finding</b>: the participant is given a short, natural-language shopping goal and must reach the correct product detail page using the menu. The task never names the exact product; it describes two or three attributes. This forces category navigation rather than string matching, while keeping the target unambiguous.</p>
+
+  <div class="callout">
+    <h4>Example task (the running example)</h4>
+    <p class="small"><b>“You’re looking for a titanium dive watch with 300 m water resistance and a deep blue dial. Find it.”</b><br>
+    Correct path: <b>Sport &amp; Dive → Pro Diver 300m → Steel Blue</b> (or the leaf whose attribute vector matches; the build-time uniqueness test decides). The exact label “Titanium Deep” is not shown in the task, so the participant must use the hierarchy and the product attributes.</p>
+  </div>
+
+  <p><b>Difficulty</b> is manipulated as a within-participant covariate, not as a fully crossed factor. Three levels are defined by three orthogonal properties: (1) serial position of the department and subcategory in the menu, (2) semantic distance between the task wording and the leaf label, and (3) number of plausible distractor leaves with the same colour or material. Each participant sees 24 targets, balanced 8 easy / 8 medium / 8 hard. The assignment of difficulty to the 24 menu × state cells is rotated across participants so difficulty cannot be confounded with a condition.</p>
+
+  <table class="long">
+    <caption>Table 5.1 — Twelve example tasks (the full bank contains 72 targets plus matched variants)</caption>
+    <thead><tr><th style="width:6%">ID</th><th style="width:39%">Task wording (attribute description)</th><th style="width:18%">Correct department</th><th style="width:17%">Correct subcategory</th><th style="width:13%">Correct leaf</th><th style="width:7%">Diff.</th></tr></thead>
+    <tbody>
+      <tr><td class="k">T01</td><td>Titanium dive watch, 300 m, deep blue dial</td><td>Sport &amp; Dive</td><td>Pro Diver 300m</td><td>Steel Blue</td><td>Easy</td></tr>
+      <tr><td class="k">T02</td><td>Lightweight titanium dive watch, 300 m, black dial</td><td>Sport &amp; Dive</td><td>Pro Diver 300m</td><td>Titanium Deep</td><td>Medium</td></tr>
+      <tr><td class="k">T03</td><td>42 mm automatic trail watch, green dial, fabric strap</td><td>Sport &amp; Dive</td><td>Trail Master GMT</td><td>Forest Green</td><td>Medium</td></tr>
+      <tr><td class="k">T04</td><td>Rose-gold dress watch, ivory dial, leather strap</td><td>Dress &amp; Formal</td><td>Heritage Classic</td><td>Ivory Dial</td><td>Easy</td></tr>
+      <tr><td class="k">T05</td><td>Black-tie watch, deep navy dial, 40 mm</td><td>Dress &amp; Formal</td><td>Midnight Dress</td><td>Deep Navy</td><td>Medium</td></tr>
+      <tr><td class="k">T06</td><td>Moonphase complication, celestial blue dial</td><td>Dress &amp; Formal</td><td>Artisan Moonphase</td><td>Celestial Blue</td><td>Hard</td></tr>
+      <tr><td class="k">T07</td><td>38 mm field watch, khaki canvas strap, automatic</td><td>Everyday &amp; Casual</td><td>Field Standard</td><td>Khaki Canvas</td><td>Easy</td></tr>
+      <tr><td class="k">T08</td><td>Minimalist watch, matte white dial, steel mesh strap</td><td>Everyday &amp; Casual</td><td>Urban Minimal</td><td>Matte White</td><td>Medium</td></tr>
+      <tr><td class="k">T09</td><td>Weekend watch, sunset clay dial, rubber strap</td><td>Everyday &amp; Casual</td><td>Weekender</td><td>Sunset Clay</td><td>Hard</td></tr>
+      <tr><td class="k">T10</td><td>Graphite smartwatch, titanium case, 44 mm</td><td>Smart &amp; Hybrid</td><td>Smart One</td><td>Graphite</td><td>Medium</td></tr>
+      <tr><td class="k">T11</td><td>Hybrid sport watch, orange accent, rubber strap</td><td>Smart &amp; Hybrid</td><td>Hybrid Active</td><td>Orange Sport</td><td>Hard</td></tr>
+      <tr><td class="k">T12</td><td>Connected classic, burgundy leather strap, 42 mm</td><td>Smart &amp; Hybrid</td><td>Connected Classic</td><td>Burgundy</td><td>Hard</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.3 Success, errors, and path efficiency</h2>
+  <table>
+    <thead><tr><th style="width:22%">Outcome</th><th style="width:78%">Definition and coding rule</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Success</td><td>1 if the correct product detail page (matching product ID) is reached within 120 s; otherwise 0. Automated coding from the event log; no experimenter judgement.</td></tr>
+      <tr><td class="k">Completion time</td><td>Time from task onset (instruction disappears) to the correct product page render. Log-transformed. Failures are right-censored at 120 s and analysed with a survival model as a sensitivity analysis.</td></tr>
+      <tr><td class="k">Wrong department</td><td>First department selected is not the target department. Counted once per trial.</td></tr>
+      <tr><td class="k">Wrong subcategory</td><td>Correct department, wrong subcategory selected before success. Counted per trial.</td></tr>
+      <tr><td class="k">Wrong leaf</td><td>Any leaf selection other than the target before success. Counted per trial.</td></tr>
+      <tr><td class="k">Backtrack</td><td>A transition from a deeper level to a shallower level without reaching a leaf. Counted per trial.</td></tr>
+      <tr><td class="k">Category switch</td><td>Selecting a different department or subcategory after a previous selection. Counted per trial.</td></tr>
+      <tr><td class="k">Path efficiency</td><td>Minimum required clicks / actual clicks. Minimum is 2 for C and 3 for A/B/D/E/F. Values &gt; 1 are capped at 1; values ≤ 0 are set to missing.</td></tr>
+      <tr><td class="k">First-click correctness</td><td>1 if the first department click is the target department. A process measure of category knowledge.</td></tr>
+      <tr><td class="k">Search attempts</td><td>Number of clicks on the disabled search control. A signal of menu failure; not a success path.</td></tr>
+      <tr><td class="k">Timeout / give-up</td><td>No correct product within 120 s. The participant can press “I can’t find it” to end early; both are failures, but the reason is logged.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.4 Event logging and data schema</h2>
+  <p>Every interaction is logged as a JSON line with a client timestamp (<code>performance.now()</code>) and a server receipt timestamp. The client timestamp is used for within-trial timing; the server timestamp is used for data integrity. Events are batched every 500 ms and flushed on page unload; an offline queue prevents data loss if the connection drops.</p>
+
+  <table class="compact">
+    <thead><tr><th style="width:17%">Field</th><th style="width:17%">Type</th><th style="width:66%">Description</th></tr></thead>
+    <tbody>
+      <tr><td class="k">event_id</td><td>UUID</td><td>Unique event identifier; idempotent ingestion.</td></tr>
+      <tr><td class="k">participant_id</td><td>string</td><td>Pseudonymous ID; no name, email, or IP in the research dataset.</td></tr>
+      <tr><td class="k">session_id</td><td>UUID</td><td>One per session; links events to consent and questionnaires.</td></tr>
+      <tr><td class="k">study</td><td>enum</td><td><code>pilot</code>, <code>s1</code>, <code>s2</code>, <code>s3</code>.</td></tr>
+      <tr><td class="k">block_id / trial_id</td><td>string</td><td>Emotion block and trial identifiers.</td></tr>
+      <tr><td class="k">task_id / target_id</td><td>string</td><td>Task bank ID and correct product ID.</td></tr>
+      <tr><td class="k">menu_id</td><td>enum</td><td><code>A</code>–<code>F</code>.</td></tr>
+      <tr><td class="k">state_label</td><td>enum</td><td><code>happy</code>, <code>frustrated</code>, <code>confused</code>, <code>bored</code>, <code>mixed</code>.</td></tr>
+      <tr><td class="k">condition</td><td>enum</td><td><code>static</code>, <code>matched</code>, <code>mismatched</code>, <code>sham</code>, <code>hybrid</code> (study-specific).</td></tr>
+      <tr><td class="k">event_type</td><td>enum</td><td>See the list below.</td></tr>
+      <tr><td class="k">t_client / t_server</td><td>float / ISO</td><td>Millisecond client time; server receipt time.</td></tr>
+      <tr><td class="k">elapsed_ms</td><td>int</td><td>Milliseconds since trial start.</td></tr>
+      <tr><td class="k">level</td><td>int</td><td>0 = root, 1 = department, 2 = subcategory, 3 = leaf.</td></tr>
+      <tr><td class="k">element_id / label</td><td>string</td><td>Stable ID and visible label of the clicked/hovered element.</td></tr>
+      <tr><td class="k">parent_id</td><td>string</td><td>Parent node ID, for reconstructing the path.</td></tr>
+      <tr><td class="k">x / y</td><td>int</td><td>Viewport coordinates of the pointer event.</td></tr>
+      <tr><td class="k">input_type</td><td>enum</td><td><code>mouse</code>, <code>trackpad</code>, <code>keyboard</code>, <code>touch</code>.</td></tr>
+      <tr><td class="k">meta</td><td>JSON</td><td>Event-specific fields (e.g., <code>visible_options</code>, <code>switch_reason</code>, <code>confidence</code>).</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Event types:</b> <code>session_start</code>, <code>consent</code>, <code>demographics</code>, <code>practice_start</code>, <code>block_start</code>, <code>induction_start</code>, <code>induction_end</code>, <code>checkin</code>, <code>trial_start</code>, <code>menu_open</code>, <code>menu_close</code>, <code>node_hover</code>, <code>node_click</code>, <code>leaf_select</code>, <code>product_view</code>, <code>back</code>, <code>search_attempt</code>, <code>timeout</code>, <code>give_up</code>, <code>trial_end</code>, <code>block_end</code>, <code>adaptation_shown</code>, <code>adaptation_accepted</code>, <code>adaptation_reverted</code>, <code>questionnaire</code>, <code>session_end</code>.</p>
+
+  <pre><span class="c">// Example event (truncated)</span>
+{
+  <span class="s">"event_id"</span>: <span class="s">"evt_01HZX..."</span>,
+  <span class="s">"participant_id"</span>: <span class="s">"p_0042"</span>,
+  <span class="s">"session_id"</span>: <span class="s">"ses_01HZX..."</span>,
+  <span class="s">"study"</span>: <span class="s">"s1"</span>,
+  <span class="s">"block_id"</span>: <span class="s">"block_frustrated"</span>,
+  <span class="s">"trial_id"</span>: <span class="s">"trial_07"</span>,
+  <span class="s">"task_id"</span>: <span class="s">"T02"</span>,
+  <span class="s">"target_id"</span>: <span class="s">"prod_titanium_deep"</span>,
+  <span class="s">"menu_id"</span>: <span class="s">"C"</span>,
+  <span class="s">"state_label"</span>: <span class="s">"frustrated"</span>,
+  <span class="s">"event_type"</span>: <span class="s">"node_click"</span>,
+  <span class="s">"t_client"</span>: 18432.7,
+  <span class="s">"elapsed_ms"</span>: 3920,
+  <span class="s">"level"</span>: 2,
+  <span class="s">"element_id"</span>: <span class="s">"sport.prodiver"</span>,
+  <span class="s">"element_label"</span>: <span class="s">"Pro Diver 300m"</span>,
+  <span class="s">"parent_id"</span>: <span class="s">"sport"</span>,
+  <span class="s">"x"</span>: 412, <span class="s">"y"</span>: 268,
+  <span class="s">"input_type"</span>: <span class="s">"mouse"</span>,
+  <span class="s">"meta"</span>: { <span class="s">"visible_options"</span>: 18, <span class="s">"menu_open_ms"</span>: 740 }
+}</pre>
+
+  <h2>5.5 Platform architecture</h2>
+  <p>The recommended build is a single-page React + TypeScript application with a small Node/PostgreSQL backend. The front end owns the menu renderers, the experiment timeline, and the event buffer. The back end owns randomisation, condition assignment, data ingestion, and exports. The analysis pipeline reads a versioned CSV/JSONL export and a frozen analysis script.</p>
+
+  <table>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:42%">Recommended choice</th><th style="width:38%">Why</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Front end</td><td>React 18 + TypeScript + Vite; Zustand for session state; CSS modules or Tailwind.</td><td>Component reuse across six menus; strong typing for the taxonomy; fast local development.</td></tr>
+      <tr><td class="k">Menu rendering</td><td>Shared <code>MenuRenderer</code> contract; A/B/C with Radix/Headless UI primitives; D/F with D3 + SVG; E with CSS Grid + Framer Motion.</td><td>Reuse accessible primitives where possible; custom geometry where the structure demands it.</td></tr>
+      <tr><td class="k">Experiment runner</td><td>Custom timeline inspired by jsPsych; <code>performance.now()</code> for timing; server-side sequence assignment.</td><td>jsPsych is excellent for standard stimuli, but the six custom menus need a React-native runner. Borrow its timeline and data model.</td></tr>
+      <tr><td class="k">Back end</td><td>Node + Express/Fastify + PostgreSQL (or Supabase for a managed option).</td><td>Reliable ingestion, simple exports, role-based access, easy local deployment.</td></tr>
+      <tr><td class="k">Data store</td><td>Normalised tables for participants, sessions, trials, events, questionnaires; JSONB for event metadata.</td><td>Fast queries for analysis; schema validation at ingestion; raw JSONL retained for reproducibility.</td></tr>
+      <tr><td class="k">Deployment</td><td>Lab server on a wired network; optional cloud deployment behind authentication.</td><td>Avoids internet latency and third-party data processing; supports offline fallback.</td></tr>
+      <tr><td class="k">Analysis</td><td>R 4.x: <code>lme4</code>, <code>lmerTest</code>, <code>emmeans</code>, <code>brms</code>, <code>survival</code>, <code>pROC</code>; Python for simulation if preferred.</td><td>Mixed models, Bayesian policy estimation, survival analysis, and calibration are all mature in R.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.6 Build versus reuse</h2>
+  <p>There is no single library that provides all six menus over one taxonomy. Reuse the primitives and build the geometry. The table lists candidate sources; check licence, maintenance, and accessibility before adopting.</p>
+
+  <table class="long">
+    <thead><tr><th style="width:18%">Need</th><th style="width:44%">Candidate libraries / repositories</th><th style="width:38%">Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A/B/C primitives</td><td>Radix UI NavigationMenu; Headless UI Menu; shadcn/ui NavigationMenu; MUI Menu; Ant Design Menu.</td><td>Use Radix or Headless UI for focus management and ARIA; restyle to the shared palette. Do not adopt a full design system just for the menu.</td></tr>
+      <tr><td class="k">C · mega menu</td><td><code>jasonrundell/react-mega-menu</code> (small, MIT-style; verify); many CSS-only patterns.</td><td>Use as a structural reference; the panel must show 3 columns × 6 leaves and meet the parity contract. A custom component is likely simpler than adapting a library.</td></tr>
+      <tr><td class="k">D · fractal</td><td><code>jeanvdd/Fractal</code> (“Fractal Adaptive Menu”; verify licence and completeness); D3 <code>zoomable treemap</code> / <code>d3-zoom</code> + <code>d3-hierarchy</code>.</td><td>Use D3 for the zoom/transition; the paper’s L-system is a conceptual reference, not a production dependency. Build the 4 → 3 → 6 grid directly.</td></tr>
+      <tr><td class="k">F · radial</td><td><code>react-planet</code>; <code>react-pie-menu</code>; <code>react-radial-menu</code>; D3 <code>arc</code> and <code>radialLine</code>.</td><td>Use D3 for precise angles and hit targets; generic radial menus often assume a single ring and cannot project L2/L3 onto concentric rings.</td></tr>
+      <tr><td class="k">E · icon grid</td><td>CSS Grid + Framer Motion; Radix primitives; icon set (Lucide, Phosphor).</td><td>Build directly. The hard part is the product-card content and the colour system, not the grid.</td></tr>
+      <tr><td class="k">Experiment runner</td><td>jsPsych 7; lab.js; PsychoJS.</td><td>Borrow the timeline/data model; do not force the custom menus into a stimulus plugin unless the timing tests pass.</td></tr>
+      <tr><td class="k">Eye tracking (optional)</td><td>Tobii Pro Lab / Tobii SDK; PyGaze; iMotions.</td><td>Use Tobii Pro Lab for AOI definition and export; pre-register the fixation filter and AOIs.</td></tr>
+      <tr><td class="k">Stats</td><td>R <code>lme4</code>, <code>brms</code>, <code>emmeans</code>, <code>survival</code>, <code>pROC</code>, <code>rmcorr</code>; Python <code>statsmodels</code>, <code>PyMC</code>.</td><td>R for the primary mixed models; Python only if the team is more fluent there. Freeze the analysis script before data lock.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.7 Accessibility and standardisation</h2>
+  <p>All menus should meet WCAG 2.2 AA where feasible: keyboard operability, visible focus, 4.5:1 text contrast, 3:1 non-text contrast, reduced-motion support, and semantic roles. However, the confirmatory experiment standardises on mouse/trackpad to compare motor performance; keyboard input is supported and logged, and participants who prefer it are not excluded. Input modality is included as a covariate, and a separate accessibility session can be run if the sample includes keyboard-only users. Do not claim full accessibility compliance without an audit.</p>
+
+  <div class="keybox">
+    <h4>Build acceptance criteria (gate to pilot)</h4>
+    <ul class="small" style="margin:0; padding-left:5mm">
+      <li>Every one of the 72 products is reachable in every menu, with the same number of semantic levels.</li>
+      <li>Every target description maps to exactly one product (uniqueness test).</li>
+      <li>All six menus show the same labels and product data from one JSON source.</li>
+      <li>All interactive targets are ≥ 44 × 44 px at 1920 × 1080; no overlap or clipping.</li>
+      <li>Transitions are 180–220 ms and do not drop below 50 fps on the lab machine.</li>
+      <li>Event logs reconstruct the full path for 100% of test trials; no missing <code>trial_end</code>.</li>
+      <li>Randomisation is reproducible from a seed and audited server-side.</li>
+      <li>No console errors; no external network requests during a trial.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 6 DESIGN ================= -->
+<section class="section" id="design">
+  <h1><span class="num">6</span> Study design overview</h1>
+
+  <p class="lead">The programme is sequential by design. Study 1 estimates the mapping; Study 2 freezes it and tests causality; Study 3 tests the complete system with a noisy estimator. This avoids the circularity of deriving a policy and testing it on the same data.</p>
+
+  <h2>6.1 Why three studies rather than one</h2>
+  <table>
+    <thead><tr><th style="width:18%">Design</th><th style="width:41%">What it can show</th><th style="width:41%">What it cannot show</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Single 6 × 4 experiment</td><td>Whether menus differ across induced states; a descriptive mapping.</td><td>Whether using the mapping causally helps; whether switching costs erase the gain; whether a noisy estimator works.</td></tr>
+      <tr><td class="k">Single adaptive-vs-static experiment</td><td>Whether an adaptive system beats a static one.</td><td>Whether the benefit comes from matching, from change/novelty, or from a better global menu.</td></tr>
+      <tr><td class="k">Three-study sequence</td><td>Mapping, causal matching, and end-to-end feasibility, each with a clean counterfactual.</td><td>Long-term learning and real-world adoption; those are future work.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 Design summary</h2>
+  <table class="long">
+    <thead><tr><th style="width:12%">Study</th><th style="width:9%">N (full)</th><th style="width:9%">N (reduced)</th><th style="width:24%">Design</th><th style="width:22%">Trials / session</th><th style="width:24%">Primary outcomes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Pilot</td><td>10</td><td>8</td><td>All menus, all inductions; think-aloud; timing.</td><td>24 + practice; ~90 min</td><td>Task success, SUS, manipulation check, technical errors.</td></tr>
+      <tr><td class="k">Study 1</td><td>72</td><td>48</td><td>6 menus × 4 states within-subject; 24 trials; Latin-square block/menu order; target rotation.</td><td>24 + 6 practice; ~90 min</td><td>Success, log time, errors, NASA-TLX, UMUX-Lite, disorientation.</td></tr>
+      <tr><td class="k">Study 2</td><td>80</td><td>60</td><td>4 conditions (static, matched, mismatched, sham) × 4 states; 16 trials; within-subject; known labels.</td><td>16 + 4 practice; ~70 min</td><td>Success, log time, errors, switching cost, perceived disruption, load, trust.</td></tr>
+      <tr><td class="k">Study 3</td><td>72</td><td>24–48</td><td>Static vs hybrid adaptive; 8 trials + 5-min free browsing; estimator validation.</td><td>8 + free browse; ~70 min</td><td>Macro-F1, calibration, success/time, switch acceptance, trust.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small muted">The “full” column is the recommended confirmatory sample. The “reduced” column is the minimum for a semester project; it is powered for larger effects and must be reported with precision, not as a definitive null. §13 gives the power curves and the assumptions behind them.</p>
+
+  <h2>6.3 Randomisation and counterbalancing</h2>
+  <p>Study 1 has two crossed order factors: four emotion blocks and six menus within each block. A full randomisation of 24 cells would confound order with the cell-specific targets at small N. Instead, use two Latin squares:</p>
+  <ul class="small" style="padding-left:5mm">
+    <li><b>Emotion block order:</b> four sequences — ABCD, BCDA, CDAB, DABC — assigned evenly across participants. Each state appears in each serial position exactly once across the four sequences.</li>
+    <li><b>Menu order within block:</b> a 6 × 6 balanced Latin square, so each menu appears in each within-block position once. A different row is used for each block to avoid the same menu always following the same state.</li>
+    <li><b>Target rotation:</b> six target sets of 24 tasks, each balanced by department and difficulty. Across participants, each target set is paired with each block order and menu order equally often. The full matrix is in Appendix E.</li>
+    <li><b>Practice:</b> one practice trial per menu (not analysed) before the main blocks, to separate menu learning from the experimental effect. Practice targets are not reused in the main trials.</li>
+    <li><b>Breaks:</b> a 2-min neutral reset between blocks; participants can take a longer break without losing compensation.</li>
+  </ul>
+
+  <p>Study 2 uses the same block-order logic but four conditions per state. The four conditions are presented in a 4 × 4 Latin square within each block; across participants, each condition appears in each position equally often. Study 3 has two conditions (static, hybrid) and uses an ABBA/BAAB crossover to balance order and carry-over.</p>
+
+  <h2>6.4 Session length and burden</h2>
+  <table>
+    <thead><tr><th style="width:28%">Segment</th><th style="width:18%">Study 1</th><th style="width:18%">Study 2</th><th style="width:18%">Study 3</th><th style="width:18%">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Consent, demographics, baseline affect</td><td>12 min</td><td>10 min</td><td>10 min</td><td>Includes colour-vision check and audio check.</td></tr>
+      <tr><td class="k">Instructions and practice</td><td>12 min</td><td>10 min</td><td>8 min</td><td>6 practice trials (one per menu) in Study 1/2.</td></tr>
+      <tr><td class="k">Inductions + checks</td><td>16 min</td><td>16 min</td><td>12 min</td><td>4 blocks; 2.5 min induction + 1 min check each.</td></tr>
+      <tr><td class="k">Main trials</td><td>20 min</td><td>12 min</td><td>12 min + 5 min browse</td><td>24 trials × ~45 s; 16 trials × ~45 s; 8 trials + free browsing.</td></tr>
+      <tr><td class="k">Questionnaires</td><td>18 min</td><td>12 min</td><td>15 min</td><td>SUS per menu; NASA-TLX/UMUX-Lite per block; adaptation items.</td></tr>
+      <tr><td class="k">Debrief and suspicion check</td><td>8 min</td><td>6 min</td><td>8 min</td><td>Includes neutral-mood check and resources.</td></tr>
+      <tr><td class="k"><b>Total</b></td><td><b>~86 min</b></td><td><b>~66 min</b></td><td><b>~70 min</b></td><td>Add a 10-min buffer; pilot confirms.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.5 Recruitment, inclusion, and compensation</h2>
+  <p>Recruit adults aged 18–65 who are fluent in English and have normal or corrected-to-normal vision. No prior participation in the pilot or in another study of the programme. Colour vision is screened with a short Ishihara-style test; the palette is designed to be distinguishable for the most common deficiencies, so colour-vision deficiency is not an automatic exclusion — it is recorded and analysed as a covariate. Participants must be able to use a mouse or trackpad; keyboard-only users can be accommodated in a separate session.</p>
+
+  <p>Use a university participant pool and a reputable online panel (e.g., Prolific) for the reduced design. Compensate at £12–£15 per hour or course credit with a comparable alternative. Do not use performance-contingent bonuses: they would confound emotion induction and risk pressure. Target a 20% attrition/technical-failure buffer; replace participants who fail the pre-registered data-quality checks, not those whose results are inconvenient.</p>
+
+  <div class="keybox">
+    <h4>Stopping and data-quality rules</h4>
+    <p class="small">Collect in waves (e.g., 4 × 18 participants in Study 1) and check only <b>data quality</b> between waves: missing logs, failed randomisation, session length, and technical errors. Do not check condition effects or stop early for significance. Pre-register the final N. Exclude a session only if (a) the event log is incomplete for more than 10% of trials, (b) the participant did not complete at least 75% of trials, (c) the participant reports a technical failure that prevented menu use, or (d) the participant was previously in the pilot. Report all exclusions and the reasons in a flow diagram.</p>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+{
+  "created_at": "2026-10-23T18:43:52.486Z",
+  "seed_hash": "a856f7056e8c11aa32f5b11ed66cfced0330e850b169ba55d11acede564f9bfe",
+  "taxonomy_hash": "2d9f0f748ceda84c4908dc2386b5dabb125076c102b6ed993b1528c746a433a9",
+  "files": [
+    {
+      "name": "events.jsonl",
+      "rows": 1190,
+      "sha256": "8246ea46f5d70a682383c9c244aa53322249305f3e6a2b698d9f5da587457d77"
+    },
+    {
+      "name": "events.csv",
+      "rows": 1190,
+      "sha256": "79686c2762e5582f8b4164b4ee8348135be82dafe4a1840a124a8ecdc0c7e1e3"
+    },
+    {
+      "name": "trials.csv",
+      "rows": 144,
+      "sha256": "eadb2df83c0c8b77a70573c61a1c5f61eddf39bba381afeb873db0359f2c06e2"
+    },
+    {
+      "name": "checkins.csv",
+      "rows": 72,
+      "sha256": "27e6c7b148848b1d66e1878f4ff360dd401a5eb73027a7bc6051e93a4b7fd32a"
+    },
+    {
+      "name": "questionnaires.csv",
+      "rows": 584,
+      "sha256": "9b7b190fabc0cb8db88e7623a54ffc0ca1348ce073811c04ba057fabbda3d27f"
+    },
+    {
+      "name": "assignments.csv",
+      "rows": 8,
+      "sha256": "4f67ba09aa23eb208e20e34c3096d6c176751c215ddf8c91aa01b735d336bd7d"
+    },
+    {
+      "name": "tasks.csv",
+      "rows": 72,
+      "sha256": "e24dc1bc3b49433f72cefcc2c3b67490413fdd938cbe69481a2e777afafe5606"
+    }
+  ]
+}
