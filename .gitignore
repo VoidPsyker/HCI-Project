@@ -1,9 +1,16 @@
 node_modules/
 dist/
 coverage/
+apps/web/public/vendor/webgazer/
 data/
 test-results/
 playwright-report/
+tests/artifacts/preview-results/
+tests/artifacts/preview-report/
+tests/artifacts/**/*-results/
+tests/artifacts/**/*-report/
+/opencode.json
+__pycache__/
 .env
 .DS_Store
 *.log

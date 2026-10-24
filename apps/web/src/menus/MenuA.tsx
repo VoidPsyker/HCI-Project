@@ -1,57 +1,119 @@
-﻿import { useState } from "react";
+import { useRef, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { DEPARTMENTS, PALETTE, childrenOf, departmentColour, type TaxonomyNode } from "@meridian/taxonomy";
 import type { MenuProps } from "../types";
 import { NodeIcon } from "../components/Icon";
-import { MenuHeading } from "../components/MenuChrome";
+import { MenuHeading, createMenuLog, inputTypeFor, useInert, useMenuOpened } from "../components/MenuChrome";
+import { useBrowserBack, type BackSource } from "./browserBack";
 
-export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProps) {
+export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent, disabled = false }: MenuProps) {
   const [openDept, setOpenDept] = useState<string | null>(null);
   const [sub, setSub] = useState<TaxonomyNode | null>(null);
+  const itemInput = useRef<"keyboard" | "mouse">("mouse");
+  const shellRef = useInert<HTMLElement>(disabled);
   const dept = openDept ? DEPARTMENTS.find((d) => d.id === openDept) : sub ? DEPARTMENTS.find((d) => d.id === sub.parentId) : null;
   const path = dept ? (sub ? [dept, sub] : [dept]) : [];
   const colour = dept ? PALETTE[departmentColour(dept.id, colourMapping)] : PALETTE.teal;
+  const visibleOptions = sub ? 6 : openDept ? 3 : 4;
+  const log = createMenuLog(onEvent, visibleOptions, disabled);
+  useMenuOpened(log);
+
+  const back = (source: BackSource = "control") => {
+    if (disabled) return;
+    if (sub) {
+      log("back", { level: 2, element_id: sub.id, element_label: sub.label, meta: { source, visible_after: 3 } });
+      setSub(null);
+      setOpenDept(sub.parentId);
+      return;
+    }
+    if (openDept) {
+      const department = DEPARTMENTS.find((d) => d.id === openDept);
+      log("back", {
+        level: 1,
+        element_id: openDept,
+        element_label: department?.label,
+        meta: { source, visible_after: 4 }
+      });
+      setOpenDept(null);
+      return;
+    }
+    log("back", { level: 0, meta: { source, at_root: true } });
+  };
+  useBrowserBack(back);
 
   const handleOpen = (value: boolean, id: string) => {
-    setOpenDept(value ? id : null);
-    if (value) {
-      setSub(null);
-      onEvent("menu_open", { level: 1, element_id: id });
+    if (disabled) return;
+    if (!value) {
+      setOpenDept(null);
+      return;
     }
+    const department = DEPARTMENTS.find((d) => d.id === id);
+    setOpenDept(id);
+    setSub(null);
+    log("menu_open", {
+      level: 1,
+      element_id: id,
+      element_label: department?.label,
+      meta: { visible_options: 3, stage: id }
+    });
   };
 
-  const selectSub = (node: TaxonomyNode) => {
-    onEvent("node_click", { level: 2, element_id: node.id, element_label: node.label, parent_id: node.parentId });
+  const selectSub = (node: TaxonomyNode, inputType: "keyboard" | "mouse" = "mouse") => {
+    if (disabled) return;
+    log("node_click", {
+      level: 2,
+      element_id: node.id,
+      element_label: node.label,
+      parent_id: node.parentId,
+      input_type: inputType,
+      meta: { visible_after: 6 }
+    });
+    log("menu_open", {
+      level: 2,
+      element_id: node.id,
+      element_label: node.label,
+      parent_id: node.parentId,
+      meta: { visible_options: 6, stage: node.id }
+    });
     setSub(node);
     setOpenDept(null);
   };
 
   const reset = () => {
+    if (disabled) return;
     setOpenDept(null);
-    setSub(null);
-  };
-  const back = () => {
-    onEvent("back", { level: sub ? 2 : 1 });
     setSub(null);
   };
 
   return (
-    <section className="menu-shell menu-a" data-menu-id={menuId} data-testid="menu-a">
+    <section
+      ref={shellRef}
+      className="menu-shell menu-a"
+      data-menu-id={menuId}
+      data-testid="menu-a"
+      data-aoi="menu"
+      aria-disabled={disabled || undefined}
+    >
       <MenuHeading
         menuId={menuId}
         title="Shop by department"
         subtitle="Choose a department, then a collection, then a watch."
         path={path}
         onHome={reset}
-        onBack={sub ? back : undefined}
+        onBack={sub || openDept ? () => back("control") : undefined}
+        breadcrumb="after-selection"
+        onEvent={onEvent}
+        visibleOptions={visibleOptions}
+        disabled={disabled}
       />
-      <div className="a-bar" style={{ borderColor: colour.border }}>
+      <div className="a-bar" style={{ borderColor: colour.border }} data-aoi="bar">
         {DEPARTMENTS.map((department) => {
           const palette = PALETTE[departmentColour(department.id, colourMapping)];
           return (
             <DropdownMenu.Root
               key={department.id}
-              open={openDept === department.id}
+              modal={false}
+              open={!disabled && openDept === department.id}
               onOpenChange={(value) => handleOpen(value, department.id)}
             >
               <DropdownMenu.Trigger asChild>
@@ -59,6 +121,7 @@ export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
                   type="button"
                   className="a-tab"
                   data-node-id={department.id}
+                  data-aoi-level={department.level}
                   data-hit-target
                   aria-label={`${department.label} department`}
                   style={{
@@ -66,26 +129,37 @@ export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
                     color: openDept === department.id ? palette.fg : palette.bg,
                     borderColor: palette.border
                   }}
-                  onClick={() =>
-                    onEvent("node_click", { level: 1, element_id: department.id, element_label: department.label })
+                  onClick={(event) =>
+                    // Radix opens on pointerdown, so pin the click to the level it leaves.
+                    log("node_click", {
+                      level: 1,
+                      element_id: department.id,
+                      element_label: department.label,
+                      input_type: inputTypeFor(event),
+                      meta: { visible_options: 4 }
+                    })
                   }
                 >
                   <NodeIcon name={department.icon} size={26} />
                   <span>{department.label}</span>
                   <span className="a-caret" aria-hidden="true">
-                    â–¾
+                    {"\u25BE"}
                   </span>
                 </button>
               </DropdownMenu.Trigger>
-              <DropdownMenu.Content className="a-dropdown" align="start" sideOffset={8}>
+              <DropdownMenu.Content className="a-dropdown" align="start" sideOffset={8} data-aoi="dropdown">
                 <div className="dropdown-title">{department.label} collections</div>
                 {childrenOf(department.id).map((subcategory) => (
                   <DropdownMenu.Item
                     key={subcategory.id}
                     className="a-dropdown-item"
                     data-node-id={subcategory.id}
+                    data-aoi-level={subcategory.level}
                     data-hit-target
-                    onSelect={() => selectSub(subcategory)}
+                    onClick={(event) => {
+                      itemInput.current = inputTypeFor(event);
+                    }}
+                    onSelect={() => selectSub(subcategory, itemInput.current)}
                   >
                     <NodeIcon name={subcategory.icon} size={22} />
                     <span>{subcategory.label}</span>
@@ -99,7 +173,7 @@ export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
       </div>
       <div className="a-stage">
         {sub ? (
-          <div className="a-flyout" style={{ borderColor: colour.border }} data-testid="a-flyout">
+          <div className="a-flyout" style={{ borderColor: colour.border }} data-testid="a-flyout" data-aoi="flyout">
             <div className="flyout-title">{sub.label}</div>
             <div className="flyout-sub">Choose one of the six watches.</div>
             <div className="a-leaf-list">
@@ -109,8 +183,9 @@ export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
                   type="button"
                   className="a-leaf"
                   data-node-id={leaf.id}
+                  data-aoi-level={leaf.level}
                   data-hit-target
-                  onClick={() => onLeafSelect(leaf)}
+                  onClick={(event) => onLeafSelect(leaf, inputTypeFor(event))}
                 >
                   <span className="leaf-icon">
                     <NodeIcon name="Watch" size={20} />
@@ -143,5 +218,3 @@ export function MenuA({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
     </section>
   );
 }
-
-

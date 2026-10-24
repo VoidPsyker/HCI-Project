@@ -1,0 +1,226 @@
+{
+  "label": "diagnostic-paired-2026-10-24",
+  "note": "Labeled diagnostic, not the production gate. Fake video device has no face. Measures runtime contention only; no human accuracy or calibration claim.",
+  "timestamp": "2026-10-24T04:20:10.474Z",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpuModel": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+    "logicalCpus": 8,
+    "totalMemoryBytes": 12594225152
+  },
+  "browser": {
+    "version": "156.0.8078.4",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "chromeNative": true,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "devicePixelRatio": 1,
+    "hardwareConcurrency": 8,
+    "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "baselineFpsBeforeInference": 59.98800239952008
+  },
+  "camera": {
+    "fakeDevice": true,
+    "settings": [
+      {
+        "width": 640,
+        "height": 480,
+        "frameRate": 20,
+        "label": "fake_device_0"
+      }
+    ],
+    "note": "Chromium fake capture device; no face present, so every prediction is no_prediction by construction."
+  },
+  "measurementMethod": {
+    "transition": "Menu D root -> sport zoom, D3 .duration(180)",
+    "activeInterval": "D3 scheduled transition.time to first frame observing transform removal",
+    "fps": "count(active frame deltas) / sum(active frame deltas) * 1000; no idle tail",
+    "pairing": "same page, same Menu D instance, same camera tracks; inference then paused for the second phase",
+    "order": "warm-up zoom under inference, phase A concurrent inference, phase B paused"
+  },
+  "phaseA_concurrentInference": {
+    "configuredDurationMs": 180,
+    "scheduledStart": 8703.30000000447,
+    "observedDurationMs": 182.49999999552892,
+    "activeFrameCount": 8,
+    "activeFps": 47.99040191961639,
+    "frameDeltasMs": [
+      16.600000000000364,
+      16.69999999999891,
+      16.600000000000364,
+      16.899999999999636,
+      33.399999999999636,
+      16.400000000001455,
+      33.399999999999636,
+      16.69999999999891
+    ],
+    "samplesBefore": 74,
+    "samplesAfter": 88,
+    "samplesDuringZoom": 14,
+    "inferenceCallsDuringZoom": 9,
+    "inferenceDurationsDuringZoomMs": [
+      11.4,
+      18.2,
+      14.4,
+      15.1,
+      13.9,
+      31.2,
+      16.3,
+      22.1,
+      16.4
+    ],
+    "inferenceOverlapMs": 145.9,
+    "inferenceShareOfObservedDuration": 0.799,
+    "fps50GateMet": false
+  },
+  "phaseB_inferencePaused": {
+    "configuredDurationMs": 180,
+    "scheduledStart": 10165.90000000596,
+    "observedDurationMs": 203.29999999404026,
+    "activeFrameCount": 11,
+    "activeFps": 59.945504087193456,
+    "frameDeltasMs": [
+      16.799999999999272,
+      16.700000000000728,
+      16.599999999998545,
+      16.600000000000364,
+      16.700000000000728,
+      16.69999999999891,
+      16.700000000000728,
+      16.600000000000364,
+      16.600000000000364,
+      16.69999999999891,
+      16.80000000000109
+    ],
+    "samplesBefore": 123,
+    "samplesAfter": 123,
+    "samplesDuringZoom": 0,
+    "inferenceCallsDuringZoom": 0,
+    "inferenceDurationsDuringZoomMs": [],
+    "inferenceOverlapMs": 0,
+    "inferenceShareOfObservedDuration": 0,
+    "fps50GateMet": true
+  },
+  "warmup": {
+    "configuredDurationMs": 180,
+    "observedDurationMs": 202.10000000000036,
+    "activeFps": 32.715376226826514,
+    "error": null
+  },
+  "steadyState": {
+    "note": "HARNESS ORDER BUG in the artifact-producing revision: both 500 ms windows were sampled after phase B paused inference (inferenceCallsDuringWindow=0, samplesDuringWindow=0 in both). They are two menu-only windows and are excluded from the paired comparison; the phase A/B active intervals are unaffected. The spec now samples inference cadence before the pause for future runs.",
+    "postPauseWindow1": {
+      "fps": 60.02400960384141,
+      "frameDeltasMs": [
+        16.600000000000364,
+        16.600000000000364,
+        16.700000000000728,
+        16.599999999998545,
+        16.600000000000364,
+        16.80000000000109,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.600000000000364,
+        16.700000000000728,
+        16.69999999999891,
+        16.700000000000728,
+        16.600000000000364,
+        16.69999999999891,
+        16.700000000000728,
+        16.600000000000364,
+        16.69999999999891,
+        16.900000000001455,
+        16.5,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        16.69999999999891,
+        16.600000000000364,
+        16.600000000000364
+      ],
+      "inferenceCallsDuringWindow": 0,
+      "samplesDuringWindow": 0
+    },
+    "postPauseWindow2": {
+      "fps": 59.988002399520056,
+      "frameDeltasMs": [
+        16.600000000000364,
+        16.80000000000109,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728,
+        16.599999999998545,
+        16.900000000001455,
+        16.5,
+        16.799999999999272,
+        16.700000000000728,
+        16.5,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728,
+        16.799999999999272,
+        16.5,
+        16.700000000000728,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728,
+        16.799999999999272,
+        16.5,
+        16.600000000000364,
+        16.69999999999891,
+        16.700000000000728,
+        16.700000000000728,
+        16.69999999999891
+      ]
+    }
+  },
+  "inferenceRuntime": {
+    "totalCalls": 120,
+    "medianMs": 12.200000002980232,
+    "p90Ms": 18.399999998509884,
+    "maxMs": 178.70000000298023,
+    "results": {
+      "no_face": 120
+    }
+  },
+  "pauseState": {
+    "status": "paused",
+    "cameraActive": true,
+    "samplesBefore": 123,
+    "samplesAfter": 123
+  },
+  "teardown": {
+    "status": "stopped",
+    "cameraActive": false,
+    "trackCount": 1,
+    "allTracksEnded": true
+  },
+  "externalRequests": [],
+  "mediaPipeAssetsLoaded": [
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh.binarypb",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets.data",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm"
+  ],
+  "pageErrors": [],
+  "validity": {
+    "phaseAInferenceObserved": true,
+    "phaseBInferenceAbsent": true,
+    "configuredDurationSame": true,
+    "activeIntervalsPresent": true,
+    "noExternalRequests": true
+  },
+  "valid": true
+}

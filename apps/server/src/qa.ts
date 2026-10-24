@@ -1,4 +1,5 @@
 import { validateTaxonomy } from "@meridian/taxonomy";
+import { manipulationCheckPassed, type AffectRatings } from "@meridian/scoring";
 import type { Repository } from "./repository";
 
 export type CheckStatus = "pass" | "fail" | "na";
@@ -89,8 +90,8 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
 
   const states = ["happy", "frustrated", "confused", "bored"] as const;
   const manipulation = states.map((state) => {
-    const relevant = checkins.filter((c) => c.state_label === state && c.meta.phase !== "post_trials");
-    const hits = relevant.filter((c) => c.meta.dominant_state === state && Number(c.meta.intensity ?? 0) >= 5);
+    const relevant = checkins.filter((c) => c.state_label === state && c.meta.phase === "post_induction");
+    const hits = relevant.filter((c) => manipulationCheckPassed(state, c.meta as AffectRatings));
     return { state, rate: relevant.length ? hits.length / relevant.length : null, n: relevant.length };
   });
   if (manipulation.every((m) => m.n === 0)) {
@@ -100,7 +101,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     const lowest = valid.reduce((a, b) => ((a.rate ?? 0) <= (b.rate ?? 0) ? a : b));
     const value = valid.map((m) => `${m.state}: ${m.rate === null ? "NA" : Math.round(m.rate * 1000) / 10 + "%"}`).join("; ");
     criteria.push(
-      (lowest.rate ?? 0) >= 0.6
+      valid.length === states.length && (lowest.rate ?? 0) >= 0.6
         ? pass("manipulation", "Induction manipulation check", value, ">= 60% dominant state per induction, intensity >= 5/7")
         : fail("manipulation", "Induction manipulation check", value, ">= 60% dominant state per induction, intensity >= 5/7")
     );

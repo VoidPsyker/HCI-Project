@@ -1,0 +1,80 @@
+﻿
+Running 76 tests using 3 workers
+
+[1/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu A (Horizontal bar) has no serious axe violations
+[2/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu B (Vertical sidebar) has no serious axe violations
+[3/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu C (Mega menu) has no serious axe violations
+[4/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu D (Fractal tiles) has no serious axe violations
+[5/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu E (Icon grid) has no serious axe violations
+[6/76] [chromium] › tests\e2e\axe.spec.ts:62:5 › axe accessibility › Menu F (Radial lattice) has no serious axe violations
+[7/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu A (Horizontal bar) meets target and spacing sizes
+[8/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu B (Vertical sidebar) meets target and spacing sizes
+[9/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu C (Mega menu) meets target and spacing sizes
+[10/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu D (Fractal tiles) meets target and spacing sizes
+[11/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu E (Icon grid) meets target and spacing sizes
+[12/76] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu F (Radial lattice) meets target and spacing sizes
+[13/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu A (Horizontal bar) is operable with the keyboard
+[14/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu B (Vertical sidebar) is operable with the keyboard
+[15/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu C (Mega menu) is operable with the keyboard
+[16/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu D (Fractal tiles) is operable with the keyboard
+[17/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu E (Icon grid) is operable with the keyboard
+[18/76] [chromium] › tests\e2e\keyboard.spec.ts:11:5 › keyboard routes › Menu F (Radial lattice) is operable with the keyboard
+[19/76] [chromium] › tests\e2e\keyboard.spec.ts:23:3 › keyboard routes › Space also activates a native menu control
+[20/76] [chromium] › tests\e2e\motion.spec.ts:185:3 › motion timing › Menu A level change uses a 180–220 ms transition
+[21/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu B (Vertical sidebar) suppresses level transitions
+[22/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu A (Horizontal bar) suppresses level transitions
+[23/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu C (Mega menu) suppresses level transitions
+[24/76] [chromium] › tests\e2e\motion.spec.ts:196:3 › motion timing › Menu E level change uses a 180–220 ms transition
+[25/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu D (Fractal tiles) suppresses level transitions
+[26/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu E (Icon grid) suppresses level transitions
+[27/76] [chromium] › tests\e2e\motion.spec.ts:207:3 › motion timing › Menu D zoom transition measures in the required window
+[28/76] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu F (Radial lattice) suppresses level transitions
+[29/76] [chromium] › tests\e2e\network.spec.ts:11:1 › a complete trial makes no external request and logs no console errors
+[30/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu A (Horizontal bar) uses the shared taxonomy labels
+[31/76] [chromium] › tests\e2e\motion.spec.ts:238:3 › motion timing › frame cadence stays at or above 50 fps during a D zoom
+[32/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu B (Vertical sidebar) uses the shared taxonomy labels
+[33/76] [chromium] › tests\e2e\motion.spec.ts:320:3 › motion timing › transition durations outside the menus are not used as the timing gate
+[34/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu C (Mega menu) uses the shared taxonomy labels
+[35/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu D (Fractal tiles) uses the shared taxonomy labels
+[36/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu E (Icon grid) uses the shared taxonomy labels
+[37/76] [chromium] › tests\e2e\parity.spec.ts:30:5 › label parity › Menu F (Radial lattice) uses the shared taxonomy labels
+[38/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu A shows the disabled search control
+[39/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu B shows the disabled search control
+[40/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu C shows the disabled search control
+[41/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu D shows the disabled search control
+[42/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu E shows the disabled search control
+[43/76] [chromium] › tests\e2e\parity.spec.ts:101:5 › search parity › Menu F shows the disabled search control
+[44/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu A (Horizontal bar) · happy → Titanium Deep
+[45/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu A (Horizontal bar) · frustrated → Ivory Dial
+[46/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu A (Horizontal bar) · confused → Khaki Canvas
+[47/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu A (Horizontal bar) · bored → Graphite
+[48/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu B (Vertical sidebar) · happy → Steel Blue
+[49/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu B (Vertical sidebar) · frustrated → Rose Gold
+[50/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu B (Vertical sidebar) · confused → Olive
+[51/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu B (Vertical sidebar) · bored → Silver
+[52/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu C (Mega menu) · happy → Carbon Black
+[53/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu C (Mega menu) · frustrated → Anthracite
+[54/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu C (Mega menu) · confused → Stone
+[55/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu C (Mega menu) · bored → Rose
+[56/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu D (Fractal tiles) · happy → Ocean Green
+[57/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu D (Fractal tiles) · frustrated → Moon Silver
+[58/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu D (Fractal tiles) · confused → Sandstone
+[59/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu D (Fractal tiles) · bored → Midnight
+[60/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu E (Icon grid) · happy → Bronze Reef
+[61/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu E (Icon grid) · frustrated → Bordeaux
+[62/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu E (Icon grid) · confused → Charcoal
+[63/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu E (Icon grid) · bored → Titanium
+[64/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu F (Radial lattice) · happy → Midnight Lume
+[65/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu F (Radial lattice) · frustrated → Onyx
+[66/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu F (Radial lattice) · confused → Navy Weave
+[67/76] [chromium] › tests\e2e\smoke-24-paths.spec.ts:14:7 › @smoke smoke · six menus × four states › Menu F (Radial lattice) · bored → Forest
+[68/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu A (Horizontal bar) logs a complete reconstructable path
+[69/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu B (Vertical sidebar) logs a complete reconstructable path
+[70/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu C (Mega menu) logs a complete reconstructable path
+[71/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu D (Fractal tiles) logs a complete reconstructable path
+[72/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu E (Icon grid) logs a complete reconstructable path
+[73/76] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu F (Radial lattice) logs a complete reconstructable path
+[74/76] [chromium] › tests\e2e\trial-events.spec.ts:85:3 › trial event reconstruction › search attempts are ingested as search_attempt with the unavailable message
+[75/76] [chromium] › tests\e2e\trial-events.spec.ts:100:3 › trial event reconstruction › keyboard activation is logged as input_type=keyboard
+[76/76] [chromium] › tests\e2e\trial-events.spec.ts:123:3 › trial event reconstruction › a timeout still ends with exactly one trial_end
+  76 passed (1.6m)

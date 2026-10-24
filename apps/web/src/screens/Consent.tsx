@@ -25,7 +25,7 @@ export function ConsentScreen({ onConsent, busy }: { onConsent: (version: string
           onClick={() => void onConsent(CONSENT_VERSION)}
           data-testid="consent-continue"
         >
-          {busy ? "Saving…" : "Continue to demographics"}
+          {busy ? "Saving…" : "Continue to eye-tracking consent"}
         </button>
       </div>
     </section>

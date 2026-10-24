@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { tasks } from "@meridian/taxonomy";
+import { manipulationCheckPassed, reportedState, type AffectRatings } from "@meridian/scoring";
 import type { Repository } from "./repository";
 
 export interface ExportFile {
@@ -46,7 +47,17 @@ function eventRecord(row: ReturnType<Repository["allEvents"]>[number]) {
 }
 
 export function buildExportBundle(repo: Repository): ExportFile[] {
+  const rawCheckins = repo.allCheckins();
+  const inductionCheckins = new Map(rawCheckins
+    .filter((row) => row.meta.phase === "post_induction" && row.block_id !== null)
+    .map((row) => [`${row.session_id}:${row.block_id}`, row]));
   const events = repo.allEvents().map(eventRecord);
+  const startedSessions = new Set(events.filter((row) => row.event_type === "session_start").map((row) => row.session_id));
+  const syntheticSessions = new Set(events.filter((row) =>
+    row.event_type === "session_start" && row.meta !== null && typeof row.meta === "object" &&
+    (row.meta as Record<string, unknown>).synthetic === true
+  ).map((row) => row.session_id));
+  const synthetic = (sessionId: string) => startedSessions.has(sessionId) ? syntheticSessions.has(sessionId) : null;
   const eventColumns = [
     "event_id",
     "participant_id",
@@ -72,13 +83,21 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "input_type",
     "meta"
   ];
-  const trials = repo.allTrials().map((t) => ({
-    ...t,
-    path: t.path_json,
-    first_click_ok: t.first_click_ok === null ? "" : t.first_click_ok
-  }));
+  const trials = repo.allTrials().map((t) => {
+    const checkin = inductionCheckins.get(`${t.session_id}:${t.block_id}`);
+    const ratings = checkin?.meta as AffectRatings | undefined;
+    return {
+      ...t,
+      synthetic: synthetic(t.session_id),
+      reported_state: ratings ? reportedState(ratings) : null,
+      manipulation_check_passed: ratings ? manipulationCheckPassed(t.state_label ?? "mixed", ratings) : null,
+      path: t.path_json,
+      first_click_ok: t.first_click_ok === null ? "" : t.first_click_ok
+    };
+  });
   const trialColumns = [
     "trial_id",
+    "synthetic",
     "session_id",
     "participant_id",
     "block_id",
@@ -88,6 +107,8 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "target_id",
     "menu_id",
     "state_label",
+    "reported_state",
+    "manipulation_check_passed",
     "condition",
     "difficulty",
     "practice",
@@ -112,27 +133,34 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "event_count",
     "path"
   ];
-  const checkins = repo.allCheckins().map((c) => ({
-    event_id: c.event_id,
-    session_id: c.session_id,
-    participant_id: c.participant_id,
-    block_id: c.block_id,
-    state_label: c.state_label,
-    t_server: c.t_server,
-    valence: c.meta.valence ?? "",
-    arousal: c.meta.arousal ?? "",
-    happy: c.meta.happy ?? "",
-    frustrated: c.meta.frustrated ?? "",
-    confused: c.meta.confused ?? "",
-    bored: c.meta.bored ?? "",
-    distress: c.meta.distress ?? "",
-    dominant_state: c.meta.dominant_state ?? "",
-    intensity: c.meta.intensity ?? "",
-    fatigue: c.meta.fatigue ?? "",
-    meta: c.meta
-  }));
+  const checkins = rawCheckins.map((c) => {
+    const ratings = c.meta as AffectRatings;
+    return {
+      event_id: c.event_id,
+      synthetic: synthetic(c.session_id),
+      session_id: c.session_id,
+      participant_id: c.participant_id,
+      block_id: c.block_id,
+      state_label: c.state_label,
+      t_server: c.t_server,
+      valence: c.meta.valence ?? "",
+      arousal: c.meta.arousal ?? "",
+      happy: c.meta.happy ?? "",
+      frustrated: c.meta.frustrated ?? "",
+      confused: c.meta.confused ?? "",
+      bored: c.meta.bored ?? "",
+      distress: c.meta.distress ?? "",
+      dominant_state: c.meta.dominant_state ?? "",
+      reported_state: reportedState(ratings),
+      manipulation_check_passed: manipulationCheckPassed(c.state_label, ratings),
+      intensity: c.meta.intensity ?? "",
+      fatigue: c.meta.fatigue ?? "",
+      meta: c.meta
+    };
+  });
   const checkinColumns = [
     "event_id",
+    "synthetic",
     "session_id",
     "participant_id",
     "block_id",
@@ -146,6 +174,8 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "bored",
     "distress",
     "dominant_state",
+    "reported_state",
+    "manipulation_check_passed",
     "intensity",
     "fatigue",
     "meta"

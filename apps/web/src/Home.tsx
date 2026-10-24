@@ -58,7 +58,7 @@ export function Home() {
               <span>12 scored trials</span>
               <span>6 balanced menus</span>
               <span>≤ 100 minutes</span>
-              <span>No webcam / no biometrics</span>
+              <span>Webcam eye tracking · separate consent</span>
             </div>
           </div>
           <div className="home-hero-art" aria-hidden="true">
@@ -74,8 +74,9 @@ export function Home() {
             <span className="home-card-number">01</span>
             <h2>Participant run</h2>
             <p>
-              Consent, demographics, baseline affect, six practice trials, four counterbalanced scenarios, twelve
-              scored trials, check-ins, neutral resets, questionnaires, and debrief.
+              Consent, separate gaze consent, measured screen setup, calibration, demographics, baseline affect, six
+              practice trials, four counterbalanced scenarios, twelve scored trials, check-ins, neutral resets,
+              questionnaires, and debrief.
             </p>
             <a href="/admin">Create a link →</a>
           </article>
@@ -109,7 +110,8 @@ export function Home() {
             <li>Every raw event appended to <code>data/raw/&lt;session_id&gt;.jsonl</code>.</li>
             <li>Trials are recomputed from events, so a browser crash does not lose the path.</li>
             <li>Reduced-motion support, visible Stop control, and a distress threshold that stops the induction.</li>
-            <li>No external requests: all fonts, icons, illustrations, and data are local.</li>
+            <li>Gaze is stored separately with restricted access; raw video is never recorded, and a failed calibration blocks scored trials.</li>
+            <li>No external requests: all fonts, icons, illustrations, WebGazer assets, and data are local.</li>
           </ul>
         </section>
       </main>

@@ -1,0 +1,107 @@
+=================================================================
+Biometric Menu D Paired Diagnostic - COMPLETED
+=================================================================
+Start Time: 2026-10-24T04:19:52.425Z
+End Time:   2026-10-24T04:20:11.081Z
+Exit Code:  0
+Command:    npx.cmd playwright test --config tests/biometric-menu-performance/playwright.diagnostic.config.ts
+Label:      diagnostic-paired-2026-10-24 (NOT the 50 fps gate)
+
+--- PAIRED MEASUREMENT ---
+Phase A (concurrent FaceMesh inference): 47.99 fps (8 active frames, 182.5 ms observed, 9 inference calls, 145.9 ms inference overlap)
+Phase B (inference paused):            59.95 fps (11 active frames, 203.3 ms observed)
+Steady-state rAF (BOTH windows taken after pause; harness order bug, excluded from comparison): 60.02 and 59.99 fps
+Inference duration: median 12.20 ms, p90 18.40 ms, max 178.70 ms across 120 calls
+Diagnostic internally valid: true
+
+--- PLAYWRIGHT OUTPUT ---
+Running 1 test using 1 worker
+
+DIAGNOSTIC PAIRED OBSERVATION: {
+  "phaseA": {
+    "configuredDurationMs": 180,
+    "scheduledStart": 8703.30000000447,
+    "observedDurationMs": 182.49999999552892,
+    "activeFrameCount": 8,
+    "activeFps": 47.99040191961639,
+    "frameDeltasMs": [
+      16.600000000000364,
+      16.69999999999891,
+      16.600000000000364,
+      16.899999999999636,
+      33.399999999999636,
+      16.400000000001455,
+      33.399999999999636,
+      16.69999999999891
+    ],
+    "samplesBefore": 74,
+    "samplesAfter": 88,
+    "samplesDuringZoom": 14,
+    "inferenceCallsDuringZoom": 9,
+    "inferenceDurationsDuringZoomMs": [
+      11.4,
+      18.2,
+      14.4,
+      15.1,
+      13.9,
+      31.2,
+      16.3,
+      22.1,
+      16.4
+    ],
+    "inferenceOverlapMs": 145.9,
+    "inferenceShareOfObservedDuration": 0.799,
+    "fps50GateMet": false
+  },
+  "phaseB": {
+    "configuredDurationMs": 180,
+    "scheduledStart": 10165.90000000596,
+    "observedDurationMs": 203.29999999404026,
+    "activeFrameCount": 11,
+    "activeFps": 59.945504087193456,
+    "frameDeltasMs": [
+      16.799999999999272,
+      16.700000000000728,
+      16.599999999998545,
+      16.600000000000364,
+      16.700000000000728,
+      16.69999999999891,
+      16.700000000000728,
+      16.600000000000364,
+      16.600000000000364,
+      16.69999999999891,
+      16.80000000000109
+    ],
+    "samplesBefore": 123,
+    "samplesAfter": 123,
+    "samplesDuringZoom": 0,
+    "inferenceCallsDuringZoom": 0,
+    "inferenceDurationsDuringZoomMs": [],
+    "inferenceOverlapMs": 0,
+    "inferenceShareOfObservedDuration": 0,
+    "fps50GateMet": true
+  },
+  "steadyInferenceFps": 60.02400960384141,
+  "steadyMenuOnlyFps": 59.988002399520056,
+  "inferenceRuntime": {
+    "totalCalls": 120,
+    "medianMs": 12.200000002980232,
+    "p90Ms": 18.399999998509884,
+    "maxMs": 178.70000000298023,
+    "results": {
+      "no_face": 120
+    }
+  },
+  "validity": {
+    "phaseAInferenceObserved": true,
+    "phaseBInferenceAbsent": true,
+    "configuredDurationSame": true,
+    "activeIntervalsPresent": true,
+    "noExternalRequests": true
+  }
+}
+  ok 1 tests\biometric-menu-performance\diagnostic-paired.spec.ts:79:3 › Diagnostic: paired Menu D cadence with and without concurrent FaceMesh › one same-page pair: Menu D zoom during FaceMesh and while paused (13.1s)
+
+  1 passed (15.6s)
+
+=================================================================

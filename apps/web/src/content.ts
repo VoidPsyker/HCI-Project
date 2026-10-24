@@ -1,14 +1,24 @@
 import type { StateLabel } from "@meridian/scoring";
 
-export const CONSENT_VERSION = "pilot-consent-placeholder-v1";
+export const CONSENT_VERSION = "pilot-consent-placeholder-v2";
+export const GAZE_CONSENT_VERSION = "pilot-gaze-consent-placeholder-v1";
 
 export const CONSENT_PARAGRAPHS = [
   "This is a placeholder consent form for the Meridian Timepieces pilot. It must be replaced with the approved ethics documentation before any real participant takes part.",
   "You are invited to take part in a study about how the organisation of an online watch catalogue affects searching. The session takes up to 100 minutes. You will browse a fictional store, complete short check-ins about how you feel, and answer questionnaires.",
-  "The study does not use webcam, facial analysis, biometric sensing, or emotion detection. Your responses are pseudonymous: we store a participant code, not your name. Raw interaction events and questionnaire answers are stored on this research computer.",
+  "The study also uses webcam-based eye tracking during the scored search trials. That needs a separate consent step after this one, and you can refuse it; refusing ends the session before the scored trials. Gaze positions and timing are stored separately from your clicks and questionnaire answers. Raw video is never recorded or stored, and the study does not infer emotion from your face or gaze.",
+  "Your responses are pseudonymous: we store a participant code, not your name. Interaction events, questionnaire answers, and separate gaze files are stored on this research computer. Gaze files have restricted researcher access and are deleted if you withdraw.",
   "You can pause or stop at any time without giving a reason. If you feel uncomfortable, choose the visible Stop control and the session will end immediately with a debrief. You may withdraw your data at the end of the session.",
   "There are no known physical risks. Some induction tasks are deliberately mildly frustrating, confusing, or boring. They last at most 2.5 minutes and are followed by a check-in and a neutral reset.",
   "By continuing you confirm that you have read this placeholder information, that your questions have been answered, and that you agree to take part."
+];
+
+export const GAZE_CONSENT_PARAGRAPHS = [
+  "This is a separate consent for eye tracking. The core study consent above is not enough on its own.",
+  "The pilot uses the camera in this computer to estimate where you look during the scored search trials. The camera starts only after you agree here. It does not record video, images, or audio, and no face images leave the browser.",
+  "Gaze coordinates, timing, calibration results, and measured screen geometry are stored in a separate restricted dataset. They are not mixed into the click-event log or questionnaire tables. Researchers can export them only from the password-protected console.",
+  "Webcam eye tracking is less accurate than a dedicated research tracker. A measured nine-point calibration and held-out validation decide whether the session can continue. If the error is above 1.5° or cannot be evaluated, the scored trials cannot run.",
+  "You can refuse now and end the session, or stop at any time. Withdrawal deletes the gaze files together with the rest of the session data."
 ];
 
 export const DEMOGRAPHICS = {
@@ -120,7 +130,7 @@ export const CREDIBILITY_ITEMS = [
 export const DEBRIEF_PARAGRAPHS = [
   "Thank you. This pilot tests a fictional watch store and several menu layouts. We are checking whether the procedures, menus, and measures are usable before a larger study.",
   "Some tasks were designed to be mildly frustrating, confusing, or boring. Those feelings were part of the procedure, not a judgement of you. The check-ins and neutral resets were there to bring you back to baseline.",
-  "We did not use webcam, facial analysis, biometric sensing, or automated emotion detection. Your data are pseudonymous and stored on this research computer. You can withdraw your data now or ask the researcher to remove it later.",
+  "We used webcam-based eye tracking during the scored search trials, with separate consent. No video, images, audio, or automated emotion detection were stored or inferred. Gaze data are kept in a separate restricted dataset and are pseudonymous. You can withdraw your data now or ask the researcher to remove it later.",
   "If you feel unwell or distressed, please tell the researcher. You can stop at any point. Contact details for support should be inserted here after ethics approval.",
   "This is a pilot build. Ethics approval is required before any real participant takes part."
 ];

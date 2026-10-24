@@ -294,7 +294,7 @@ function checkinMeta(state: StateLabel, phase: "baseline" | "post_induction" | "
   return {
     phase,
     valence: state === "happy" ? 7 : state === "bored" ? 3 : 4,
-    arousal: state === "happy" ? 5 : state === "frustrated" ? 6 : 3,
+    arousal: state === "happy" || state === "confused" ? 5 : state === "frustrated" ? 6 : 3,
     ...base,
     distress: state === "happy" ? 1 : 2,
     dominant_state: state === "mixed" ? "mixed" : state,
@@ -375,6 +375,53 @@ function questionnaires(design: StudyDesign, startT: number): { rows: Array<Reco
   return { rows, events, tEnd: t };
 }
 
+/**
+ * Rehearsal sessions are synthetic through the same persisted gaze provenance
+ * as any other synthetic capture; completion is never exempted by a label.
+ */
+function seedSyntheticGaze(repo: Repository, sessionId: string): void {
+  repo.createGazeConsent(sessionId, {
+    version: "pilot-gaze-consent-placeholder-v1",
+    camera_used: false,
+    synthetic: true,
+    viewport: { width_px: 1920, height_px: 1080 },
+    geometry: {
+      width_px: 1920,
+      height_px: 1080,
+      width_mm: 531,
+      height_mm: 298,
+      viewing_distance_mm: 600
+    },
+    source: {
+      kind: "synthetic",
+      adapter: "seed-rehearsal",
+      device: "Seeded rehearsal",
+      nominal_hz: 60,
+      hardware_backed: false,
+      synthetic: true,
+      capabilities: ["gaze"]
+    }
+  });
+  repo.completeGazeSession(sessionId, {
+    calibration: null,
+    quality: {
+      overall: "fail",
+      analysis_ready: false,
+      angular_metrics_ready: false,
+      missing_pct: 100,
+      sample_count: 0,
+      valid_sample_count: 0,
+      rejected_samples: 0,
+      dropped_samples: 0
+    },
+    metrics: [],
+    clock: { method: "same_clock", offset_ms: 0 },
+    max_samples: 0,
+    rejected_samples: 0,
+    dropped_samples: 0
+  });
+}
+
 function seedSession(repo: Repository, index: number, failurePlan: { Easy: number; Medium: number; Hard: number }): StudyDesign {
   const created = repo.createSession(`SEED-${String(index + 1).padStart(2, "0")}`);
   const sessionId = created.session.session_id;
@@ -391,6 +438,7 @@ function seedSession(repo: Repository, index: number, failurePlan: { Easy: numbe
   };
   const design = repo.assignDesign(sessionId, demographics, index);
   repo.addNote(sessionId, "Synthetic rehearsal data. Not a human participant; excluded from confirmatory analysis.");
+  seedSyntheticGaze(repo, sessionId);
 
   const events: EventInput[] = [];
   let t = 0;

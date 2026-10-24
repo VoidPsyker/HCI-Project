@@ -1,11 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { GazeConsent, ScreenGeometry, Viewport } from "@meridian/analysis";
 import type { StudyDesign, SessionInfo, ParticipantInfo } from "./types";
 
 export type RunnerPhase =
   | "loading"
   | "error"
   | "consent"
+  | "gaze_consent"
+  | "gaze_setup"
+  | "calibration"
+  | "gaze_failed"
   | "demographics"
   | "baseline"
   | "instructions"
@@ -38,6 +43,9 @@ interface RunnerState {
   fastMode: boolean;
   completionCode: string | null;
   abortReason: string | null;
+  gazeConsent: GazeConsent | null;
+  gazeViewport: Viewport | null;
+  gazeGeometry: ScreenGeometry | null;
   setBootstrap: (bundle: {
     session: SessionInfo;
     participant: ParticipantInfo | null;
@@ -50,6 +58,9 @@ interface RunnerState {
   setParticipant: (participant: ParticipantInfo | null) => void;
   setStartedLogged: (value: boolean) => void;
   setCheckinPhase: (phase: "baseline" | "post_induction" | "post_trials") => void;
+  setGazeConsent: (consent: GazeConsent) => void;
+  setGazeSetup: (setup: { viewport: Viewport; geometry: ScreenGeometry }) => void;
+  clearGaze: () => void;
   startPractice: () => void;
   nextPractice: () => void;
   startBlock: (index: number) => void;
@@ -73,12 +84,16 @@ const initial = {
   startedLogged: false,
   fastMode: false,
   completionCode: null,
-  abortReason: null
+  abortReason: null,
+  gazeConsent: null,
+  gazeViewport: null,
+  gazeGeometry: null
 };
 
 function resumePhase(phase: RunnerPhase): RunnerPhase {
   if (phase === "practice_trial" || phase === "practice_result") return "practice_intro";
-  if (phase === "trial" || phase === "product") return "trial_intro";
+  if (phase === "trial" || phase === "product" || phase === "trial_intro") return "calibration";
+  if (phase === "calibration" || phase === "gaze_failed") return "calibration";
   return phase;
 }
 
@@ -89,8 +104,21 @@ export const useRunnerStore = create<RunnerState>()(
       setBootstrap: ({ session, participant, design, fastMode }) => {
         const previous = get();
         const same = previous.sessionId === session.session_id;
+        const gazeConsent = same ? previous.gazeConsent : null;
+        const gazeViewport = same ? previous.gazeViewport : null;
+        const gazeGeometry = same ? previous.gazeGeometry : null;
         if (session.status === "completed") {
-          set({ sessionId: session.session_id, session, participant, design, phase: "complete", fastMode });
+          set({
+            sessionId: session.session_id,
+            session,
+            participant,
+            design,
+            phase: "complete",
+            fastMode,
+            gazeConsent,
+            gazeViewport,
+            gazeGeometry
+          });
           return;
         }
         if (session.status === "aborted" || session.status === "withdrawn") {
@@ -101,20 +129,87 @@ export const useRunnerStore = create<RunnerState>()(
             design,
             phase: "aborted",
             fastMode,
-            abortReason: session.abort_reason
+            abortReason: session.abort_reason,
+            gazeConsent,
+            gazeViewport,
+            gazeGeometry
           });
           return;
         }
         if (!participant?.consented_at) {
-          set({ sessionId: session.session_id, session, participant, design, phase: "consent", fastMode });
+          set({
+            sessionId: session.session_id,
+            session,
+            participant,
+            design,
+            phase: "consent",
+            fastMode,
+            gazeConsent: null,
+            gazeViewport: null,
+            gazeGeometry: null
+          });
+          return;
+        }
+        if (!gazeConsent) {
+          set({
+            sessionId: session.session_id,
+            session,
+            participant,
+            design,
+            phase: "gaze_consent",
+            fastMode,
+            gazeConsent: null,
+            gazeViewport: null,
+            gazeGeometry: null
+          });
+          return;
+        }
+        if (!gazeGeometry) {
+          set({
+            sessionId: session.session_id,
+            session,
+            participant,
+            design,
+            phase: "gaze_setup",
+            fastMode,
+            gazeConsent,
+            gazeViewport,
+            gazeGeometry: null
+          });
           return;
         }
         if (!design) {
-          set({ sessionId: session.session_id, session, participant, design: null, phase: "demographics", fastMode });
+          set({
+            sessionId: session.session_id,
+            session,
+            participant,
+            design: null,
+            phase: "demographics",
+            fastMode,
+            gazeConsent,
+            gazeViewport,
+            gazeGeometry
+          });
           return;
         }
+        const blockIndex = same ? previous.blockIndex : 0;
         let phase: RunnerPhase = same ? resumePhase(previous.phase) : "baseline";
-        if (phase === "loading" || phase === "error" || phase === "consent" || phase === "demographics") phase = "baseline";
+        if (
+          phase === "loading" ||
+          phase === "error" ||
+          phase === "consent" ||
+          phase === "demographics" ||
+          phase === "gaze_consent" ||
+          phase === "gaze_setup"
+        ) {
+          phase = "baseline";
+        }
+        const needsCalibration =
+          phase === "block_intro" ||
+          phase === "induction" ||
+          (phase === "checkin" && previous.checkinPhase !== "baseline") ||
+          (phase === "block_end" && blockIndex + 1 < design.blocks.length);
+        if (needsCalibration) phase = "calibration";
         set({
           sessionId: session.session_id,
           session,
@@ -123,10 +218,13 @@ export const useRunnerStore = create<RunnerState>()(
           phase,
           fastMode,
           practiceIndex: same ? previous.practiceIndex : 0,
-          blockIndex: same ? previous.blockIndex : 0,
+          blockIndex,
           trialIndex: same ? previous.trialIndex : 0,
           checkinPhase: same ? previous.checkinPhase : "baseline",
-          startedLogged: same ? previous.startedLogged : false
+          startedLogged: same ? previous.startedLogged : false,
+          gazeConsent,
+          gazeViewport,
+          gazeGeometry
         });
       },
       setPhase: (phase) => set({ phase }),
@@ -135,6 +233,10 @@ export const useRunnerStore = create<RunnerState>()(
       setParticipant: (participant) => set({ participant }),
       setStartedLogged: (startedLogged) => set({ startedLogged }),
       setCheckinPhase: (checkinPhase) => set({ checkinPhase }),
+      setGazeConsent: (gazeConsent) => set({ gazeConsent }),
+      setGazeSetup: ({ viewport, geometry }) =>
+        set({ gazeViewport: viewport, gazeGeometry: geometry }),
+      clearGaze: () => set({ gazeConsent: null, gazeViewport: null, gazeGeometry: null }),
       startPractice: () => set({ phase: "practice_intro", practiceIndex: 0 }),
       nextPractice: () => {
         const { practiceIndex, design } = get();
@@ -188,7 +290,10 @@ export const useRunnerStore = create<RunnerState>()(
         startedLogged: state.startedLogged,
         fastMode: state.fastMode,
         completionCode: state.completionCode,
-        abortReason: state.abortReason
+        abortReason: state.abortReason,
+        gazeConsent: state.gazeConsent,
+        gazeViewport: state.gazeViewport,
+        gazeGeometry: state.gazeGeometry
       })
     }
   )

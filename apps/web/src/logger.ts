@@ -57,7 +57,7 @@ export class EventLogger {
   private activeTrial = false;
   private frameStart = 0;
   private frameCount = 0;
-  private lastFps = 60;
+  private lastFps: number | null = null;
   private rafId: number | null = null;
   private consoleErrors: string[] = [];
   private queueKey: string;
@@ -106,6 +106,7 @@ export class EventLogger {
       state_label: context.state_label ?? this.context.state_label
     };
     this.trialStart = performance.now();
+    this.lastFps = null;
     this.activeTrial = true;
     this.startFrames();
   }
@@ -120,7 +121,7 @@ export class EventLogger {
     return this.activeTrial;
   }
 
-  currentFps(): number {
+  currentFps(): number | null {
     return this.lastFps;
   }
 

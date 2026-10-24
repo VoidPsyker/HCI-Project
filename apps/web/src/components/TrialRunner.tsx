@@ -3,6 +3,7 @@ import { EVENT_TYPES, type EventType, type StateLabel } from "@meridian/scoring"
 import { NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
 import type { EventLogger } from "../logger";
 import { MENU_NAMES, ProductDetail } from "../components/MenuChrome";
+import type { GazeTrialHandle } from "../gaze/GazeController";
 import { MenuA } from "../menus/MenuA";
 import { MenuB } from "../menus/MenuB";
 import { MenuC } from "../menus/MenuC";
@@ -31,18 +32,24 @@ export function TrialRunner({
   colourMapping,
   logger,
   fastMode,
+  gaze,
   onComplete
 }: {
   spec: TrialInstruction;
   colourMapping: ColourMapping;
   logger: EventLogger;
   fastMode: boolean;
+  gaze?: GazeTrialHandle;
   onComplete: (result: { success: boolean }) => void;
 }) {
   const [step, setStep] = useState<Step>("instruction");
   const [wrongProduct, setWrongProduct] = useState<string | null>(null);
   const [stuck, setStuck] = useState(false);
   const [correct, setCorrect] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const [gazeError, setGazeError] = useState<string | null>(null);
+  const stageRef = useRef<HTMLElement | null>(null);
+  const gazeStartedRef = useRef(false);
   const finishedRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +65,38 @@ export function TrialRunner({
     };
   }, []);
 
+  useEffect(() => {
+    if (!gaze || step !== "menu" || !gazeStartedRef.current) return;
+    let frame = 0;
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    const capture = () => {
+      const root = stageRef.current;
+      if (root) gaze.captureAois(root, performance.now());
+    };
+    const schedule = () => {
+      if (typeof requestAnimationFrame !== "function") {
+        capture();
+        return;
+      }
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(capture);
+    };
+    schedule();
+    timers.push(setTimeout(capture, 80), setTimeout(capture, 350));
+    const observer = new MutationObserver(schedule);
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class", "style", "aria-expanded", "data-state", "hidden"]
+    });
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+      for (const timer of timers) clearTimeout(timer);
+    };
+  }, [gaze, step]);
+
   const log = (type: string, payload: Record<string, unknown> = {}) => {
     if (!EVENT_TYPES.includes(type as EventType)) return;
     logger.log({
@@ -72,13 +111,36 @@ export function TrialRunner({
     });
   };
 
+  useEffect(() => {
+    if (step !== "wrong_product") return;
+    const onBack = () => {
+      if (finishedRef.current || stepRef.current !== "wrong_product") return;
+      log("back", { meta: { from: "product", correct: false, source: "browser" } });
+      setStep("menu");
+      setWrongProduct(null);
+    };
+    window.addEventListener("popstate", onBack);
+    return () => window.removeEventListener("popstate", onBack);
+  }, [step]);
+
   const finish = (success: boolean, terminal: "product" | "give_up" | "timeout") => {
     if (finishedRef.current) return;
     finishedRef.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (stuckRef.current) clearTimeout(stuckRef.current);
+    const endMs = performance.now();
+    if (gaze && gazeStartedRef.current) {
+      try {
+        gaze.endTrial({ trial_id: spec.trialId, end_ms: endMs });
+      } catch (endError) {
+        setGazeError((endError as Error).message);
+        gaze.endActiveTrial?.();
+      } finally {
+        gazeStartedRef.current = false;
+      }
+    }
     log("trial_end", {
-      elapsed_ms: Math.round(performance.now() - startedAtRef.current),
+      elapsed_ms: Math.round(endMs - startedAtRef.current),
       meta: {
         practice: spec.practice,
         trial_index: spec.trialIndex,
@@ -94,8 +156,27 @@ export function TrialRunner({
 
   const startedAtRef = useRef(0);
 
-  const start = () => {
-    startedAtRef.current = performance.now();
+  const start = async () => {
+    if (starting || finishedRef.current) return;
+    setStarting(true);
+    setGazeError(null);
+    let startMs = performance.now();
+    try {
+      if (gaze) {
+        const result = await gaze.beginTrial({
+          trial_id: spec.trialId,
+          menu_id: spec.menuId,
+          target_product_id: spec.targetId
+        });
+        startMs = result.start_ms;
+        gazeStartedRef.current = true;
+      }
+    } catch (gazeStartError) {
+      setGazeError((gazeStartError as Error).message);
+      setStarting(false);
+      return;
+    }
+    startedAtRef.current = startMs;
     logger.beginTrial({
       block_id: spec.blockId,
       trial_id: spec.trialId,
@@ -107,6 +188,7 @@ export function TrialRunner({
     });
     log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex } });
     setStep("menu");
+    setStarting(false);
     const timeoutMs = fastMode ? 30_000 : 120_000;
     timeoutRef.current = setTimeout(() => {
       if (finishedRef.current) return;
@@ -118,13 +200,19 @@ export function TrialRunner({
     stuckRef.current = setTimeout(() => setStuck(true), stuckMs);
   };
 
-  const handleLeaf = (leaf: TaxonomyNode) => {
+  const handleLeaf = (leaf: TaxonomyNode, inputType?: "keyboard" | "mouse") => {
     if (finishedRef.current) return;
+    const resolvedInputType =
+      inputType ??
+      (typeof window !== "undefined" && window.event && "detail" in window.event && (window.event as UIEvent).detail === 0
+        ? "keyboard"
+        : "mouse");
     log("leaf_select", {
       level: 3,
       element_id: leaf.id,
       element_label: leaf.label,
       parent_id: leaf.parentId,
+      input_type: resolvedInputType,
       meta: { correct: leaf.productId === spec.targetId }
     });
     if (leaf.productId === spec.targetId) {
@@ -132,6 +220,7 @@ export function TrialRunner({
         level: 3,
         element_id: leaf.id,
         element_label: leaf.label,
+        input_type: resolvedInputType,
         meta: { correct: true, product_id: leaf.productId }
       });
       finish(true, "product");
@@ -142,6 +231,7 @@ export function TrialRunner({
       level: 3,
       element_id: leaf.id,
       element_label: leaf.label,
+      input_type: resolvedInputType,
       meta: { correct: false, product_id: leaf.productId }
     });
     setWrongProduct(leaf.productId ?? null);
@@ -171,8 +261,14 @@ export function TrialRunner({
             Start when you are ready. The task stays hidden while you search. If you cannot find the product, use the
             visible “I can’t find it” button rather than guessing.
           </p>
-          <button type="button" className="button primary big" onClick={start} data-testid="start-trial">
-            Start trial
+          {gazeError ? (
+            <div className="warning-box" role="alert">
+              Eye tracking could not start: {gazeError}. The scored trial has not started. Ask the researcher before
+              retrying.
+            </div>
+          ) : null}
+          <button type="button" className="button primary big" onClick={() => void start()} disabled={starting} data-testid="start-trial">
+            {starting ? "Starting eye tracker..." : "Start trial"}
           </button>
         </div>
       </section>
@@ -180,7 +276,12 @@ export function TrialRunner({
   }
 
   return (
-    <section className="trial-stage" data-testid="trial-stage" data-trial-id={spec.trialId}>
+    <section className="trial-stage" data-testid="trial-stage" data-trial-id={spec.trialId} ref={stageRef}>
+      {gazeError ? (
+        <div className="warning-box" role="alert">
+          Eye-tracking warning: {gazeError}
+        </div>
+      ) : null}
       <div className={step === "product" || step === "wrong_product" || step === "failed" || step === "timeout" ? "trial-menu-wrap trial-menu-dim" : "trial-menu-wrap"}>
         <Menu
           menuId={spec.menuId}

@@ -1,0 +1,13 @@
+﻿
+Running 9 tests using 3 workers
+
+[1/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu A (Horizontal bar) logs a complete reconstructable path
+[2/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu C (Mega menu) logs a complete reconstructable path
+[3/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu B (Vertical sidebar) logs a complete reconstructable path
+[4/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu D (Fractal tiles) logs a complete reconstructable path
+[5/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu E (Icon grid) logs a complete reconstructable path
+[6/9] [chromium] › tests\e2e\trial-events.spec.ts:42:5 › trial event reconstruction › Menu F (Radial lattice) logs a complete reconstructable path
+[7/9] [chromium] › tests\e2e\trial-events.spec.ts:85:3 › trial event reconstruction › search attempts are ingested as search_attempt with the unavailable message
+[8/9] [chromium] › tests\e2e\trial-events.spec.ts:100:3 › trial event reconstruction › keyboard activation is logged as input_type=keyboard
+[9/9] [chromium] › tests\e2e\trial-events.spec.ts:123:3 › trial event reconstruction › a timeout still ends with exactly one trial_end
+  9 passed (23.7s)

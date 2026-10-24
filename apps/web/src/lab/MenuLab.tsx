@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MENU_IDS, NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
 import type { StateLabel } from "@meridian/scoring";
 import { MENU_NAMES, ProductDetail } from "../components/MenuChrome";
@@ -10,6 +10,25 @@ import { MenuE } from "../menus/MenuE";
 import { MenuF } from "../menus/MenuF";
 
 const MENUS = { A: MenuA, B: MenuB, C: MenuC, D: MenuD, E: MenuE, F: MenuF };
+const STAGE_WIDTH = 1800;
+const STAGE_HEIGHT = 720;
+
+/** Fit the lab canvas without shrinking targets on a 1920 x 1080 screen. */
+function useLabStageScale() {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const update = () => {
+      const viewport = viewportRef.current;
+      if (!viewport) return;
+      setScale(Math.min(1, viewport.clientWidth / STAGE_WIDTH, viewport.clientHeight / STAGE_HEIGHT));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return { viewportRef, scale };
+}
 const MAPPINGS: Array<{ id: string; label: string; value: ColourMapping }> = [
   { id: "default", label: "Default mapping", value: { sport: "teal", dress: "amber", everyday: "olive", smart: "indigo" } },
   { id: "shift", label: "Shifted mapping", value: { sport: "indigo", dress: "teal", everyday: "amber", smart: "olive" } },
@@ -24,6 +43,7 @@ export function MenuLab() {
   const [events, setEvents] = useState<string[]>([]);
   const mapping = useMemo(() => MAPPINGS.find((item) => item.id === mappingId)?.value ?? MAPPINGS[0]!.value, [mappingId]);
   const Menu = MENUS[menuId];
+  const { viewportRef, scale } = useLabStageScale();
 
   return (
     <div className="lab-shell">
@@ -72,8 +92,8 @@ export function MenuLab() {
           </a>
         </div>
       </header>
-      <div className="stage-viewport lab-stage-viewport">
-        <div className="stage lab-stage" style={{ transform: "scale(var(--stage-scale, 1))" }}>
+      <div className="stage-viewport lab-stage-viewport" ref={viewportRef}>
+        <div className="stage lab-stage" style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
           <div className="lab-canvas">
             <div className="lab-badge">
               Menu {menuId} · {MENU_NAMES[menuId]} · {stateLabel}

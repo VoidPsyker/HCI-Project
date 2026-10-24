@@ -1,4 +1,4 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   DEPARTMENTS,
@@ -6,12 +6,12 @@ import {
   childrenOf,
   departmentColour,
   departmentOf,
-  NODE_BY_ID,
   type TaxonomyNode
 } from "@meridian/taxonomy";
 import type { MenuProps } from "../types";
 import { NodeIcon } from "../components/Icon";
-import { MenuHeading } from "../components/MenuChrome";
+import { MenuHeading, createMenuLog, useInert, useMenuOpened } from "../components/MenuChrome";
+import { useBrowserBack, type BackSource } from "./browserBack";
 
 interface Tile {
   key: string;
@@ -59,15 +59,36 @@ function layoutTiles(items: TaxonomyNode[], hasBack: boolean): Tile[] {
   return tiles;
 }
 
-export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProps) {
+export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled = false }: MenuProps) {
   const [path, setPath] = useState<TaxonomyNode[]>([]);
   const [busy, setBusy] = useState(false);
+  const shellRef = useInert<HTMLElement>(disabled);
   const sceneRef = useRef<SVGGElement>(null);
   const items = path.length === 0 ? DEPARTMENTS : path.length === 1 ? childrenOf(path[0]!.id) : childrenOf(path[1]!.id);
   const tiles = layoutTiles(items, path.length > 0);
   const dept = path.length > 0 ? departmentOf(path[path.length - 1]!.id) : null;
   const colour = dept ? PALETTE[departmentColour(dept.id, colourMapping)] : PALETTE.teal;
   const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const visibleOptions = items.length;
+  const log = createMenuLog(onEvent, visibleOptions, disabled);
+  useMenuOpened(log);
+
+  const back = (source: BackSource = "control") => {
+    if (disabled) return;
+    if (path.length === 0) {
+      log("back", { level: 0, meta: { source, at_root: true } });
+      return;
+    }
+    const current = path[path.length - 1];
+    log("back", {
+      level: path.length,
+      element_id: current?.id,
+      element_label: current?.label,
+      meta: { source, visible_after: path.length === 1 ? 4 : 3 }
+    });
+    setPath(path.slice(0, -1));
+  };
+  useBrowserBack(back);
 
   const zoom = (tile: Tile, callback: () => void) => {
     if (busy) return;
@@ -90,41 +111,64 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
       });
   };
 
-  const choose = (tile: Tile) => {
-    if (busy) return;
+  const choose = (tile: Tile, inputType: "keyboard" | "mouse") => {
+    if (disabled || busy) return;
     if (tile.back) {
-      onEvent("back", { level: path.length });
-      setPath(path.slice(0, -1));
+      back("control");
       return;
     }
     const node = tile.node;
     if (!node) return;
     if (node.level === 3) {
-      onLeafSelect(node);
+      onLeafSelect(node, inputType);
       return;
     }
-    onEvent("node_click", { level: node.level, element_id: node.id, element_label: node.label, parent_id: node.parentId });
+    const nextVisible = childrenOf(node.id).length;
+    log("node_click", {
+      level: node.level,
+      element_id: node.id,
+      element_label: node.label,
+      parent_id: node.parentId,
+      input_type: inputType,
+      meta: { visible_after: nextVisible }
+    });
+    log("menu_open", {
+      level: node.level,
+      element_id: node.id,
+      element_label: node.label,
+      parent_id: node.parentId,
+      meta: { visible_options: nextVisible, stage: node.id }
+    });
     zoom(tile, () => setPath([...path, node]));
   };
 
-  const reset = () => setPath([]);
-  const back = () => {
-    if (path.length === 0) return;
-    onEvent("back", { level: path.length });
-    setPath(path.slice(0, -1));
+  const reset = () => {
+    if (disabled) return;
+    setPath([]);
   };
 
   return (
-    <section className="menu-shell menu-d" data-menu-id={menuId} data-testid="menu-d">
+    <section
+      ref={shellRef}
+      className="menu-shell menu-d"
+      data-menu-id={menuId}
+      data-testid="menu-d"
+      data-aoi="menu"
+      aria-disabled={disabled || undefined}
+    >
       <MenuHeading
         menuId={menuId}
         title="Fractal tiles"
         subtitle="Zoom into a tile, then keep choosing. The grid reorganises at each level."
         path={path}
         onHome={reset}
-        onBack={path.length ? back : undefined}
+        onBack={path.length ? () => back("control") : undefined}
+        breadcrumb="always"
+        onEvent={onEvent}
+        visibleOptions={visibleOptions}
+        disabled={disabled}
       />
-      <div className="d-frame" style={{ borderColor: colour.border }}>
+      <div className="d-frame" style={{ borderColor: colour.border }} data-aoi="tile-grid">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="d-svg"
@@ -150,17 +194,17 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
                     tabIndex={0}
                     aria-label="Back one level"
                     data-testid="d-back"
-                    onClick={() => choose(tile)}
+                    onClick={() => choose(tile, "mouse")}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        choose(tile);
+                        choose(tile, "keyboard");
                       }
                     }}
                   >
                     <rect data-hit-target x={tile.x} y={tile.y} width={tile.w} height={tile.h} rx={18} />
                     <text x={tile.x + tile.w / 2} y={tile.y + tile.h / 2 - 6} textAnchor="middle" className="d-back-arrow">
-                      â†
+                      {"\u2190"}
                     </text>
                     <text x={tile.x + tile.w / 2} y={tile.y + tile.h / 2 + 28} textAnchor="middle" className="d-back-label">
                       Back
@@ -172,19 +216,21 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
               const nodeDept = departmentOf(node.id);
               const palette = PALETTE[departmentColour(nodeDept?.id ?? node.id, colourMapping)];
               const isLeaf = node.level === 3;
+              const sublabel = node.level === 1 ? "Open department" : node.level === 2 ? "6 watches" : "View product";
               return (
                 <g
                   key={tile.key}
                   className="d-tile"
                   role="button"
                   tabIndex={0}
-                  aria-label={node.label}
+                  aria-label={`${node.label} ${sublabel}`}
                   data-node-id={node.id}
-                  onClick={() => choose(tile)}
+                  data-aoi-level={node.level}
+                  onClick={() => choose(tile, "mouse")}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      choose(tile);
+                      choose(tile, "keyboard");
                     }
                   }}
                 >
@@ -209,15 +255,15 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
                     className={isLeaf ? "d-label d-label-leaf" : "d-label"}
                     fill={isLeaf ? "#0f172a" : "#ffffff"}
                   >
-                    {node.label}
+                    {`${node.label} `}
                   </text>
                   <text
                     x={tile.x + 22}
                     y={tile.y + tile.h - 28}
                     className="d-sub"
-                    fill={isLeaf ? "#475569" : "rgba(255,255,255,0.78)"}
+                    fill={isLeaf ? "#475569" : "#ffffff"}
                   >
-                    {node.level === 1 ? "Open department" : node.level === 2 ? "6 watches" : "View product"}
+                    {sublabel}
                   </text>
                 </g>
               );
@@ -232,5 +278,3 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent }: MenuProp
     </section>
   );
 }
-
-

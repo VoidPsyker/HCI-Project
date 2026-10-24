@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-10-24T06:58:47.877Z",
+  "durationMs": 12336,
+  "chromeNative": true,
+  "preConsentBlocked": true,
+  "preConsentError": "gaze_consent_required",
+  "getUserMediaCallsBeforeConsent": 0,
+  "startOk": true,
+  "runtimeStatus": "stopped",
+  "cameraActiveDuringRun": true,
+  "totalSamplesReceived": 2,
+  "sampleSlice": [
+    {
+      "seq": 1,
+      "t_ms": 9218.39999999851,
+      "t_source_ms": 6756.30000000447,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 2,
+      "t_ms": 9285.59999999404,
+      "t_source_ms": 6807.4000000059605,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    }
+  ],
+  "seqStrictlyIncreasing": true,
+  "teardownStatus": "stopped",
+  "cameraActiveAfterTeardown": false,
+  "trackCount": 1,
+  "allTracksEnded": true,
+  "externalRequests": [],
+  "localMediaPipeAssetsLoaded": [
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh.binarypb",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets.data",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm"
+  ]
+}

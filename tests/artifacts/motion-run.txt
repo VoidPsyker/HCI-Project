@@ -1,0 +1,15 @@
+﻿
+Running 11 tests using 3 workers
+
+[1/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu A (Horizontal bar) suppresses level transitions
+[2/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu B (Vertical sidebar) suppresses level transitions
+[3/11] [chromium] › tests\e2e\motion.spec.ts:185:3 › motion timing › Menu A level change uses a 180–220 ms transition
+[4/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu C (Mega menu) suppresses level transitions
+[5/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu D (Fractal tiles) suppresses level transitions
+[6/11] [chromium] › tests\e2e\motion.spec.ts:196:3 › motion timing › Menu E level change uses a 180–220 ms transition
+[7/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu E (Icon grid) suppresses level transitions
+[8/11] [chromium] › tests\e2e\motion.spec.ts:337:5 › reduced motion › Menu F (Radial lattice) suppresses level transitions
+[9/11] [chromium] › tests\e2e\motion.spec.ts:207:3 › motion timing › Menu D zoom transition measures in the required window
+[10/11] [chromium] › tests\e2e\motion.spec.ts:238:3 › motion timing › frame cadence stays at or above 50 fps during a D zoom
+[11/11] [chromium] › tests\e2e\motion.spec.ts:320:3 › motion timing › transition durations outside the menus are not used as the timing gate
+  11 passed (26.2s)

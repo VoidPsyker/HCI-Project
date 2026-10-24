@@ -1,0 +1,22 @@
+Running 6 tests using 3 workers
+
+[1/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu A (Horizontal bar) meets target and spacing sizes
+[2/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu C (Mega menu) meets target and spacing sizes
+[3/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu B (Vertical sidebar) meets target and spacing sizes
+  1) [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu A (Horizontal bar) meets target and spacing sizes
+
+    Test timeout of 120000ms exceeded.
+    Error: locator.waitFor: Test timeout of 120000ms exceeded.
+    Call log: waiting for getByTestId('start-trial') to be visible
+    at support\session.ts:160
+
+  2) [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu C (Mega menu) meets target and spacing sizes
+    Test timeout of 120000ms exceeded.
+
+  3) [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu B (Vertical sidebar) meets target and spacing sizes
+    Test timeout of 120000ms exceeded.
+
+[4/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu E (Icon grid) meets target and spacing sizes
+[5/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu D (Fractal tiles) meets target and spacing sizes
+[6/6] [chromium] › tests\e2e\geometry.spec.ts:143:5 › geometry at 1920×1080 › Menu F (Radial lattice) meets target and spacing sizes
+  6 failed (timeout on mandatory gaze bootstrap prior to test-only harness)

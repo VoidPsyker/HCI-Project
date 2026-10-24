@@ -107,6 +107,80 @@ export interface TrialRow {
   scored_at: string;
 }
 
+export interface GazeSessionRow {
+  session_id: string;
+  participant_id: string;
+  consent_version: string;
+  consented_at: string;
+  camera_used: number;
+  synthetic: number;
+  token_hash: string;
+  viewport_json: string;
+  geometry_json: string;
+  source_json: string;
+  status: string;
+  last_seq: number;
+  sample_count: number;
+  calibration_json: string | null;
+  quality_json: string | null;
+  metrics_json: string | null;
+  manifest_json: string | null;
+  quality_overall: string | null;
+  analysis_ready: number;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+}
+
+export interface GazeSampleRow {
+  session_id: string;
+  seq: number;
+  t_ms: number;
+  t_source_ms: number | null;
+  x_px: number | null;
+  y_px: number | null;
+  valid: number;
+  invalid_reason: string | null;
+  pupil_left_mm: number | null;
+  pupil_right_mm: number | null;
+  trial_id: string | null;
+}
+
+export interface GazeConsentInput {
+  version: string;
+  camera_used: boolean;
+  synthetic: boolean;
+  viewport: Record<string, unknown>;
+  geometry: Record<string, unknown>;
+  source: Record<string, unknown>;
+}
+
+export interface GazeBatchInput {
+  batch_id: string;
+  samples: Array<{
+    seq: number;
+    t_ms: number;
+    t_source_ms?: number | null;
+    x_px?: number | null;
+    y_px?: number | null;
+    valid: boolean;
+    invalid_reason?: string;
+    pupil_left_mm?: number | null;
+    pupil_right_mm?: number | null;
+    trial_id?: string | null;
+  }>;
+}
+
+export interface GazeCompletionInput {
+  calibration: Record<string, unknown> | null;
+  quality: Record<string, unknown>;
+  metrics: Array<Record<string, unknown>>;
+  clock: Record<string, unknown>;
+  max_samples: number;
+  rejected_samples: number;
+  dropped_samples: number;
+}
+
 export interface AdminSession {
   session_id: string;
   participant_id: string;
@@ -153,9 +227,15 @@ function makeId(prefix: string): string {
 export class Repository {
   readonly db: Db;
   readonly rawDir: string;
+  readonly gazeDir: string;
   readonly seed: string;
 
-  constructor(dbPath: string, rawDir: string, seed = process.env.STUDY_SEED ?? "meridian-pilot-2026") {
+  constructor(
+    dbPath: string,
+    rawDir: string,
+    seed = process.env.STUDY_SEED ?? "meridian-pilot-2026",
+    gazeDir?: string
+  ) {
     if (dbPath !== ":memory:") fs.mkdirSync(path.dirname(dbPath), { recursive: true });
     fs.mkdirSync(rawDir, { recursive: true });
     this.db = new Database(dbPath);
@@ -163,6 +243,8 @@ export class Repository {
     this.db.pragma("foreign_keys = ON");
     this.db.exec(SCHEMA_SQL);
     this.rawDir = rawDir;
+    this.gazeDir = gazeDir ?? path.join(path.dirname(rawDir), "gaze");
+    fs.mkdirSync(this.gazeDir, { recursive: true });
     this.seed = seed;
   }
 
@@ -317,11 +399,24 @@ export class Repository {
     if (!session) throw new Error("session not found");
     const status = patch.status ?? session.status;
     const phase = patch.phase ?? session.phase;
+    if (status === "completed" && session.status !== "completed") {
+      this.assertGazeFinalizedForCompletion(sessionId);
+    }
     const endedAt = status === "completed" || status === "aborted" || status === "withdrawn" ? nowIso() : session.ended_at;
     this.db
       .prepare("UPDATE sessions SET status=?, phase=?, abort_reason=?, ended_at=? WHERE session_id=?")
       .run(status, phase, patch.abort_reason ?? session.abort_reason, endedAt, sessionId);
     return this.getSession(sessionId)!;
+  }
+
+  /**
+   * Biometric completion is mandatory: a participant session may complete only
+   * after its persisted gaze bundle is finalized. Seeded rehearsal data uses
+   * the same synthetic gaze row/provenance rather than a completion exception.
+   */
+  private assertGazeFinalizedForCompletion(sessionId: string): void {
+    const gaze = this.getGazeSession(sessionId);
+    if (!gaze || gaze.status !== "completed") throw new Error("gaze_session_not_finalized");
   }
 
   completeSession(sessionId: string): SessionRow {
@@ -336,6 +431,9 @@ export class Repository {
     const session = this.getSession(sessionId);
     if (!session) return;
     const tx = this.db.transaction(() => {
+      this.db.prepare("DELETE FROM gaze_samples WHERE session_id = ?").run(sessionId);
+      this.db.prepare("DELETE FROM gaze_batches WHERE session_id = ?").run(sessionId);
+      this.db.prepare("DELETE FROM gaze_sessions WHERE session_id = ?").run(sessionId);
       this.db.prepare("DELETE FROM events WHERE session_id = ?").run(sessionId);
       this.db.prepare("DELETE FROM trials WHERE session_id = ?").run(sessionId);
       this.db.prepare("DELETE FROM questionnaires WHERE session_id = ?").run(sessionId);
@@ -347,6 +445,8 @@ export class Repository {
     tx();
     const rawFile = path.join(this.rawDir, `${sessionId}.jsonl`);
     if (fs.existsSync(rawFile)) fs.rmSync(rawFile, { force: true });
+    const gazeDirectory = path.join(this.gazeDir, sessionId);
+    if (fs.existsSync(gazeDirectory)) fs.rmSync(gazeDirectory, { recursive: true, force: true });
   }
 
   insertEvents(events: EventInput[]): { accepted: number; duplicates: number; trialEndConflicts: number } {
@@ -361,6 +461,9 @@ export class Repository {
         if (!session) throw new Error(`session not found: ${input.session_id}`);
         sessionCache.set(input.session_id, session);
         if (session.participant_id !== input.participant_id) throw new Error("participant/session mismatch");
+        if (input.event_type === "session_end" && session.status !== "completed") {
+          this.assertGazeFinalizedForCompletion(input.session_id);
+        }
         if (input.event_type === "trial_end" && input.trial_id) {
           const existing = this.db
             .prepare("SELECT event_id FROM events WHERE trial_id = ? AND event_type = 'trial_end' LIMIT 1")
@@ -709,6 +812,379 @@ export class Repository {
       t_server: row.t_server,
       meta: parseMeta(row.meta_json)
     }));
+  }
+
+  getGazeSession(sessionId: string): GazeSessionRow | null {
+    return (
+      (this.db.prepare("SELECT * FROM gaze_sessions WHERE session_id = ?").get(sessionId) as GazeSessionRow | undefined) ?? null
+    );
+  }
+
+  getGazeSamples(sessionId: string): GazeSampleRow[] {
+    return this.db
+      .prepare("SELECT * FROM gaze_samples WHERE session_id = ? ORDER BY seq ASC")
+      .all(sessionId) as GazeSampleRow[];
+  }
+
+  private hashGazeToken(token: string): string {
+    return crypto.createHash("sha256").update(token, "utf8").digest("hex");
+  }
+
+  private tokenMatches(provided: string, expectedHash: string): boolean {
+    const providedHash = this.hashGazeToken(provided);
+    const a = Buffer.from(providedHash, "utf8");
+    const b = Buffer.from(expectedHash, "utf8");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
+
+  /**
+   * Records separate gaze consent and returns the only copy of the ingestion
+   * token. Re-consent requires the existing token and preserves already-ingested
+   * samples; capture configuration is immutable once samples exist.
+   */
+  createGazeConsent(
+    sessionId: string,
+    input: GazeConsentInput,
+    existingToken?: string
+  ): { session: GazeSessionRow; token: string } {
+    const session = this.getSession(sessionId);
+    if (!session) throw new Error("session_not_found");
+    const participant = this.getParticipant(session.participant_id);
+    if (!participant?.consented_at) throw new Error("core_consent_required");
+    if (session.status === "aborted" || session.status === "withdrawn") throw new Error("session_not_active");
+    const existing = this.getGazeSession(sessionId);
+    if (existing?.status === "completed") throw new Error("gaze_session_completed");
+    if (existing?.status === "withdrawn") throw new Error("gaze_session_withdrawn");
+    if (existing) {
+      if (!existingToken || !this.tokenMatches(existingToken, existing.token_hash)) {
+        throw new Error("gaze_unauthorized");
+      }
+    }
+
+    if (existing && existing.sample_count > 0) {
+      if (existing.synthetic !== (input.synthetic ? 1 : 0)) {
+        throw new Error("gaze_consent_synthetic_mismatch");
+      }
+      if (
+        existing.camera_used !== (input.camera_used ? 1 : 0) ||
+        existing.viewport_json !== JSON.stringify(input.viewport) ||
+        existing.geometry_json !== JSON.stringify(input.geometry) ||
+        existing.source_json !== JSON.stringify(input.source)
+      ) {
+        throw new Error("gaze_configuration_immutable");
+      }
+    }
+
+    const token = crypto.randomBytes(32).toString("base64url");
+    const tokenHash = this.hashGazeToken(token);
+    const at = nowIso();
+    this.db
+      .prepare(
+        `INSERT INTO gaze_sessions
+           (session_id, participant_id, consent_version, consented_at, camera_used, synthetic, token_hash,
+            viewport_json, geometry_json, source_json, status, last_seq, sample_count, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'consented', 0, 0, ?, ?)
+         ON CONFLICT(session_id) DO UPDATE SET
+           consent_version=excluded.consent_version,
+           consented_at=excluded.consented_at,
+           camera_used=excluded.camera_used,
+           synthetic=excluded.synthetic,
+           token_hash=excluded.token_hash,
+           viewport_json=excluded.viewport_json,
+           geometry_json=excluded.geometry_json,
+           source_json=excluded.source_json,
+           status=CASE WHEN gaze_sessions.sample_count > 0 THEN 'acquiring' ELSE 'consented' END,
+           updated_at=excluded.updated_at`
+      )
+      .run(
+        sessionId,
+        session.participant_id,
+        input.version,
+        at,
+        input.camera_used ? 1 : 0,
+        input.synthetic ? 1 : 0,
+        tokenHash,
+        JSON.stringify(input.viewport),
+        JSON.stringify(input.geometry),
+        JSON.stringify(input.source),
+        at,
+        at
+      );
+    return { session: this.getGazeSession(sessionId)!, token };
+  }
+
+  authorizeGaze(sessionId: string, token: string | undefined): GazeSessionRow | null {
+    if (!token) return null;
+    const session = this.getSession(sessionId);
+    if (!session || session.status === "aborted" || session.status === "withdrawn") return null;
+    const participant = this.getParticipant(session.participant_id);
+    if (!participant || participant.withdrawn_at) return null;
+    const row = this.getGazeSession(sessionId);
+    if (!row || row.status === "withdrawn" || row.status === "completed") return null;
+    return this.tokenMatches(token, row.token_hash) ? row : null;
+  }
+
+  /** Idempotent batch ingestion. A repeated batch_id returns duplicate:true. */
+  insertGazeBatch(
+    sessionId: string,
+    input: GazeBatchInput
+  ): { accepted: number; duplicate: boolean; last_seq: number } {
+    const row = this.getGazeSession(sessionId);
+    if (!row) throw new Error("gaze_session_not_found");
+    if (row.status === "completed") throw new Error("gaze_session_completed");
+    if (row.status === "withdrawn") throw new Error("gaze_session_withdrawn");
+    if (input.samples.length === 0) throw new Error("gaze_batch_empty");
+    let previous = 0;
+    const normalized = input.samples.map((sample) => {
+      if (!Number.isInteger(sample.seq) || sample.seq <= 0) throw new Error("gaze_sample_seq_invalid");
+      if (sample.seq <= previous) throw new Error("gaze_sample_seq_not_increasing");
+      previous = sample.seq;
+      if (!Number.isFinite(sample.t_ms)) throw new Error("gaze_sample_time_invalid");
+      let valid = sample.valid;
+      let reason = sample.invalid_reason;
+      const finiteX = sample.x_px !== null && Number.isFinite(sample.x_px);
+      const finiteY = sample.y_px !== null && Number.isFinite(sample.y_px);
+      if (valid && (!finiteX || !finiteY)) {
+        valid = false;
+        reason = sample.x_px === null || sample.y_px === null ? "no_prediction" : "non_finite";
+      }
+      return {
+        seq: sample.seq,
+        t_ms: sample.t_ms,
+        t_source_ms: sample.t_source_ms ?? null,
+        x_px: sample.x_px ?? null,
+        y_px: sample.y_px ?? null,
+        valid: valid ? 1 : 0,
+        invalid_reason: reason ?? null,
+        pupil_left_mm: sample.pupil_left_mm ?? null,
+        pupil_right_mm: sample.pupil_right_mm ?? null,
+        trial_id: sample.trial_id ?? null
+      };
+    });
+    const firstSeq = normalized[0]!.seq;
+    const lastSeq = normalized[normalized.length - 1]!.seq;
+    const digest = crypto.createHash("sha256").update(JSON.stringify(input.samples), "utf8").digest("hex");
+    const at = nowIso();
+    const tx = this.db.transaction(() => {
+      const existing = this.db
+        .prepare("SELECT last_seq FROM gaze_batches WHERE session_id = ? AND batch_id = ?")
+        .get(sessionId, input.batch_id) as { last_seq: number } | undefined;
+      if (existing) return { accepted: 0, duplicate: true, last_seq: existing.last_seq };
+      if (firstSeq <= row.last_seq) throw new Error("gaze_seq_conflict");
+      const insert = this.db.prepare(
+        `INSERT INTO gaze_samples
+           (session_id, seq, t_ms, t_source_ms, x_px, y_px, valid, invalid_reason, pupil_left_mm, pupil_right_mm, trial_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      );
+      for (const sample of normalized) {
+        insert.run(
+          sessionId,
+          sample.seq,
+          sample.t_ms,
+          sample.t_source_ms,
+          sample.x_px,
+          sample.y_px,
+          sample.valid,
+          sample.invalid_reason,
+          sample.pupil_left_mm,
+          sample.pupil_right_mm,
+          sample.trial_id
+        );
+      }
+      this.db
+        .prepare(
+          `INSERT INTO gaze_batches (session_id, batch_id, first_seq, last_seq, sample_count, sha256, received_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        )
+        .run(sessionId, input.batch_id, firstSeq, lastSeq, normalized.length, digest, at);
+      this.db
+        .prepare(
+          `UPDATE gaze_sessions SET last_seq = ?, sample_count = sample_count + ?, status = 'acquiring', updated_at = ?
+           WHERE session_id = ?`
+        )
+        .run(lastSeq, normalized.length, at, sessionId);
+      return { accepted: normalized.length, duplicate: false, last_seq: lastSeq };
+    });
+    return tx();
+  }
+
+  private gazeExportDirectory(sessionId: string): string {
+    return path.join(this.gazeDir, sessionId);
+  }
+
+  /**
+   * Finalises a gaze session and writes the restricted bundle. The server
+   * recomputes analysis_ready from the submitted gates; a client can never mark
+   * synthetic data analysis-ready or bypass a failed calibration gate.
+   */
+  completeGazeSession(
+    sessionId: string,
+    input: GazeCompletionInput
+  ): { manifest: Record<string, unknown>; sample_count: number; files: string[] } {
+    const row = this.getGazeSession(sessionId);
+    if (!row) throw new Error("gaze_session_not_found");
+    if (row.status === "withdrawn") throw new Error("gaze_session_withdrawn");
+    if (row.status === "completed" && row.manifest_json) {
+      const stored = JSON.parse(row.manifest_json) as Record<string, unknown>;
+      return { manifest: stored, sample_count: row.sample_count, files: this.listGazeExportFiles(sessionId) };
+    }
+    const qualitySampleCount = Number(input.quality.sample_count);
+    if (!Number.isInteger(qualitySampleCount) || qualitySampleCount !== row.sample_count) {
+      throw new Error("gaze_sample_count_mismatch");
+    }
+    const geometry = JSON.parse(row.geometry_json) as Record<string, unknown>;
+    const viewport = JSON.parse(row.viewport_json) as Record<string, unknown>;
+    const source = JSON.parse(row.source_json) as Record<string, unknown>;
+    const synthetic = row.synthetic === 1 || source.synthetic === true || source.kind === "synthetic";
+    const calibration = input.calibration;
+    const maxError = calibration && typeof calibration.max_error_deg === "number" ? calibration.max_error_deg : null;
+    const FIXED_STUDY_GATE_DEG = 1.5;
+    const calibrationPassed = calibration?.passes === true && maxError !== null && maxError <= FIXED_STUDY_GATE_DEG;
+    const qualityPassed = input.quality.overall === "pass" && input.quality.analysis_ready === true;
+    const at = nowIso();
+    const samples = this.getGazeSamples(sessionId);
+    const validSamples = samples.filter(
+      (sample) => sample.valid === 1 && sample.x_px !== null && sample.y_px !== null && Number.isFinite(sample.x_px) && Number.isFinite(sample.y_px)
+    ).length;
+    const computedMissingPct = samples.length > 0 ? ((samples.length - validSamples) / samples.length) * 100 : 100;
+    const analysisReady =
+      !synthetic &&
+      calibrationPassed &&
+      qualityPassed &&
+      samples.length > 0 &&
+      validSamples > 0 &&
+      computedMissingPct <= 20;
+    const manifest: Record<string, unknown> = {
+      schema: "meridian.gaze/1",
+      schema_version: "meridian.gaze/1",
+      created_at: at,
+      participant_id: row.participant_id,
+      session_id: row.session_id,
+      source,
+      synthetic,
+      human_data: !synthetic,
+      consent: {
+        version: row.consent_version,
+        granted_at: row.consented_at,
+        scope: "eye_tracking_only",
+        camera_used: row.camera_used === 1,
+        raw_video_retention: false,
+        separate_from_core_consent: true
+      },
+      geometry,
+      viewport,
+      clock: input.clock,
+      quality_overall: input.quality.overall,
+      analysis_ready: analysisReady,
+      angular_metrics_ready: !synthetic && input.quality.angular_metrics_ready === true,
+      streams: {
+        samples: "gaze_samples.jsonl",
+        aoi_metrics: "aoi_metrics.jsonl",
+        quality: "gaze_quality.json"
+      },
+      contains_click_events: false,
+      contains_raw_video: false,
+      restricted_access: true,
+      retention: {
+        samples_scope: synthetic ? "synthetic_full" : "trial_only",
+        max_samples: input.max_samples,
+        rejected_samples: input.rejected_samples,
+        dropped_samples: input.dropped_samples
+      },
+      counts: { samples: row.sample_count, valid_samples: validSamples, trials: input.metrics.length }
+    };
+    const samplesJsonl =
+      samples
+        .map((sample) =>
+          JSON.stringify({
+            seq: sample.seq,
+            t_ms: sample.t_ms,
+            t_source_ms: sample.t_source_ms,
+            x_px: sample.x_px,
+            y_px: sample.y_px,
+            valid: sample.valid === 1,
+            ...(sample.invalid_reason ? { invalid_reason: sample.invalid_reason } : {}),
+            ...(sample.pupil_left_mm === null ? {} : { pupil_left_mm: sample.pupil_left_mm }),
+            ...(sample.pupil_right_mm === null ? {} : { pupil_right_mm: sample.pupil_right_mm }),
+            trial_id: sample.trial_id
+          })
+        )
+        .join("\n") + (samples.length > 0 ? "\n" : "");
+    const metricsJsonl = input.metrics.map((metric) => JSON.stringify(metric)).join("\n") + (input.metrics.length > 0 ? "\n" : "");
+    const qualityJson = `${JSON.stringify({ calibration: input.calibration, quality: input.quality }, null, 2)}\n`;
+    const directory = this.gazeExportDirectory(sessionId);
+    fs.mkdirSync(directory, { recursive: true });
+    const write = (name: string, content: string) => {
+      fs.writeFileSync(path.join(directory, name), content, { encoding: "utf8", mode: 0o600 });
+      return name;
+    };
+    const files = [
+      write("gaze_samples.jsonl", samplesJsonl),
+      write("aoi_metrics.jsonl", metricsJsonl),
+      write("gaze_quality.json", qualityJson),
+      write("manifest.json", `${JSON.stringify(manifest, null, 2)}\n`)
+    ];
+    this.db
+      .prepare(
+        `UPDATE gaze_sessions
+         SET status='completed', calibration_json=?, quality_json=?, metrics_json=?, manifest_json=?,
+             quality_overall=?, analysis_ready=?, completed_at=?, updated_at=?
+         WHERE session_id=?`
+      )
+      .run(
+        input.calibration ? JSON.stringify(input.calibration) : null,
+        JSON.stringify(input.quality),
+        JSON.stringify(input.metrics),
+        JSON.stringify(manifest),
+        input.quality.overall ?? null,
+        analysisReady ? 1 : 0,
+        at,
+        at,
+        sessionId
+      );
+    return { manifest, sample_count: row.sample_count, files };
+  }
+
+  private listGazeExportFiles(sessionId: string): string[] {
+    const directory = this.gazeExportDirectory(sessionId);
+    if (!fs.existsSync(directory)) return [];
+    return fs.readdirSync(directory).sort();
+  }
+
+  getGazeSummary(sessionId: string): Record<string, unknown> | null {
+    const row = this.getGazeSession(sessionId);
+    if (!row) return null;
+    const batchCount = (
+      this.db.prepare("SELECT COUNT(*) AS n FROM gaze_batches WHERE session_id = ?").get(sessionId) as { n: number }
+    ).n;
+    return {
+      session_id: row.session_id,
+      participant_id: row.participant_id,
+      consent_version: row.consent_version,
+      consented_at: row.consented_at,
+      camera_used: row.camera_used === 1,
+      synthetic: row.synthetic === 1,
+      status: row.status,
+      last_seq: row.last_seq,
+      sample_count: row.sample_count,
+      batch_count: batchCount,
+      quality_overall: row.quality_overall,
+      analysis_ready: row.analysis_ready === 1,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      completed_at: row.completed_at,
+      export_files: this.listGazeExportFiles(sessionId)
+    };
+  }
+
+  readGazeExportFile(sessionId: string, name: string): { content: string; sha256: string } | null {
+    const allowed = new Set(["manifest.json", "gaze_samples.jsonl", "aoi_metrics.jsonl", "gaze_quality.json"]);
+    if (!allowed.has(name)) return null;
+    const directory = this.gazeExportDirectory(sessionId);
+    const filePath = path.join(directory, name);
+    if (!fs.existsSync(filePath)) return null;
+    const content = fs.readFileSync(filePath, "utf8");
+    return { content, sha256: crypto.createHash("sha256").update(content, "utf8").digest("hex") };
   }
 
   getMeta(key: string): string | null {

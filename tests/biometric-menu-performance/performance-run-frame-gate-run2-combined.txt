@@ -1,0 +1,163 @@
+=================================================================
+Biometric Menu D Performance Verification Run - FAILED
+=================================================================
+Start Time: 2026-10-24T04:42:46.993Z
+End Time:   2026-10-24T04:43:31.494Z
+Exit Code:  1
+Command:    npx.cmd playwright test --config tests/biometric-menu-performance/playwright.config.ts
+
+--- TEST EXECUTION ERROR ---
+Running 1 test using 1 worker
+
+MEASURED MOTION DATA: {
+  "cameraSettings": [
+    {
+      "width": 640,
+      "height": 480,
+      "frameRate": 20
+    }
+  ],
+  "configuredDuration": 180,
+  "measuredDuration": 233.10000000149012,
+  "deltas": [
+    83.39999999999782,
+    66.70000000000073
+  ],
+  "totalMs": 150.09999999999854,
+  "fps": 13.324450366422514,
+  "samplesAtFirst": 28,
+  "samplesAtEnd": 30,
+  "samplesDuringZoom": 2,
+  "totalSamples": 31,
+  "sampleSlice": [
+    {
+      "seq": 1,
+      "t_ms": 19068.30000000447,
+      "t_source_ms": 10634.60000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 2,
+      "t_ms": 19111.20000000298,
+      "t_source_ms": 10683.60000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 3,
+      "t_ms": 19148.04250011243,
+      "t_source_ms": 10720.10000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 4,
+      "t_ms": 19183.858726122344,
+      "t_source_ms": 10757.10000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 5,
+      "t_ms": 19217.36910068839,
+      "t_source_ms": 10790.20000000298,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 6,
+      "t_ms": 19249.699809183643,
+      "t_source_ms": 10823.70000000298,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 7,
+      "t_ms": 19281.202071674452,
+      "t_source_ms": 10855.10000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 8,
+      "t_ms": 19320.369242132263,
+      "t_source_ms": 10889.10000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 9,
+      "t_ms": 19370.075072246404,
+      "t_source_ms": 10934,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 10,
+      "t_ms": 19423.055420951838,
+      "t_source_ms": 10982.70000000298,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    }
+  ]
+}
+  x  1 tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference (25.6s)
+
+
+  1) tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference
+
+    Error: must sample multiple frames during active zoom
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 5
+    Received:    2
+
+      409 |
+      410 |       // B. Frame count during active zoom
+    > 411 |       expect(motionData.deltas.length, "must sample multiple frames during active zoom").toBeGreaterThanOrEqual(5);
+          |                                                                                          ^
+      412 |
+      413 |       // C. Observed runtime duration bound with frame quantization tolerance [170ms, 240ms]
+      414 |       expect(motionData.measuredDuration, "measured D3 zoom duration must not be null").not.toBeNull();
+        at C:\Users\Cauti\orca\workspaces\HCI-Project\periwinkle\tests\biometric-menu-performance\biometric-menu-performance.spec.ts:411:90
+
+    Error Context: test-results\biometric-menu-performance-65be0--bundled-FaceMesh-inference\error-context.md
+
+    Error Context: test-results\biometric-menu-performance-65be0--bundled-FaceMesh-inference\error-context.md
+
+  1 failed
+    tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference
+
+=================================================================

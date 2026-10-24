@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-10-24T04:36:38.826Z",
+  "cameraSettings": [
+    {
+      "width": 640,
+      "height": 480,
+      "frameRate": 20
+    }
+  ],
+  "configuredDuration": 180,
+  "measuredDuration": 191.6000000029817,
+  "deltas": [
+    33,
+    16.69999999999709,
+    17,
+    16.400000000001455,
+    33.20000000000073,
+    16.700000000000728,
+    33.39999999999782,
+    16.600000000002183
+  ],
+  "totalMs": 183,
+  "fps": 43.71584699453552,
+  "samplesAtFirst": 3,
+  "samplesAtEnd": 3,
+  "samplesDuringZoom": 0,
+  "totalSamples": 3,
+  "sampleSlice": [
+    {
+      "seq": 1,
+      "t_ms": 17960.79999999702,
+      "t_source_ms": 9864.70000000298,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 2,
+      "t_ms": 18063.89999999851,
+      "t_source_ms": 9903.60000000149,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 3,
+      "t_ms": 18103.676965704377,
+      "t_source_ms": 9997.20000000298,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    }
+  ]
+}

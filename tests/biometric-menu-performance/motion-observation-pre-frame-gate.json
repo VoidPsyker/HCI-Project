@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-10-24T02:45:56.675Z",
+  "configuredDuration": 180,
+  "measuredDuration": 189.5999999985097,
+  "deltas": [
+    33.29999999999927,
+    33.30000000000018,
+    33.30000000000018,
+    33.399999999999636,
+    33.30000000000018
+  ],
+  "totalMs": 166.59999999999945,
+  "fps": 30.012004801920863,
+  "samplesAtFirst": 29,
+  "samplesAtEnd": 34,
+  "samplesDuringZoom": 5,
+  "totalSamples": 35,
+  "sampleSlice": [
+    {
+      "seq": 1,
+      "t_ms": 7240.5,
+      "t_source_ms": 3764.3000000044703,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 2,
+      "t_ms": 7272.30000000447,
+      "t_source_ms": 3824.4000000059605,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 3,
+      "t_ms": 7298.427670061128,
+      "t_source_ms": 3853,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 4,
+      "t_ms": 7324.194400279908,
+      "t_source_ms": 3884.2000000029802,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 5,
+      "t_ms": 7341.933008491777,
+      "t_source_ms": 3906.7000000029802,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 6,
+      "t_ms": 7355.945690107777,
+      "t_source_ms": 3922.3000000044703,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 7,
+      "t_ms": 7375.725816175558,
+      "t_source_ms": 3942.7000000029802,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 8,
+      "t_ms": 7396.532153726239,
+      "t_source_ms": 3963,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 9,
+      "t_ms": 7416.414520614138,
+      "t_source_ms": 3984.4000000059605,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 10,
+      "t_ms": 7432.83348681729,
+      "t_source_ms": 4001.5,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    }
+  ]
+}

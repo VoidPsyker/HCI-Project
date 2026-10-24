@@ -1,11 +1,16 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import type { StateLabel } from "@meridian/scoring";
+import { manipulationCheckPassed, reportedState, type StateLabel } from "@meridian/scoring";
+import type { CalibrationReport, ScreenGeometry } from "@meridian/analysis";
 import { loadSession, loadSessionStatus, patchSessionState, recordConsent, stopSession, submitDemographics, submitQuestionnaires, withdrawSession } from "./api";
 import { EventLogger } from "./logger";
 import { useRunnerStore } from "./store";
 import type { CheckinPayload, SessionInfo, StudyDesign } from "./types";
 import { SessionChrome } from "./components/SessionChrome";
 import { ConsentScreen } from "./screens/Consent";
+import { GazeConsentScreen } from "./screens/GazeConsent";
+import { GazeSetupScreen } from "./screens/GazeSetup";
+import { GazeCalibrationScreen } from "./screens/GazeCalibration";
+import { GazeFailureScreen } from "./screens/GazeFailure";
 import { DemographicsScreen } from "./screens/Demographics";
 import { CheckinScreen } from "./screens/Checkin";
 import { InductionScreen } from "./screens/Induction";
@@ -13,8 +18,18 @@ import { QuestionnairesScreen } from "./screens/Questionnaires";
 import { DebriefScreen } from "./screens/Debrief";
 import { BlockIntroScreen, CompleteScreen, InstructionsScreen, NeutralResetScreen } from "./screens/Interstitials";
 import { TrialRunner, type TrialInstruction } from "./components/TrialRunner";
+import { GazeController } from "./gaze/GazeController";
+import { gazeApi } from "./gaze/gazeClient";
+import { WebGazerSource } from "./biometrics/webgazer";
+import { loadBundledWebGazer } from "./biometrics/webgazerLoader";
+import { grantGazeConsent } from "./biometrics/consent";
+import { GAZE_CONSENT_VERSION } from "./content";
 
 const SERVER_PHASE: Partial<Record<string, string>> = {
+  gaze_consent: "consent",
+  gaze_setup: "setup",
+  calibration: "calibration",
+  gaze_failed: "excluded",
   baseline: "baseline",
   instructions: "instructions",
   practice_intro: "practice",
@@ -41,6 +56,15 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const loggerRef = useRef<EventLogger | null>(null);
+  const gazeRef = useRef<GazeController | null>(null);
+  const gazeStartingRef = useRef(false);
+  const gazeCalibratedRef = useRef(false);
+  const gazeFinalizedRef = useRef(false);
+  const [gazeAttempt, setGazeAttempt] = useState(0);
+  const [gazeStarting, setGazeStarting] = useState(false);
+  const [gazeStartError, setGazeStartError] = useState<string | null>(null);
+  const [gazeReady, setGazeReady] = useState(false);
+  const [gazeReport, setGazeReport] = useState<CalibrationReport | null>(null);
   const fastMode = new URLSearchParams(window.location.search).get("fast") === "1";
 
   useEffect(() => {
@@ -82,6 +106,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     const onUnload = () => {
       logger.interruptTrial("page_unload");
       logger.beacon();
+      gazeRef.current?.flushBeacon();
     };
     window.addEventListener("beforeunload", onUnload);
     window.addEventListener("pagehide", onUnload);
@@ -90,6 +115,13 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       window.removeEventListener("pagehide", onUnload);
     };
   }, [logger]);
+
+  useEffect(() => {
+    return () => {
+      void gazeRef.current?.stop();
+      gazeRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (!logger || state.startedLogged) return;
@@ -132,6 +164,81 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.sessionId, state.phase]);
 
+  useEffect(() => {
+    if (state.phase !== "calibration") return;
+    if (gazeStartingRef.current || (gazeRef.current && gazeRef.current.status !== "failed")) return;
+    if (!state.session || !state.gazeConsent || !state.gazeViewport || !state.gazeGeometry) return;
+    let cancelled = false;
+    gazeStartingRef.current = true;
+    setGazeStarting(true);
+    setGazeStartError(null);
+    setGazeReport(null);
+    const controller: GazeController = gazeRef.current ?? new GazeController({
+      participant_id: state.session.participant_id,
+      session_id: state.session.session_id,
+      consent: state.gazeConsent,
+      viewport: state.gazeViewport,
+      geometry: state.gazeGeometry,
+      source: new WebGazerSource({
+        participant_id: state.session.participant_id,
+        session_id: state.session.session_id,
+        load: loadBundledWebGazer,
+        viewport: () => ({ width_px: window.innerWidth, height_px: window.innerHeight })
+      }),
+      api: gazeApi,
+      criterionDeg: 1.5,
+      onError: (message) => {
+        if (message === "gaze_viewport_changed") {
+          logger?.interruptTrial(message);
+          gazeCalibratedRef.current = false;
+          setGazeReady(false);
+          setGazeReport(controller.report);
+          setBanner("The screen size changed after measurement. Eye tracking stopped; ask the researcher to start a new session.");
+          state.setPhase("gaze_failed");
+          return;
+        }
+        if (message) setBanner(`Eye-tracking upload: ${message}`);
+      }
+    });
+    gazeRef.current = controller;
+    controller
+      .start()
+      .then(() => {
+        if (!cancelled && gazeRef.current === controller) setGazeReady(true);
+      })
+      .catch((startFailure: Error) => {
+        if (cancelled || gazeRef.current !== controller) return;
+        setGazeReady(false);
+        setGazeStartError(startFailure.message || "The eye tracker could not start.");
+      })
+      .finally(() => {
+        gazeStartingRef.current = false;
+        if (!cancelled) setGazeStarting(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // The controller is created once per calibration attempt. Depend on the
+    // session identity, not the bootstrap object: refreshing the same session
+    // must not cancel an in-flight camera start.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.phase,
+    gazeAttempt,
+    state.session?.session_id,
+    state.session?.participant_id,
+    state.gazeConsent,
+    state.gazeViewport,
+    state.gazeGeometry
+  ]);
+
+  useEffect(() => {
+    const controller = gazeRef.current;
+    if (!controller) return;
+    if (state.phase === "trial" || state.phase === "product" || state.phase === "calibration") return;
+    void controller.pause();
+  }, [state.phase]);
+
   const handleConsent = async (version: string) => {
     if (!logger) return;
     setBusy(true);
@@ -145,12 +252,71 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         consent_version: version,
         consented_at: new Date().toISOString()
       });
-      state.setPhase("demographics");
+      state.setPhase("gaze_consent");
     } catch (consentError) {
       setBanner((consentError as Error).message);
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleGazeConsent = async (cameraUsed: boolean) => {
+    if (!state.session) return;
+    setBusy(true);
+    setBanner(null);
+    try {
+      const consent = grantGazeConsent({
+        participant_id: state.session.participant_id,
+        session_id: state.session.session_id,
+        version: GAZE_CONSENT_VERSION,
+        camera_used: cameraUsed
+      });
+      state.setGazeConsent(consent);
+      state.setPhase("gaze_setup");
+    } catch (gazeConsentError) {
+      setBanner((gazeConsentError as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const endForGaze = async (reason: string) => {
+    setBusy(true);
+    try {
+      await gazeRef.current?.stop();
+      gazeRef.current = null;
+      setGazeReady(false);
+      await stopSession(sessionId, reason).catch(() => undefined);
+      state.abort(reason);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleGazeRefuse = async () => {
+    await endForGaze("gaze_consent_refused");
+  };
+
+  const handleGazeSetup = (geometry: ScreenGeometry) => {
+    state.setGazeSetup({
+      viewport: { width_px: geometry.width_px, height_px: geometry.height_px },
+      geometry
+    });
+    state.setPhase("demographics");
+  };
+
+  const handleCalibrated = (report: CalibrationReport) => {
+    setGazeReport(report);
+    if (report.passes === true && report.angular_available) {
+      gazeCalibratedRef.current = true;
+      state.setPhase("trial_intro");
+      return;
+    }
+    state.setPhase("gaze_failed");
+  };
+
+  const handleGazeFailureEnd = async () => {
+    await endForGaze("gaze_quality_gate_failed");
   };
 
   const handleDemographics = async (data: Record<string, unknown>) => {
@@ -216,7 +382,11 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       event_type: "checkin",
       block_id: block?.blockId ?? null,
       state_label: block?.stateLabel ?? "mixed",
-      meta: { ...payload }
+      meta: {
+        ...payload,
+        reported_state: reportedState(payload),
+        manipulation_check_passed: manipulationCheckPassed(block?.stateLabel ?? "mixed", payload)
+      }
     });
     if (payload.distress > 6) {
       await stopForDistress("distress_gt_6");
@@ -227,7 +397,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       return;
     }
     if (payload.phase === "post_induction") {
-      state.setPhase("trial_intro");
+      state.setPhase(gazeCalibratedRef.current ? "trial_intro" : "calibration");
       return;
     }
     state.setPhase("block_end");
@@ -248,6 +418,13 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       });
     }
     logger.interruptTrial(reason);
+    try {
+      await gazeRef.current?.stop();
+    } catch {
+      // Camera teardown must not prevent the participant from reaching the debrief.
+    }
+    gazeRef.current = null;
+    setGazeReady(false);
     try {
       await stopSession(sessionId, reason);
     } catch {
@@ -297,6 +474,29 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       state.complete("STOPPED");
       return;
     }
+    if (state.gazeConsent && !gazeFinalizedRef.current && !gazeRef.current) {
+      setBanner(
+        "Eye-tracking data could not be finalized because this page lost the gaze session. Do not mark the session complete; ask the researcher for a fresh session link."
+      );
+      return;
+    }
+    if (gazeRef.current) {
+      setBusy(true);
+      setBanner(null);
+      try {
+        await gazeRef.current.complete();
+        gazeFinalizedRef.current = true;
+        gazeRef.current = null;
+        setGazeReady(false);
+      } catch (gazeCompleteError) {
+        setBanner(
+          `Eye-tracking data could not be saved: ${(gazeCompleteError as Error).message}. Do not close this page; ask the researcher to retry.`
+        );
+        return;
+      } finally {
+        setBusy(false);
+      }
+    }
     const code = makeCode();
     logger?.setContext({ state_label: "mixed", block_id: null, trial_id: null, task_id: null, target_id: null, menu_id: null });
     logger?.log({ event_type: "session_end", state_label: "mixed", meta: { completed: true, completion_code: code } });
@@ -313,6 +513,9 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBusy(true);
     try {
       logger?.discard();
+      await gazeRef.current?.withdraw();
+      gazeRef.current = null;
+      setGazeReady(false);
       await withdrawSession(sessionId);
       state.reset();
     } finally {
@@ -376,6 +579,32 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   let content: React.ReactNode = null;
   if (state.phase === "consent") {
     content = <ConsentScreen onConsent={handleConsent} busy={busy} />;
+  } else if (state.phase === "gaze_consent") {
+    content = (
+      <GazeConsentScreen
+        onGrant={handleGazeConsent}
+        onRefuse={handleGazeRefuse}
+        busy={busy}
+        error={banner}
+      />
+    );
+  } else if (state.phase === "gaze_setup") {
+    content = <GazeSetupScreen onSubmit={handleGazeSetup} busy={busy} error={banner} />;
+  } else if (state.phase === "calibration") {
+    content = (
+      <GazeCalibrationScreen
+        controller={gazeReady ? gazeRef.current : null}
+        starting={gazeStarting}
+        startError={gazeStartError}
+        onRetry={() => {
+          setGazeStartError(null);
+          setGazeAttempt((attempt) => attempt + 1);
+        }}
+        onCalibrated={handleCalibrated}
+      />
+    );
+  } else if (state.phase === "gaze_failed") {
+    content = <GazeFailureScreen report={gazeReport} onEnd={handleGazeFailureEnd} busy={busy} />;
   } else if (state.phase === "demographics") {
     content = <DemographicsScreen onSubmit={handleDemographics} busy={busy} />;
   } else if (state.phase === "baseline") {
@@ -424,6 +653,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         colourMapping={design?.colourMapping ?? { sport: "teal", dress: "amber", everyday: "olive", smart: "indigo" }}
         logger={logger!}
         fastMode={fastMode}
+        gaze={gazeRef.current ?? undefined}
         onComplete={finishMainTrial}
       />
     );

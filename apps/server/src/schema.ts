@@ -155,4 +155,60 @@ CREATE TABLE IF NOT EXISTS meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+
+-- Gaze is deliberately separate from events/trials/questionnaires. It has its
+-- own consent record, token hash, sample table and restricted export directory.
+CREATE TABLE IF NOT EXISTS gaze_sessions (
+  session_id TEXT PRIMARY KEY REFERENCES sessions(session_id) ON DELETE CASCADE,
+  participant_id TEXT NOT NULL,
+  consent_version TEXT NOT NULL,
+  consented_at TEXT NOT NULL,
+  camera_used INTEGER NOT NULL,
+  synthetic INTEGER NOT NULL DEFAULT 0,
+  token_hash TEXT NOT NULL,
+  viewport_json TEXT NOT NULL,
+  geometry_json TEXT NOT NULL,
+  source_json TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'consented',
+  last_seq INTEGER NOT NULL DEFAULT 0,
+  sample_count INTEGER NOT NULL DEFAULT 0,
+  calibration_json TEXT,
+  quality_json TEXT,
+  metrics_json TEXT,
+  manifest_json TEXT,
+  quality_overall TEXT,
+  analysis_ready INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  completed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS gaze_batches (
+  session_id TEXT NOT NULL REFERENCES gaze_sessions(session_id) ON DELETE CASCADE,
+  batch_id TEXT NOT NULL,
+  first_seq INTEGER NOT NULL,
+  last_seq INTEGER NOT NULL,
+  sample_count INTEGER NOT NULL,
+  sha256 TEXT NOT NULL,
+  received_at TEXT NOT NULL,
+  PRIMARY KEY (session_id, batch_id)
+);
+
+CREATE TABLE IF NOT EXISTS gaze_samples (
+  session_id TEXT NOT NULL REFERENCES gaze_sessions(session_id) ON DELETE CASCADE,
+  seq INTEGER NOT NULL,
+  t_ms REAL NOT NULL,
+  t_source_ms REAL,
+  x_px REAL,
+  y_px REAL,
+  valid INTEGER NOT NULL,
+  invalid_reason TEXT,
+  pupil_left_mm REAL,
+  pupil_right_mm REAL,
+  trial_id TEXT,
+  PRIMARY KEY (session_id, seq)
+);
+
+CREATE INDEX IF NOT EXISTS idx_gaze_samples_session_time ON gaze_samples(session_id, t_ms);
+CREATE INDEX IF NOT EXISTS idx_gaze_batches_session ON gaze_batches(session_id);
 `;

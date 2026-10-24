@@ -167,7 +167,7 @@ export function DemographicsScreen({
           <small>1 = not confident, 7 = very confident</small>
         </label>
         <div className="panel-actions span-2">
-          <span className="small-note">No name, email, IP address or webcam data is collected.</span>
+          <span className="small-note">No name, email, or IP address is collected. Gaze data are stored separately from these answers.</span>
           <button type="submit" className="button primary" disabled={!complete || busy} data-testid="demographics-continue">
             {busy ? "Assigning sequence…" : "Continue to baseline"}
           </button>

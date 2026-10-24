@@ -1,0 +1,6 @@
+{
+  "timestamp": "2026-10-24T02:47:21.708Z",
+  "baselineFpsBeforeInference": 59.999999999999986,
+  "hardwareConcurrency": 8,
+  "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+}

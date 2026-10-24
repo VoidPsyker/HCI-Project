@@ -12,6 +12,10 @@ import {
   createSessionSchema,
   demographicsSchema,
   eventBatchSchema,
+  findForbiddenMediaKey,
+  gazeBatchSchema,
+  gazeCompleteSchema,
+  gazeConsentSchema,
   noteSchema,
   questionnaireBatchSchema,
   updateSessionSchema
@@ -58,6 +62,18 @@ function publicDesign(design: ReturnType<Repository["getDesign"]>) {
   if (!design) return null;
   const { seed: _seed, seedHash: _seedHash, ...rest } = design;
   return rest;
+}
+
+function gazeToken(request: FastifyRequest): string | undefined {
+  const raw = request.headers["x-gaze-token"];
+  return Array.isArray(raw) ? raw[0] : raw;
+}
+
+function rejectMedia(body: unknown, reply: FastifyReply): boolean {
+  const found = findForbiddenMediaKey(body);
+  if (!found) return false;
+  reply.code(400).send({ error: "gaze_media_forbidden", field: found });
+  return true;
 }
 
 export async function createServer(repo: Repository, options: ServerOptions = {}): Promise<FastifyInstance> {
@@ -162,8 +178,15 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     if (body.status === "aborted" || body.status === "withdrawn") {
       return reply.code(400).send({ error: "use_stop_or_admin_endpoint" });
     }
-    const session = repo.updateSession(sessionId, body);
-    return { session: publicSession(session) };
+    try {
+      const session = repo.updateSession(sessionId, body);
+      return { session: publicSession(session) };
+    } catch (error) {
+      if ((error as Error).message === "gaze_session_not_finalized") {
+        return reply.code(409).send({ error: "gaze_session_not_finalized" });
+      }
+      throw error;
+    }
   });
 
   app.post("/api/sessions/:sessionId/stop", async (request, reply) => {
@@ -206,7 +229,112 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       const result = repo.insertEvents(events);
       return { ok: true, ...result };
     } catch (error) {
-      return reply.code(400).send({ error: "event_ingestion_failed", message: (error as Error).message });
+      const message = (error as Error).message;
+      if (message === "gaze_session_not_finalized") {
+        return reply.code(409).send({ error: "gaze_session_not_finalized" });
+      }
+      return reply.code(400).send({ error: "event_ingestion_failed", message });
+    }
+  });
+
+  // Gaze ingestion is a separate modality with its own consent record, token,
+  // tables and restricted export directory. It never writes into events.
+  app.post("/api/gaze/sessions/:sessionId/consent", async (request, reply) => {
+    const { sessionId } = request.params as { sessionId: string };
+    if (rejectMedia(request.body, reply)) return;
+    const body = parseBody(gazeConsentSchema, request.body, reply);
+    if (!body) return;
+    try {
+      const result = repo.createGazeConsent(
+        sessionId,
+        {
+          version: body.version,
+          camera_used: body.camera_used,
+          synthetic: body.synthetic ?? false,
+          viewport: body.viewport,
+          geometry: body.geometry,
+          source: body.source
+        },
+        gazeToken(request)
+      );
+      return {
+        ok: true,
+        session_id: sessionId,
+        synthetic: result.session.synthetic === 1,
+        token: result.token,
+        consent: {
+          version: result.session.consent_version,
+          granted_at: result.session.consented_at,
+          scope: "eye_tracking_only",
+          camera_used: result.session.camera_used === 1,
+          raw_video_retention: false,
+          separate_from_core_consent: true
+        }
+      };
+    } catch (error) {
+      const message = (error as Error).message;
+      const status =
+        message === "session_not_found"
+          ? 404
+          : message === "gaze_unauthorized"
+            ? 401
+            : message === "core_consent_required" || message === "gaze_configuration_immutable"
+              ? 409
+              : message === "gaze_consent_synthetic_mismatch" || message === "gaze_session_completed" || message === "gaze_session_withdrawn" || message === "session_not_active"
+                ? 400
+                : 400;
+      return reply.code(status).send({ error: message });
+    }
+  });
+
+  app.post("/api/gaze/sessions/:sessionId/batches", async (request, reply) => {
+    const { sessionId } = request.params as { sessionId: string };
+    if (!repo.authorizeGaze(sessionId, gazeToken(request))) {
+      return reply.code(401).send({ error: "gaze_token_invalid" });
+    }
+    if (rejectMedia(request.body, reply)) return;
+    const body = parseBody(gazeBatchSchema, request.body, reply);
+    if (!body) return;
+    try {
+      return { ok: true, ...repo.insertGazeBatch(sessionId, body) };
+    } catch (error) {
+      const message = (error as Error).message;
+      const status =
+        message === "gaze_session_not_found"
+          ? 404
+          : message === "gaze_seq_conflict" || message === "gaze_session_completed"
+            ? 409
+            : 400;
+      return reply.code(status).send({ error: message });
+    }
+  });
+
+  app.post("/api/gaze/sessions/:sessionId/complete", async (request, reply) => {
+    const { sessionId } = request.params as { sessionId: string };
+    if (!repo.authorizeGaze(sessionId, gazeToken(request))) {
+      return reply.code(401).send({ error: "gaze_token_invalid" });
+    }
+    if (rejectMedia(request.body, reply)) return;
+    const body = parseBody(gazeCompleteSchema, request.body, reply);
+    if (!body) return;
+    if (
+      body.rejected_samples !== body.quality.rejected_samples ||
+      body.dropped_samples !== body.quality.dropped_samples
+    ) {
+      return reply.code(400).send({ error: "gaze_retention_counts_mismatch" });
+    }
+    try {
+      const result = repo.completeGazeSession(sessionId, body);
+      return { ok: true, ...result };
+    } catch (error) {
+      const message = (error as Error).message;
+      const status =
+        message === "gaze_session_not_found"
+          ? 404
+          : message === "gaze_sample_count_mismatch" || message === "gaze_session_completed"
+            ? 409
+            : 400;
+      return reply.code(status).send({ error: message });
     }
   });
 
@@ -246,8 +374,30 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       participant,
       design: repo.getDesign(sessionId),
       notes: repo.getNotes(sessionId),
-      events: repo.getSessionEvents(sessionId, 100)
+      events: repo.getSessionEvents(sessionId, 100),
+      gaze: repo.getGazeSummary(sessionId)
     };
+  });
+
+  app.get("/api/admin/gaze/sessions/:sessionId", { preHandler: requireAdmin }, async (request, reply) => {
+    const { sessionId } = request.params as { sessionId: string };
+    const gaze = repo.getGazeSummary(sessionId);
+    if (!gaze) return reply.code(404).send({ error: "gaze_session_not_found" });
+    return { gaze };
+  });
+
+  app.get("/api/admin/gaze/sessions/:sessionId/export/:name", { preHandler: requireAdmin }, async (request, reply) => {
+    const { sessionId, name } = request.params as { sessionId: string; name: string };
+    const file = repo.readGazeExportFile(sessionId, name);
+    if (!file) return reply.code(404).send({ error: "gaze_export_not_found" });
+    const type = name.endsWith(".jsonl")
+      ? "application/x-ndjson; charset=utf-8"
+      : "application/json; charset=utf-8";
+    return reply
+      .header("content-type", type)
+      .header("content-disposition", `attachment; filename="${name}"`)
+      .header("x-checksum-sha256", file.sha256)
+      .send(file.content);
   });
 
   app.post("/api/admin/sessions/:sessionId/abort", { preHandler: requireAdmin }, async (request, reply) => {

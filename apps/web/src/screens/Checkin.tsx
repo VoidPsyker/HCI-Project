@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { reportedState } from "@meridian/scoring";
 import { BASELINE_ITEMS, STATE_ITEMS } from "../content";
 import type { CheckinPayload } from "../types";
 
@@ -67,7 +68,7 @@ export function CheckinScreen({
   const [distress, setDistress] = useState(1);
   const [fatigue, setFatigue] = useState(2);
   const stateValues = STATE_ITEMS.map((item) => states[item.id]);
-  const dominant = STATE_ITEMS.reduce((best, item) => (states[item.id] > states[best.id] ? item : best), STATE_ITEMS[0]!);
+  const dominant = reportedState({ ...states, valence, arousal });
   const intensity = Math.max(...stateValues);
   const distressHigh = distress > 6;
   const title =
@@ -165,7 +166,7 @@ export function CheckinScreen({
               bored: states.bored,
               distress,
               fatigue,
-              dominant_state: dominant.id,
+              dominant_state: dominant,
               intensity
             })
           }

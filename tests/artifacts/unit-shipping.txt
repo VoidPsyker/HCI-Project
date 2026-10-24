@@ -1,0 +1,226 @@
+
+> meridian-timepieces-pilot@0.1.0 test
+> npm run test -w @meridian/taxonomy && npm run test -w @meridian/scoring && npm run test -w @meridian/analysis && npm run test -w @meridian/server && npm run test -w @meridian/web
+
+
+> @meridian/taxonomy@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /app/packages/taxonomy
+
+ ✓ test/taxonomy.test.ts (7 tests) 70ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  06:58:34
+   Duration  2.18s (transform 613ms, setup 0ms, collect 625ms, tests 70ms, environment 0ms, prepare 246ms)
+
+
+> @meridian/scoring@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /app/packages/scoring
+
+ ✓ test/affect.test.ts (12 tests) 62ms
+ ✓ test/scoreTrial.test.ts (15 tests) 25ms
+
+ Test Files  2 passed (2)
+      Tests  27 passed (27)
+   Start at  06:58:40
+   Duration  3.17s (transform 1.43s, setup 0ms, collect 1.79s, tests 86ms, environment 1ms, prepare 711ms)
+
+
+> @meridian/analysis@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /app/packages/analysis
+
+ ✓ test/ivt-aoi.test.ts (12 tests) 76ms
+ ✓ test/geometry-clock-calibration.test.ts (13 tests) 87ms
+ ✓ test/session-synthetic.test.ts (11 tests) 98ms
+ ✓ test/quality-export.test.ts (19 tests) 131ms
+
+ Test Files  4 passed (4)
+      Tests  55 passed (55)
+   Start at  06:58:45
+   Duration  4.24s (transform 4.45s, setup 0ms, collect 10.90s, tests 392ms, environment 3ms, prepare 1.89s)
+
+
+> @meridian/server@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /app/apps/server
+
+ ✓ test/affect-export.test.ts (4 tests) 22ms
+ ✓ test/affect-qa.test.ts (3 tests) 23ms
+docker : (node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController
+option with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will
+be removed in `fastify@6`.
+At line:2 char:1
++ docker run --rm --env NODE_ENV=test --mount "type=bind,source=$PWD/ap ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:762) [FST...in `fastify@6`.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:763) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+ ✓ test/biometrics.test.ts (11 tests) 744ms
+   ✓ Biometric Gaze Server Integration > Gaze Consent > rejects gaze consent if session does not exist  376ms
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+(node:762) [FSTDEP023] FastifyDeprecation: disableRequestLogging option is deprecated. Use the logController option
+with disableRequestLogging or isLogDisabled override instead. The disableRequestLogging top-level option will be
+removed in `fastify@6`.
+ ✓ test/gaze-acceptance.test.ts (30 tests) 2732ms
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  06:58:51
+   Duration  5.81s (transform 2.82s, setup 0ms, collect 6.60s, tests 3.52s, environment 4ms, prepare 1.35s)
+
+
+> @meridian/web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /app/apps/web
+
+ ✓ test/logger.test.ts (14 tests) 116ms
+ ✓ test/biometrics/gaze-setup.test.tsx (1 test) 174ms
+ ✓ test/biometrics/bridge.test.ts (10 tests) 69ms
+ ✓ test/biometrics/webgazer.test.ts (17 tests) 162ms
+ ✓ test/biometrics/experiment-runner-reload.test.tsx (2 tests) 227ms
+ ✓ test/trial-runner.test.tsx (4 tests) 742ms
+   ✓ TrialRunner > returns from a wrong product on browser Back without ending the trial  349ms
+ ✓ test/biometrics/gaze-controller.test.tsx (15 tests) 4348ms
+   ✓ GazeController regression tests > GazeCalibrationScreen UI component > drives training pass then validation pass and continues on passed gate  3362ms
+
+ Test Files  7 passed (7)
+      Tests  63 passed (63)
+   Start at  06:59:00
+   Duration  16.21s (transform 16.37s, setup 10.16s, collect 32.59s, tests 5.84s, environment 25.92s, prepare 5.01s)
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

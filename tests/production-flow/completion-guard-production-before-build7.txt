@@ -1,0 +1,33 @@
+
+Running 1 test using 1 worker
+
+  x  1 tests\production-flow\consent.spec.ts:102:1 › reload at debrief without a gaze controller cannot mark the session complete (7.3s)
+
+
+  1) tests\production-flow\consent.spec.ts:102:1 › reload at debrief without a gaze controller cannot mark the session complete
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/could not be finalized/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/could not be finalized/i) with timeout 5000ms
+      - waiting for getByText(/could not be finalized/i)
+
+
+      110 |   await expect(page.getByTestId("debrief-screen")).toBeVisible();
+      111 |   await page.getByTestId("finish-session").click();
+    > 112 |   await expect(page.getByText(/could not be finalized/i)).toBeVisible();
+          |                                                           ^
+      113 |   await expect(page.getByTestId("complete-screen")).toHaveCount(0);
+      114 |   await expect
+      115 |     .poll(async () => (await (await request.get(`/api/sessions/${sessionId}/status`)).json()).status)
+        at C:\Users\Cauti\orca\workspaces\HCI-Project\periwinkle\tests\production-flow\consent.spec.ts:112:59
+
+    Error Context: test-results\consent-reload-at-debrief--39c54-t-mark-the-session-complete\error-context.md
+
+  1 failed
+    tests\production-flow\consent.spec.ts:102:1 › reload at debrief without a gaze controller cannot mark the session complete

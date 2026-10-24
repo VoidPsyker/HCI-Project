@@ -138,7 +138,7 @@ export interface QaReport {
 export interface MenuProps {
   menuId: MenuId;
   colourMapping: ColourMapping;
-  onLeafSelect: (leaf: TaxonomyNode) => void;
+  onLeafSelect: (leaf: TaxonomyNode, inputType?: "keyboard" | "mouse") => void;
   onEvent: (type: string, payload?: Record<string, unknown>) => void;
   disabled?: boolean;
 }

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Biometrics offline smoke</title>
+  </head>
+  <body>
+    <p>Test-only WebGazer startup harness. No participant data is recorded.</p>
+    <script type="module">
+      import { grantGazeConsent } from "/src/biometrics/consent.ts";
+      import { WebGazerSource } from "/src/biometrics/webgazer.ts";
+      import { loadBundledWebGazer } from "/src/biometrics/webgazerLoader.ts";
+
+      const state = {
+        status: "idle",
+        error: null,
+        samples: 0,
+        cameraActive: false,
+        stopped: false
+      };
+      window.__gazeSmoke = state;
+
+      // Real Chrome exposes window.chrome, which makes WebGazer show its
+      // over-strict http://127.0.0.1 alert. Force that path in the smoke test.
+      if (!window.chrome) {
+        Object.defineProperty(window, "chrome", { value: {}, configurable: true });
+      }
+
+      const consent = grantGazeConsent({
+        participant_id: "SMOKE",
+        session_id: "SMOKE-1",
+        version: "smoke-1",
+        camera_used: true,
+        granted_at: "2026-10-24T00:00:00.000Z"
+      });
+
+      const source = new WebGazerSource({
+        participant_id: "SMOKE",
+        session_id: "SMOKE-1",
+        load: loadBundledWebGazer,
+        viewport: () => ({ width_px: window.innerWidth, height_px: window.innerHeight }),
+        calibrationRepetitions: 1,
+        repetitionDelayMs: 0,
+        onStatus: (status) => {
+          state.status = status;
+        }
+      });
+      source.subscribe(() => {
+        state.samples += 1;
+      });
+
+      window.__stopGazeSmoke = async () => {
+        await source.stop();
+        state.cameraActive = source.cameraActive;
+        state.stopped = true;
+        return state;
+      };
+
+      (async () => {
+        try {
+          await source.start(consent);
+          state.cameraActive = source.cameraActive;
+        } catch (error) {
+          state.error = String(error?.message ?? error);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+=================================================================
+WebGazer 3.5.3 Bundled Browser Runtime Verification Run
+=================================================================
+Start Time: 2026-10-24T06:58:26.200Z
+End Time:   2026-10-24T06:58:49.210Z
+Test Duration: 12336ms
+Exit Code:  0
+Command:    npx.cmd playwright test --config tests/biometric-runtime/playwright.config.ts
+
+--- MEASURED RUNTIME EVIDENCE ---
+1. Genuine Chromium Environment:
+   - window.chrome natively present: true
+   - API spoofing / polyfill used: false
+
+2. Pre-Consent Isolation:
+   - Start without consent rejected: true
+   - Pre-consent error message: gaze_consent_required
+   - getUserMedia calls before explicit consent: 0
+
+3. Explicit Consent & Runtime Startup:
+   - Explicit consent accepted: true
+   - Running status reached: true
+   - Camera active during run: true
+
+4. Fake-Camera Subscription & no_prediction Handling:
+   - Total samples received: 2
+   - Sequence numbers strictly increasing: true
+   - Sample slice inspected (first 2 samples):
+[
+    {
+        "seq": 1,
+        "t_ms": 9218.39999999851,
+        "t_source_ms": 6756.30000000447,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 2,
+        "t_ms": 9285.59999999404,
+        "t_source_ms": 6807.4000000059605,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    }
+]
+
+5. Teardown & Stopping Tracks:
+   - Final wrapper status: stopped
+   - Camera active after stop: false
+   - Total MediaStreamTracks captured: 1
+   - All tracks state ended (readyState === "ended"): true
+
+6. Network Boundary & Local Assets:
+   - External requests attempted: 0
+   - External URLs blocked: []
+   - Local MediaPipe FaceMesh assets loaded:
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh.binarypb
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets.data
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm
+
+7. Storage & Privacy:
+   - Playwright video recording: off
+   - Raw camera video files stored: 0
+
+--- PLAYWRIGHT STDOUT ---
+Running 1 test using 1 worker
+
+  ok 1 tests\biometric-runtime\webgazer-runtime.spec.ts:68:3 › WebGazer 3.5.3 Bundled Browser Runtime Verification › proves genuine Chromium, consent gate, offline local assets, no_prediction subscribe, and track teardown (13.4s)
+
+  1 passed (17.8s)
+
+=================================================================

@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ok 1 tests\production-flow\consent.spec.ts:33:1 › requires separate consent and refusal ends the session without camera access (1.3s)
+  ok 2 tests\production-flow\consent.spec.ts:42:1 › keeps camera off through setup and invalidates measurements after resize (1.4s)
+  ok 3 tests\production-flow\consent.spec.ts:83:1 › camera denial can retry without requesting replacement consent (1.6s)
+  ok 4 tests\production-flow\consent.spec.ts:94:1 › reload after gaze consent stops at authorization recovery without camera access (1.7s)
+  ok 5 tests\production-flow\consent.spec.ts:102:1 › reload at debrief without a gaze controller cannot mark the session complete (1.7s)
+
+  5 passed (11.2s)
