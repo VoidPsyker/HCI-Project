@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+**/dist
+data
+exports
+coverage
+test-results
+playwright-report
+tests/artifacts
+.git
+.env
+*.log

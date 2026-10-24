@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-8787}:8787"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8787
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-pilot-admin}
+      STUDY_SEED: ${STUDY_SEED:-meridian-pilot-2026}
+      DATABASE_PATH: /app/data/meridian.sqlite
+      RAW_DATA_DIR: /app/data/raw
+      GAZE_DATA_DIR: /app/data/gaze
+    volumes:
+      - ./data:/app/data
+      - ./exports:/app/exports
+    restart: unless-stopped
