@@ -93,12 +93,19 @@ export function shuffle<T>(items: T[], rng: () => number): T[] {
   return out;
 }
 
-const LATIN_4: StateLabel[][] = [
-  ["happy", "frustrated", "confused", "bored"],
-  ["frustrated", "confused", "bored", "happy"],
-  ["confused", "bored", "happy", "frustrated"],
-  ["bored", "happy", "frustrated", "confused"]
-];
+/** Cyclic Latin square: row r is the base order rotated left by r (plan §6.3: ABCD, BCDA, CDAB, DABC). */
+export function latinSquare(n: number): number[][] {
+  return Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => (r + c) % n));
+}
+
+/** Williams balanced Latin square for even n: every item also precedes every other item exactly once. */
+export function balancedLatinSquare(n: number): number[][] {
+  const first = Array.from({ length: n }, (_, c) => (c % 2 === 0 ? c / 2 : n - (c + 1) / 2));
+  return Array.from({ length: n }, (_, r) => first.map((v) => (v + r) % n));
+}
+
+const BLOCK_ORDERS: StateLabel[][] = latinSquare(4).map((row) => row.map((i) => STATE_LABELS[i] as StateLabel));
+const MENU_ROWS = balancedLatinSquare(6);
 
 const COLOURS: DepartmentColour[] = ["teal", "amber", "olive", "indigo"];
 
@@ -147,10 +154,44 @@ export function getTargetSets(seed: string): Task[][] {
   return sets;
 }
 
-function menuSchedule(seed: string, sequenceIndex: number): MenuId[] {
-  const rng = mulberry32(Number.parseInt(sha256(`${seed}:menus:${sequenceIndex}`).slice(0, 8), 16));
-  const base = shuffle(MENU_IDS, rng);
-  return [...base, ...base];
+/**
+ * Which row of each counterbalancing factor a sequence uses. Over every 24 consecutive sequences each
+ * block order appears 6 times, each menu row 4 times, each colour mapping once, and every
+ * (target set, block order) pair exactly once; later sequences start a fresh 24-block.
+ */
+export function sequenceFactors(sequenceIndex: number) {
+  return {
+    blockOrderRow: sequenceIndex % BLOCK_ORDERS.length,
+    menuRow: Math.floor(sequenceIndex / BLOCK_ORDERS.length) % MENU_ROWS.length,
+    targetSet: (sequenceIndex + Math.floor(sequenceIndex / 12)) % 6,
+    colourRow: sequenceIndex % COLOUR_PERMUTATIONS.length
+  };
+}
+
+export const SEQUENCE_BLOCK_SIZE = 24;
+
+/**
+ * Stratified permuted blocks: the k-th participant of a stratum takes the k-th entry of that stratum's
+ * seeded shuffle of one 24-sequence block; an exhausted block is followed by a newly generated one.
+ */
+export function stratumSequenceIndex(seed: string, stratum: string, k: number): number {
+  const block = Math.floor(k / SEQUENCE_BLOCK_SIZE);
+  const rng = mulberry32(Number.parseInt(sha256(`${seed}:stratum:${stratum}:block:${block}`).slice(0, 8), 16));
+  const order = shuffle(
+    Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, i) => i),
+    rng
+  );
+  return block * SEQUENCE_BLOCK_SIZE + (order[k % SEQUENCE_BLOCK_SIZE] ?? 0);
+}
+
+/**
+ * Twelve trial menus: blocks 1-2 take one balanced Latin-square row, blocks 3-4 the row three steps on,
+ * so each menu appears twice and never twice in a block. The seed only relabels square symbols.
+ */
+function menuSchedule(seed: string, menuRow: number): MenuId[] {
+  const symbols = shuffle(MENU_IDS, mulberry32(Number.parseInt(sha256(`${seed}:menu-symbols`).slice(0, 8), 16)));
+  const row = (r: number) => (MENU_ROWS[r % MENU_ROWS.length] ?? []).map((i) => symbols[i] as MenuId);
+  return [...row(menuRow), ...row(menuRow + 3)];
 }
 
 function practiceTrialsFor(
@@ -182,14 +223,15 @@ export function generateDesign(input: {
   now?: string;
 }): StudyDesign {
   const { sessionId, participantId, sequenceIndex, stratum, seed } = input;
+  const factors = sequenceFactors(sequenceIndex);
   const targetSets = getTargetSets(seed);
-  const targetSetIndex = sequenceIndex % targetSets.length;
+  const targetSetIndex = factors.targetSet;
   const targetSet = targetSets[targetSetIndex];
   if (!targetSet) throw new Error("target set missing");
-  const stateRow = LATIN_4[sequenceIndex % LATIN_4.length];
+  const stateRow = BLOCK_ORDERS[factors.blockOrderRow];
   if (!stateRow) throw new Error("latin square row missing");
-  const menus = menuSchedule(seed, sequenceIndex);
-  const colour = COLOUR_PERMUTATIONS[sequenceIndex % COLOUR_PERMUTATIONS.length] ?? DEFAULT_COLOUR_MAPPING;
+  const menus = menuSchedule(seed, factors.menuRow);
+  const colour = COLOUR_PERMUTATIONS[factors.colourRow] ?? DEFAULT_COLOUR_MAPPING;
 
   const blocks: BlockSpec[] = [];
   const trialSpecs: TrialSpec[] = [];

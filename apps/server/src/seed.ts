@@ -333,9 +333,9 @@ function questionnaires(design: StudyDesign, startT: number): { rows: Array<Reco
     });
   }
   for (const [item, text] of [
-    ["strategy", "I usually scan the main categories first."],
-    ["frustration", "The dense menu felt slower than the simpler one."],
-    ["suggestions", "Keep labels visible and avoid hiding the next level."]
+    ["confusing", "Which subcategory held the trail watches."],
+    ["fast", "The mega menu once I knew the department."],
+    ["frustrating", "The dense menu felt slower than the simpler one."]
   ] as const) {
     rows.push({
       response_id: crypto.randomUUID(),
@@ -353,7 +353,7 @@ function questionnaires(design: StudyDesign, startT: number): { rows: Array<Reco
       session_id: design.sessionId,
       block_id: block.blockId,
       instrument: "CREDIBILITY",
-      item_id: "credible",
+      item_id: `credible_${block.stateLabel}`,
       value: 5,
       text_value: null,
       answered_at: now

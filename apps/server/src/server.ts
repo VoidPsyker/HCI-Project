@@ -20,7 +20,7 @@ import {
   questionnaireBatchSchema,
   updateSessionSchema
 } from "./validation";
-import { exportFile } from "./exports";
+import { buildExportBundle, exportFile } from "./exports";
 import { buildGoNoGo, buildQaReport } from "./qa";
 
 export interface ServerOptions {
@@ -445,7 +445,9 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const { kind } = request.params as { kind: string };
     const normalized = kind === "manifest" ? "manifest" : kind;
     const file = exportFile(repo, normalized);
-    if (!file) return reply.code(404).send({ error: "export_not_found", kinds: ["events.jsonl", "events.csv", "trials.csv", "checkins.csv", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"] });
+    if (!file) {
+      return reply.code(404).send({ error: "export_not_found", kinds: [...buildExportBundle(repo).map((f) => f.name), "manifest"] });
+    }
     const type = file.name.endsWith(".jsonl")
       ? "application/x-ndjson; charset=utf-8"
       : file.name.endsWith(".csv")

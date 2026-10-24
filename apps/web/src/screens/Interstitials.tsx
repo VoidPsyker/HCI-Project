@@ -1,49 +1,31 @@
 import { useEffect, useState } from "react";
-import { STATE_COPY } from "../content";
-import type { StateLabel } from "@meridian/scoring";
+import { INDUCTIONS, INSTRUCTIONS, MEDIA, STATE_COPY, type InductionState } from "../content";
+import { LocalClip } from "../components/LocalClip";
 
 export function InstructionsScreen({ onStart }: { onStart: () => void }) {
   return (
     <section className="panel wide" data-testid="instructions-screen">
-      <div className="eyebrow">How the session works</div>
-      <h1>Four short scenarios, twelve searches</h1>
-      <p className="lede">
-        You will practice all six menu layouts once, then complete four blocks. Each block starts with a short
-        scenario, a check-in, and three search trials using three different menus. Every menu appears exactly twice.
-      </p>
+      <div className="eyebrow">{INSTRUCTIONS.eyebrow}</div>
+      <h1>{INSTRUCTIONS.title}</h1>
+      <p className="lede">{INSTRUCTIONS.lede}</p>
       <div className="instruction-columns">
-        <div className="instruction-card">
-          <span className="instruction-number">1</span>
-          <h3>Think aloud</h3>
-          <p>Say what you are looking for and what you notice. The researcher may prompt you but will not help you find products.</p>
-        </div>
-        <div className="instruction-card">
-          <span className="instruction-number">2</span>
-          <h3>Search naturally</h3>
-          <p>Use the menu as you would in a real shop. There is no time pressure beyond the 120-second trial limit.</p>
-        </div>
-        <div className="instruction-card">
-          <span className="instruction-number">3</span>
-          <h3>Check in honestly</h3>
-          <p>After each scenario, rate how you feel. If distress is above 6/10, the session stops immediately.</p>
-        </div>
-        <div className="instruction-card">
-          <span className="instruction-number">4</span>
-          <h3>Stop anytime</h3>
-          <p>The visible Stop control is always available. You do not need to give a reason.</p>
-        </div>
+        {INSTRUCTIONS.cards.map((card, index) => (
+          <div key={card.title} className="instruction-card">
+            <span className="instruction-number">{index + 1}</span>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+          </div>
+        ))}
       </div>
       <div className="procedure-strip">
-        <span>Consent</span>
-        <span>Practice ×6</span>
-        <span>4 × (scenario → check-in → 3 trials)</span>
-        <span>Questionnaires</span>
-        <span>Debrief</span>
+        {INSTRUCTIONS.procedure.map((step) => (
+          <span key={step}>{step}</span>
+        ))}
       </div>
       <div className="panel-actions">
-        <span className="small-note">Estimated total: 45–75 minutes. Maximum 100 minutes.</span>
+        <span className="small-note">{INSTRUCTIONS.estimate}</span>
         <button type="button" className="button primary big" onClick={onStart} data-testid="start-practice">
-          Start the six practice trials
+          {INSTRUCTIONS.start}
         </button>
       </div>
     </section>
@@ -56,22 +38,16 @@ export function BlockIntroScreen({
   onStart
 }: {
   blockIndex: number;
-  state: Exclude<StateLabel, "mixed">;
+  state: InductionState;
   onStart: () => void;
 }) {
   const copy = STATE_COPY[state];
-  const titles: Record<Exclude<StateLabel, "mixed">, string> = {
-    happy: "A pleasant browsing moment",
-    frustrated: "The search that will not cooperate",
-    confused: "Which category is right?",
-    bored: "The very repetitive catalogue check"
-  };
   return (
     <section className="panel medium block-intro" data-testid="block-intro">
       <div className="eyebrow" style={{ color: copy.colour }}>
         Block {blockIndex + 1} of 4
       </div>
-      <h1>{titles[state]}</h1>
+      <h1>{INDUCTIONS[state].title}</h1>
       <p className="lede">
         The next scenario lasts up to 90 seconds. It is designed to create a mild version of one everyday browsing
         feeling. It is not a test of you.
@@ -108,7 +84,15 @@ export function BlockIntroScreen({
   );
 }
 
-export function NeutralResetScreen({ fastMode, onContinue }: { fastMode: boolean; onContinue: () => void }) {
+export function NeutralResetScreen({
+  fastMode,
+  state,
+  onContinue
+}: {
+  fastMode: boolean;
+  state: InductionState;
+  onContinue: () => void;
+}) {
   const duration = fastMode ? 1_000 : 60_000;
   const [remaining, setRemaining] = useState(duration);
   useEffect(() => {
@@ -123,8 +107,14 @@ export function NeutralResetScreen({ fastMode, onContinue }: { fastMode: boolean
     <section className="neutral-layout" data-testid="neutral-reset">
       <div className="neutral-card">
         <div className="eyebrow">Neutral reset</div>
+        <p className="warning-box soft" data-testid="block-debrief">
+          {INDUCTIONS[state].blockDebrief}
+        </p>
         <h1>Look away. Breathe slowly.</h1>
         <p>Let the scenario fade. Roll your shoulders, look at something in the room, and wait for the timer.</p>
+        <div className="neutral-media">
+          <LocalClip slot={MEDIA.neutral_reset_clip} testId="neutral-clip" />
+        </div>
         <div className="breath-orb" aria-hidden="true">
           <div className="breath-orb-inner">{done ? "Ready" : Math.ceil(remaining / 1000)}</div>
         </div>

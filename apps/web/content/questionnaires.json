@@ -1,0 +1,33 @@
+{
+  "sus": [
+    "I think that I would like to use this menu frequently.",
+    "I found the menu unnecessarily complex.",
+    "I thought the menu was easy to use.",
+    "I think that I would need the support of a technical person to be able to use this menu.",
+    "I found the various functions in this menu were well integrated.",
+    "I thought there was too much inconsistency in this menu.",
+    "I would imagine that most people would learn to use this menu very quickly.",
+    "I found the menu very cumbersome to use.",
+    "I felt very confident using the menu.",
+    "I needed to learn a lot of things before I could get going with this menu."
+  ],
+  "nasa_tlx": [
+    { "id": "mental_demand", "label": "Mental demand", "low": "Low", "high": "High" },
+    { "id": "physical_demand", "label": "Physical demand", "low": "Low", "high": "High" },
+    { "id": "temporal_demand", "label": "Temporal demand", "low": "Low", "high": "High" },
+    { "id": "performance", "label": "Performance", "low": "Perfect", "high": "Failure" },
+    { "id": "effort", "label": "Effort", "low": "Low", "high": "High" },
+    { "id": "frustration", "label": "Frustration", "low": "Low", "high": "High" }
+  ],
+  "open": [
+    { "id": "confusing", "label": "What, if anything, was confusing?" },
+    { "id": "fast", "label": "What felt fast or easy?" },
+    { "id": "frustrating", "label": "What, if anything, felt frustrating?" }
+  ],
+  "credibility": [
+    { "id": "credible_happy", "label": "The comedy clip and great-deal scenario felt believable." },
+    { "id": "credible_frustrated", "label": "The unreliable search felt like a genuine site problem." },
+    { "id": "credible_confused", "label": "The product categorisation task felt like a genuine request." },
+    { "id": "credible_bored", "label": "The strap price check felt like a genuine catalogue task." }
+  ]
+}

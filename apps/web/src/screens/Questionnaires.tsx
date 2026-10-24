@@ -66,11 +66,7 @@ export function QuestionnairesScreen({
     for (const menu of MENU_IDS) for (let index = 0; index < SUS_ITEMS.length; index++) nextSus[`${menu}:${index}`] = 3;
     setSus(nextSus);
     setNasa(Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50])));
-    setOpen({
-      strategy: "I scanned the main departments first and then narrowed down.",
-      frustration: "The denser menu felt slower to scan.",
-      suggestions: "Keep the category labels visible and consistent."
-    });
+    setOpen(Object.fromEntries(OPEN_QUESTIONS.map((item) => [item.id, "Test-mode answer."])));
     setCredibility(Object.fromEntries(CREDIBILITY_ITEMS.map((item) => [item.id, 4])));
     setTab(TABS.length - 1);
   };

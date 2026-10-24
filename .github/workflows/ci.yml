@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 2 * * *"
+
+env:
+  # Ephemeral CI database only; not a deployment secret.
+  ADMIN_PASSWORD: ci-ephemeral-admin
+  PW_BASE_URL: http://127.0.0.1:5173
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # `build` runs validateTaxonomy first, so an invalid taxonomy or task bank fails CI here.
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:coverage
+      - run: npx playwright install --with-deps chromium
+      - name: Start API server and web app
+        run: |
+          DATABASE_PATH="$RUNNER_TEMP/ci.sqlite" RAW_DATA_DIR="$RUNNER_TEMP/raw" GAZE_DATA_DIR="$RUNNER_TEMP/gaze" \
+            npm run start -w @meridian/server > "$RUNNER_TEMP/server.log" 2>&1 &
+          npm run dev:web > "$RUNNER_TEMP/web.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:8787/api/health > /dev/null && curl -sf http://127.0.0.1:5173/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/web.log"
+          exit 1
+      - name: Acceptance suite (24-path smoke, parity, geometry, keyboard, axe, network, events, scripted session)
+        if: github.event_name != 'schedule'
+        run: >
+          npx playwright test smoke-24-paths.spec.ts parity.spec.ts geometry.spec.ts keyboard.spec.ts
+          axe.spec.ts network.spec.ts trial-events.spec.ts biometrics-offline.spec.ts full-session.spec.ts
+      - name: Nightly full suite (432 paths and transition timing)
+        if: github.event_name == 'schedule'
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/

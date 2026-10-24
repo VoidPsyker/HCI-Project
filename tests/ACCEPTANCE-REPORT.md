@@ -1,6 +1,25 @@
 # Menu acceptance evidence
 
-## Latest verification — 24 October, morning
+## Latest verification — 24 October, afternoon
+
+Live Vite on 5173 with the API on 8787 against a throwaway database, Playwright Chromium,
+1920 × 1080, on this Windows host.
+
+| Suite | Result |
+| --- | --- |
+| Unit tests (`npm test`) | 222 / 222 |
+| Scoring coverage gate (`scoreTrial.ts`, `affect.ts`) | 100 % lines, branches, functions |
+| `npm run build` (taxonomy gate first) | pass; a removed leaf fails it with exit 1 |
+| Smoke 24, parity, geometry, keyboard, axe, network, trial events, biometrics-offline | 66 / 66 |
+| Scripted full session (`full-session.spec.ts`) | pass, about 43 s in test mode |
+| Full 432 paths (`@full`) | 6 / 6 menus, 432 / 432 paths |
+| Motion and reduced motion (`--workers=1`) | 11 / 11 |
+
+The scripted session swaps the camera tracker for a scripted gaze source. It verifies the flow,
+calibration gate wiring, scoring, QA and exports, not human gaze accuracy. The 50 fps gate
+with real webcam inference remains failed, as recorded below.
+
+## Earlier verification — 24 October, morning
 
 The 82/82 result below is historical evidence, not the current release verdict.
 The isolated production preview on 8790 passed 58 menu checks; active animation

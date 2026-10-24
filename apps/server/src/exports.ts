@@ -218,11 +218,20 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
   }));
   const taskColumns = ["id", "target_id", "description", "difficulty", "canonical", "criteria"];
 
+  // JSONL carries the same columns as the matching CSV, so either format yields the same dataset.
+  const toJsonl = (rows: object[], columns?: string[]) =>
+    rows
+      .map((row) => JSON.stringify(columns ? Object.fromEntries(columns.map((c) => [c, (row as Record<string, unknown>)[c] ?? null])) : row))
+      .join("\n") + (rows.length ? "\n" : "");
+
   return [
-    file("events.jsonl", events.map((e) => JSON.stringify(e)).join("\n") + (events.length ? "\n" : ""), events.length),
+    file("events.jsonl", toJsonl(events), events.length),
     file("events.csv", toCsv(events, eventColumns), events.length),
+    file("trials.jsonl", toJsonl(trials, trialColumns), trials.length),
     file("trials.csv", toCsv(trials, trialColumns), trials.length),
+    file("checkins.jsonl", toJsonl(checkins, checkinColumns), checkins.length),
     file("checkins.csv", toCsv(checkins, checkinColumns), checkins.length),
+    file("questionnaires.jsonl", toJsonl(questionnaires, questionColumns), questionnaires.length),
     file("questionnaires.csv", toCsv(questionnaires, questionColumns), questionnaires.length),
     file("assignments.csv", toCsv(assignments, assignmentColumns), assignments.length),
     file("tasks.csv", toCsv(taskRows, taskColumns), taskRows.length)

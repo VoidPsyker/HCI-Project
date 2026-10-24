@@ -43,8 +43,16 @@ export function DemographicsScreen({
     shopping_freq: "",
     watch_expertise: 4,
     tech_savvy: 4,
-    colour_vision: ""
+    colour_vision: "",
+    prior_menu_experience: [] as string[]
   });
+  const toggleMenuExperience = (id: string) =>
+    setForm((current) => ({
+      ...current,
+      prior_menu_experience: current.prior_menu_experience.includes(id)
+        ? current.prior_menu_experience.filter((value) => value !== id)
+        : [...current.prior_menu_experience, id]
+    }));
   const set = (key: keyof typeof form, value: string | number) => setForm((current) => ({ ...current, [key]: value }));
   const complete = Boolean(
     form.age_band &&
@@ -166,6 +174,19 @@ export function DemographicsScreen({
           />
           <small>1 = not confident, 7 = very confident</small>
         </label>
+        <fieldset className="menu-experience span-2" data-testid="menu-experience">
+          <legend>{DEMOGRAPHICS.menu_experience_question}</legend>
+          {DEMOGRAPHICS.menu_experience.map((option) => (
+            <label key={option.id} className="check-row">
+              <input
+                type="checkbox"
+                checked={form.prior_menu_experience.includes(option.id)}
+                onChange={() => toggleMenuExperience(option.id)}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </fieldset>
         <div className="panel-actions span-2">
           <span className="small-note">No name, email, or IP address is collected. Gaze data are stored separately from these answers.</span>
           <button type="submit" className="button primary" disabled={!complete || busy} data-testid="demographics-continue">

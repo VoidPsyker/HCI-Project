@@ -23,15 +23,58 @@ export interface QaReport {
     duplicate_trial_ends: number;
     event_order_violations: number;
     clock_skew_flags: number;
+    duplicate_event_ids: number;
     reconstructable_trials_pct: number;
     questionnaire_completeness_pct: number | null;
     median_fps: number | null;
+    min_fps: number | null;
+    fps_samples: number;
     console_errors: number;
     distress_events: number;
     sessions_over_100_min: number;
   };
   criteria: QaCriterion[];
+  calibration: { by_task: CalibrationRow[]; by_menu: CalibrationRow[] };
   overall: "pass" | "fail" | "conditional";
+}
+
+export interface CalibrationRow {
+  key: string;
+  difficulty?: string | null;
+  n: number;
+  success_pct: number | null;
+  median_success_s: number | null;
+}
+
+/** Task calibration table (plan §7.4): main-trial success and median successful time by task and by menu. */
+export function buildCalibration(
+  trials: Array<{ practice: unknown; success: unknown; completion_time_ms: number | null; task_id: string | null; menu_id: string | null; difficulty: string | null }>
+) {
+  const main = trials.filter((t) => !t.practice);
+  const group = (key: (t: (typeof main)[number]) => string | null) => {
+    const groups = new Map<string, typeof main>();
+    for (const t of main) {
+      const k = key(t);
+      if (k) groups.set(k, [...(groups.get(k) ?? []), t]);
+    }
+    return [...groups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, rows]): CalibrationRow => {
+        const times = rows.filter((t) => t.success && t.completion_time_ms !== null).map((t) => (t.completion_time_ms ?? 0) / 1000);
+        const med = median(times);
+        return {
+          key: k,
+          n: rows.length,
+          success_pct: pct(rows.filter((t) => t.success).length, rows.length),
+          median_success_s: med === null ? null : Math.round(med * 10) / 10
+        };
+      });
+  };
+  const difficulty = new Map(main.map((t) => [t.task_id, t.difficulty]));
+  return {
+    by_task: group((t) => t.task_id).map((row) => ({ ...row, difficulty: difficulty.get(row.key) ?? null })),
+    by_menu: group((t) => t.menu_id)
+  };
 }
 
 function pct(numerator: number, denominator: number): number | null {
@@ -54,6 +97,11 @@ function fail(id: string, label: string, value: string, threshold: string, note?
 }
 function na(id: string, label: string, value: string, threshold: string, note?: string): QaCriterion {
   return { id, label, status: "na", value, threshold, note };
+}
+
+/** An empty path is the true record of a trial ended without clicks (e.g. an immediate give-up); only a success needs one. */
+function isReconstructable(t: { event_count: number; trial_end_count: number; path_json: string; success: unknown }): boolean {
+  return t.event_count > 0 && t.trial_end_count === 1 && (!t.success || t.path_json !== "[]");
 }
 
 export function buildGoNoGo(repo: Repository): QaCriterion[] {
@@ -92,16 +140,19 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
   const manipulation = states.map((state) => {
     const relevant = checkins.filter((c) => c.state_label === state && c.meta.phase === "post_induction");
     const hits = relevant.filter((c) => manipulationCheckPassed(state, c.meta as AffectRatings));
-    return { state, rate: relevant.length ? hits.length / relevant.length : null, n: relevant.length };
+    const intensity = relevant.length ? relevant.reduce((sum, c) => sum + Number(c.meta[state] ?? 0), 0) / relevant.length : null;
+    return { state, rate: relevant.length ? hits.length / relevant.length : null, intensity, n: relevant.length };
   });
   if (manipulation.every((m) => m.n === 0)) {
     criteria.push(na("manipulation", "Induction manipulation check", "no check-in data", ">= 60% dominant state per induction, intensity >= 5/7"));
   } else {
     const valid = manipulation.filter((m) => m.n > 0);
     const lowest = valid.reduce((a, b) => ((a.rate ?? 0) <= (b.rate ?? 0) ? a : b));
-    const value = valid.map((m) => `${m.state}: ${m.rate === null ? "NA" : Math.round(m.rate * 1000) / 10 + "%"}`).join("; ");
+    const value = valid
+      .map((m) => `${m.state}: ${m.rate === null ? "NA" : Math.round(m.rate * 1000) / 10 + "%"}, intensity ${m.intensity?.toFixed(1) ?? "NA"}`)
+      .join("; ");
     criteria.push(
-      valid.length === states.length && (lowest.rate ?? 0) >= 0.6
+      valid.length === states.length && (lowest.rate ?? 0) >= 0.6 && valid.every((m) => (m.intensity ?? 0) >= 5)
         ? pass("manipulation", "Induction manipulation check", value, ">= 60% dominant state per induction, intensity >= 5/7")
         : fail("manipulation", "Induction manipulation check", value, ">= 60% dominant state per induction, intensity >= 5/7")
     );
@@ -204,16 +255,14 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     );
   }
 
-  const reconstructable = main.filter((t) => t.event_count > 0 && t.trial_end_count === 1 && t.path_json !== "[]");
-  const reconstructablePct = pct(reconstructable.length, main.length);
-  if (reconstructablePct === null) {
-    criteria.push(na("reconstructable", "Trials reconstructable from event log", "no main trials", "100%"));
-  } else {
-    criteria.push(
-      reconstructablePct === 100
-        ? pass("reconstructable", "Trials reconstructable from event log", `${reconstructablePct}%`, "100%")
-        : fail("reconstructable", "Trials reconstructable from event log", `${reconstructablePct}%`, "100%")
-    );
+  for (const [id, label, subset] of [
+    ["practice_reconstructable", "Practice trials reconstructable from event log", practice],
+    ["reconstructable", "Main trials reconstructable from event log", main]
+  ] as const) {
+    const reconstructablePct = pct(subset.filter(isReconstructable).length, subset.length);
+    if (reconstructablePct === null) criteria.push(na(id, label, "no trials", "100%"));
+    else if (reconstructablePct === 100) criteria.push(pass(id, label, `${reconstructablePct}%`, "100%"));
+    else criteria.push(fail(id, label, `${reconstructablePct}%`, "100%"));
   }
 
   const fps = events
@@ -306,8 +355,7 @@ export function buildQaReport(repo: Repository): QaReport {
   const missingTrialEnds = Math.max(0, expectedTrials - trials.length) + trials.filter((t) => t.missing_trial_end).length;
   const missingStarts = trials.filter((t) => t.missing_trial_start).length;
   const duplicateEnds = trials.filter((t) => t.trial_end_count > 1).length;
-  const reconstructable = main.filter((t) => t.event_count > 0 && t.trial_end_count === 1 && t.path_json !== "[]");
-  const reconstructablePct = pct(reconstructable.length, main.length) ?? 0;
+  const reconstructablePct = pct(main.filter(isReconstructable).length, main.length) ?? 0;
   const completeness = completed.length ? pct(answers.length, completed.length * 73) : null;
 
   const fpsSamples: number[] = [];
@@ -363,14 +411,18 @@ export function buildQaReport(repo: Repository): QaReport {
       duplicate_trial_ends: duplicateEnds,
       event_order_violations: orderViolations,
       clock_skew_flags: clockSkew,
+      duplicate_event_ids: Number(repo.getMeta("duplicate_event_ids") ?? 0),
       reconstructable_trials_pct: reconstructablePct,
       questionnaire_completeness_pct: completeness,
       median_fps: median(fpsSamples),
+      min_fps: fpsSamples.length ? Math.min(...fpsSamples) : null,
+      fps_samples: fpsSamples.length,
       console_errors: consoleErrors,
       distress_events: distress,
       sessions_over_100_min: over100
     },
     criteria,
+    calibration: buildCalibration(trials),
     overall
   };
 }

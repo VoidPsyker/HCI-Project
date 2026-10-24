@@ -292,20 +292,25 @@ for (const [leafId, spec] of Object.entries(canonical)) {
   });
 }
 
+// e.g. "Find a 44 mm watch with a black dial, priced £180–£240."
 function phraseFor(criteria) {
-  const bits = [];
-  if (criteria.caseSize) bits.push(`${criteria.caseSize} mm`);
-  if (criteria.movement) bits.push(criteria.movement);
-  if (criteria.water) bits.push(`${criteria.water} m water resistance`);
-  if (criteria.dial) bits.push(`${criteria.dial} dial`);
-  if (criteria.strap) bits.push(`${criteria.strap} strap`);
-  if (criteria.priceBand) bits.push(`price ${criteria.priceBand}`);
+  const adjectives = [criteria.caseSize ? `${criteria.caseSize} mm` : null, criteria.movement ?? null].filter(Boolean);
+  const head = adjectives.length ? `${adjectives.join(" ")} watch` : "watch";
+  const article = /^[aeiou]/i.test(head) ? "an" : "a";
+  const features = [
+    criteria.dial ? `a ${criteria.dial} dial` : null,
+    criteria.strap ? `a ${criteria.strap} strap` : null,
+    criteria.water ? `${criteria.water} m water resistance` : null
+  ].filter(Boolean);
+  let phrase = `${article} ${head}`;
+  if (features.length) phrase += ` with ${features.join(" and ")}`;
+  if (criteria.priceBand) phrase += `, priced ${criteria.priceBand}`;
   if (criteria.departmentId) {
     const dept = byId.get(criteria.departmentId).label;
-    if (criteria.subcategoryId) return `In ${dept}, find a ${bits.join(", ")} in the ${byId.get(criteria.subcategoryId).label} range.`;
-    return `In ${dept}, find a ${bits.join(", ")} watch.`;
+    if (criteria.subcategoryId) return `In ${dept}, find ${phrase} in the ${byId.get(criteria.subcategoryId).label} range.`;
+    return `In ${dept}, find ${phrase}.`;
   }
-  return `Find a watch with a ${bits.join(", ")}.`;
+  return `Find ${phrase}.`;
 }
 
 const nonCanonical = leaves.filter((l) => !canonical[l.id]);

@@ -132,6 +132,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       state_label: "mixed",
       meta: {
         viewport: `${window.innerWidth}x${window.innerHeight}`,
+        device_pixel_ratio: window.devicePixelRatio,
         fast_mode: fastMode,
         taxonomy_hash: state.design?.taxonomyHash ?? null,
         study: "pilot"
@@ -325,7 +326,11 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       const response = await submitDemographics(sessionId, data);
-      logger.log({ event_type: "demographics", state_label: "mixed", meta: { completed: true } });
+      logger.log({
+        event_type: "demographics",
+        state_label: "mixed",
+        meta: { completed: true, prior_menu_experience: data.prior_menu_experience ?? [] }
+      });
       if (response.design) state.setDesign(response.design);
       state.setSession(response.session);
       state.setPhase("baseline");
@@ -537,7 +542,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         taskId: practice.taskId,
         targetId: practice.targetId,
         taskDescription: practice.taskDescription,
-        stateLabel: "happy",
+        stateLabel: "mixed",
         practice: true,
         trialIndex: state.practiceIndex
       }
@@ -560,7 +565,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     return (
       <div className="center-screen">
         <div className="spinner" />
-        <p>Loading sessionâ€¦</p>
+        <p>Loading session…</p>
       </div>
     );
   }
@@ -657,8 +662,8 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         onComplete={finishMainTrial}
       />
     );
-  } else if (state.phase === "block_end") {
-    content = <NeutralResetScreen fastMode={fastMode} onContinue={finishBlock} />;
+  } else if (state.phase === "block_end" && block) {
+    content = <NeutralResetScreen fastMode={fastMode} state={block.stateLabel as Exclude<StateLabel, "mixed">} onContinue={finishBlock} />;
   } else if (state.phase === "questionnaires") {
     content = (
       <QuestionnairesScreen sessionId={sessionId} logger={logger!} fastMode={fastMode} busy={busy} onSubmit={submitAllQuestionnaires} />
@@ -698,7 +703,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         <div className="banner error" role="alert">
           {banner}
           <button type="button" onClick={() => setBanner(null)} aria-label="Dismiss">
-            Ã—
+            ×
           </button>
         </div>
       ) : null}

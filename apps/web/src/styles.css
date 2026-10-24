@@ -224,6 +224,13 @@ code,
   color: var(--red);
 }
 
+.banner.warning {
+  background: #fffaeb;
+  border-color: #fedf89;
+  color: #93370d;
+  font-weight: 600;
+}
+
 .banner button {
   border: 0;
   background: transparent;
@@ -760,10 +767,18 @@ code,
   align-items: center;
 }
 
-.happy-media img {
+.happy-media img,
+.happy-media video,
+.neutral-media img,
+.neutral-media video {
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
+}
+
+.neutral-media {
+  max-width: 480px;
+  margin: 0 auto 16px;
 }
 
 .frustration-task {
@@ -3108,4 +3123,28 @@ code,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+.detail-grid.qa-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+[data-testid="calibration-table"] .admin-table {
+  min-width: 0;
+}
+
+.menu-experience {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.menu-experience legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
 }

@@ -115,6 +115,7 @@ export interface AdminSession {
   checkin_distress: number | null;
   checkin_dominant_state: string | null;
   stuck_seconds: number | null;
+  viewport_warning: string | null;
 }
 
 export interface QaCriterion {
@@ -132,7 +133,16 @@ export interface QaReport {
   counts: { events: number; trials: number; main_trials: number; practice_trials: number; questionnaires: number; checkins: number };
   data_quality: Record<string, number | null>;
   criteria: QaCriterion[];
+  calibration: { by_task: CalibrationRow[]; by_menu: CalibrationRow[] };
   overall: "pass" | "fail" | "conditional";
+}
+
+export interface CalibrationRow {
+  key: string;
+  difficulty?: string | null;
+  n: number;
+  success_pct: number | null;
+  median_success_s: number | null;
 }
 
 export interface MenuProps {

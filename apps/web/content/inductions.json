@@ -1,0 +1,51 @@
+{
+  "state_labels": {
+    "happy": { "label": "Happy / excited", "short": "Happy" },
+    "frustrated": { "label": "Frustrated / annoyed", "short": "Frustrated" },
+    "confused": { "label": "Confused / lost", "short": "Confused" },
+    "bored": { "label": "Bored / disengaged", "short": "Bored" },
+    "mixed": { "label": "Neutral / mixed", "short": "Neutral" }
+  },
+  "inductions": {
+    "happy": {
+      "title": "A pleasant browsing moment",
+      "intro": "Before the next set, we'll show a short clip from a comedy show used in mood research. Imagine you have also just found a great deal on a watch you love. There is nothing to solve here.",
+      "task": "Watch the local clip. When the timer ends, continue to the check-in.",
+      "durationSeconds": 90,
+      "blockDebrief": "The clip was there to set a mood, not to evaluate you."
+    },
+    "frustrated": {
+      "title": "The search that will not cooperate",
+      "intro": "The site's search is being tested and may be unreliable; please try up to three times. It is fine to stop early.",
+      "task": "Search for: a 42 mm automatic dive watch with a blue dial and a titanium strap.",
+      "durationSeconds": 90,
+      "maxAttempts": 3,
+      "noResults": "No results.",
+      "afterLastAttempt": "That was the last attempt. You can wait for the timer.",
+      "blockDebrief": "The search was designed to fail; it was not your fault. Take a break if you would like one."
+    },
+    "confused": {
+      "title": "Which category is right?",
+      "intro": "We're checking how people categorise a new product; there is no right answer. The labels below overlap and none of them clearly matches the target.",
+      "task": "Target: a watch that is formal enough for a dinner, but rugged enough for a hike.",
+      "durationSeconds": 90,
+      "categories": [
+        { "id": "formal", "label": "Formal / evening", "detail": "Dress watches with leather straps" },
+        { "id": "outdoor", "label": "Outdoor / active", "detail": "Rugged watches for trail and water" },
+        { "id": "everyday", "label": "Everyday / smart", "detail": "Versatile watches for work and weekends" },
+        { "id": "gift", "label": "Gift / statement", "detail": "Distinctive watches for special occasions" }
+      ],
+      "blockDebrief": "The categories were deliberately ambiguous; there was no correct answer. Take a break if you would like one."
+    },
+    "bored": {
+      "title": "The very repetitive catalogue check",
+      "intro": "Please verify the prices of these identical straps for the catalogue. You do not need to finish, and you may stop early.",
+      "task": "Verify the price of each strap in the list. The same value repeats.",
+      "durationSeconds": 90,
+      "items": 30,
+      "price": "£240",
+      "earlyExit": "I've had enough — continue",
+      "blockDebrief": "The repetitive task was deliberately dull. Stretch or look around before the next block."
+    }
+  }
+}

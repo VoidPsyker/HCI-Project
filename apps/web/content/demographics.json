@@ -1,0 +1,16 @@
+{
+  "age_band": ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"],
+  "gender": ["woman", "man", "non-binary", "prefer not to say", "self-describe"],
+  "education": ["secondary", "vocational", "undergraduate", "postgraduate", "doctorate", "prefer not to say"],
+  "shopping_freq": ["never", "rarely", "monthly", "weekly", "daily"],
+  "colour_vision": ["typical", "corrected", "atypical", "prefer not to say"],
+  "menu_experience_question": "Which of these menu styles have you used before on websites or apps?",
+  "menu_experience": [
+    { "id": "horizontal", "label": "Top bar with dropdown lists" },
+    { "id": "sidebar", "label": "Side menu with expanding sections" },
+    { "id": "mega", "label": "Large panel showing many links at once" },
+    { "id": "tiles", "label": "Zoomable tiles" },
+    { "id": "icon_grid", "label": "Grid of large icon cards" },
+    { "id": "radial", "label": "Circular or pie menu" }
+  ]
+}

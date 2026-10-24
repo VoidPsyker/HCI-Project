@@ -12,7 +12,7 @@ import {
 } from "../api";
 
 const STORAGE_KEY = "meridian.admin.password";
-const EXPORTS = ["events.jsonl", "events.csv", "trials.csv", "checkins.csv", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"];
+const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"];
 
 const STATUS_LABEL: Record<string, string> = {
   created: "Created",
@@ -180,6 +180,10 @@ export function AdminDashboard() {
         </div>
       </header>
 
+      <div className="banner warning" role="note" data-testid="ethics-banner">
+        Pilot build, ethics approval required before real participants.
+      </div>
+
       {error ? (
         <div className="banner error" role="alert">
           {error}
@@ -302,6 +306,12 @@ export function AdminDashboard() {
                     {session.checkin_distress !== null && session.checkin_distress > 6 ? (
                       <small className="danger-text">distress {session.checkin_distress}/10</small>
                     ) : null}
+                    {(session.stuck_seconds ?? 0) >= 60 ? (
+                      <small className="danger-text" data-testid="stuck-flag">stuck {session.stuck_seconds}s</small>
+                    ) : null}
+                    {session.viewport_warning ? (
+                      <small className="danger-text" data-testid="viewport-warning">{session.viewport_warning}</small>
+                    ) : null}
                   </td>
                   <td>{session.phase}</td>
                   <td>
@@ -331,7 +341,7 @@ export function AdminDashboard() {
                           setAbortReason("researcher_stop");
                         }}
                       >
-                        Stop
+                        Abort &amp; debrief
                       </button>
                       <button
                         type="button"
@@ -392,6 +402,15 @@ export function AdminDashboard() {
                   </li>
                 ))}
               </ul>
+              <h3>Technical QA</h3>
+              <div className="detail-grid qa-grid" data-testid="technical-qa">
+                {Object.entries(qa.data_quality).map(([key, value]) => (
+                  <div key={key}>
+                    <span>{key.replace(/_/g, " ")}</span>
+                    <strong>{value ?? "—"}</strong>
+                  </div>
+                ))}
+              </div>
             </>
           ) : (
             <p className="small-note">Loading QA…</p>
@@ -420,6 +439,49 @@ export function AdminDashboard() {
           </ul>
         </section>
       </div>
+
+      {qa ? (
+        <section className="admin-section" data-testid="calibration-table">
+          <div className="section-head">
+            <div>
+              <h2>Task calibration</h2>
+              <p className="small-note">Main trials only. Median time is over successful trials.</p>
+            </div>
+          </div>
+          <div className="admin-two-col">
+            {([
+              ["By task", qa.calibration.by_task],
+              ["By menu", qa.calibration.by_menu]
+            ] as const).map(([title, rows]) => (
+              <div key={title} className="table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>{title}</th>
+                      <th>n</th>
+                      <th>Success</th>
+                      <th>Median time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => (
+                      <tr key={row.key}>
+                        <td>
+                          {row.key}
+                          {row.difficulty ? <small>{row.difficulty}</small> : null}
+                        </td>
+                        <td>{row.n}</td>
+                        <td>{row.success_pct === null ? "—" : `${row.success_pct}%`}</td>
+                        <td>{row.median_success_s === null ? "—" : `${row.median_success_s} s`}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="admin-section">
         <div className="section-head">
@@ -493,6 +555,10 @@ export function AdminDashboard() {
             <div>
               <span>Stuck</span>
               <strong>{selected.stuck_seconds ? `${selected.stuck_seconds}s` : "—"}</strong>
+            </div>
+            <div>
+              <span>Viewport</span>
+              <strong>{selected.viewport_warning ?? "1920x1080 at 1x"}</strong>
             </div>
           </div>
           <label className="field">

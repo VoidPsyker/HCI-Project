@@ -39,7 +39,8 @@ export const demographicsSchema = z.object({
   shopping_freq: z.enum(["never", "rarely", "monthly", "weekly", "daily"]),
   watch_expertise: z.number().int().min(1).max(7),
   tech_savvy: z.number().int().min(1).max(7),
-  colour_vision: z.enum(["typical", "corrected", "atypical", "prefer not to say"])
+  colour_vision: z.enum(["typical", "corrected", "atypical", "prefer not to say"]),
+  prior_menu_experience: z.array(z.enum(["horizontal", "sidebar", "mega", "tiles", "icon_grid", "radial"])).max(6).optional().default([])
 });
 
 export const questionnaireSchema = z.object({

@@ -1,0 +1,12 @@
+{
+  "baseline_items": [
+    { "id": "valence", "label": "How pleasant do you feel right now?", "min": 1, "max": 9, "low": "Very unpleasant", "high": "Very pleasant" },
+    { "id": "arousal", "label": "How activated or alert do you feel?", "min": 1, "max": 9, "low": "Very calm", "high": "Very activated" }
+  ],
+  "state_items": [
+    { "id": "happy", "label": "Happy / excited" },
+    { "id": "frustrated", "label": "Frustrated / annoyed" },
+    { "id": "confused", "label": "Confused / lost" },
+    { "id": "bored", "label": "Bored / disengaged" }
+  ]
+}

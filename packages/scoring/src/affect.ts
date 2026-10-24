@@ -10,15 +10,18 @@ export function reportedState(ratings: AffectRatings): StateLabel {
   return intensity >= 5 && highest.length === 1 ? highest[0]! : "mixed";
 }
 
+/** SAM thresholds per induction (plan §3.4); the discrete item must also be the reported state. */
+const SAM_CHECKS: Record<(typeof STATES)[number], (valence: number, arousal: number) => boolean> = {
+  happy: (valence, arousal) => valence >= 6 && arousal >= 4 && arousal <= 7,
+  frustrated: (valence, arousal) => valence <= 4 && arousal >= 5,
+  confused: (valence, arousal) => valence <= 5 && arousal >= 4 && arousal <= 6,
+  bored: (valence, arousal) => valence <= 5 && arousal <= 4
+};
+
 export function manipulationCheckPassed(state: string, ratings: AffectRatings): boolean {
-  if (state === "mixed" || reportedState(ratings) !== state) return false;
+  const reported = reportedState(ratings);
+  if (reported === "mixed" || reported !== state) return false;
   const { valence, arousal } = ratings;
   if (![valence, arousal].every((value) => Number.isInteger(value) && value >= 1 && value <= 9)) return false;
-  switch (state) {
-    case "happy": return valence >= 6 && arousal >= 4 && arousal <= 7;
-    case "frustrated": return valence <= 4 && arousal >= 5;
-    case "confused": return valence <= 5 && arousal >= 4 && arousal <= 6;
-    case "bored": return valence <= 5 && arousal <= 4;
-  }
-  return false;
+  return SAM_CHECKS[reported](valence, arousal);
 }

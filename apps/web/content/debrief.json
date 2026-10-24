@@ -1,0 +1,11 @@
+{
+  "paragraphs": [
+    "Thank you. This pilot tests a fictional watch store and several menu layouts. We are checking whether the procedures, menus, and measures are usable before a larger study.",
+    "Some tasks were designed to be mildly frustrating, confusing, or boring: the search was built to fail and the categories were deliberately ambiguous. Those feelings were part of the procedure, not a judgement of you. The check-ins and neutral resets were there to bring you back to baseline.",
+    "We are studying the interface, not the person: the question is whether different menu layouts work better or worse under different everyday moods.",
+    "We used webcam-based eye tracking during the scored search trials, with separate consent. No video, images, audio, or automated emotion detection were stored or inferred. Gaze data are kept in a separate restricted dataset and are pseudonymous. You can withdraw your data now or ask the researcher to remove it later.",
+    "If you feel unwell or distressed, please tell the researcher. You can stop at any point. Contact details for support should be inserted here after ethics approval.",
+    "This is a pilot build. Ethics approval is required before any real participant takes part."
+  ],
+  "test_mode_notice": "Test mode: timers are shortened. Do not use for real participants."
+}

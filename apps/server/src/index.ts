@@ -1,6 +1,10 @@
 import { config } from "./config";
+import { trialCondition } from "./conditions";
 import { Repository } from "./repository";
 import { createServer } from "./server";
+
+// Refuse to start rather than silently run Study 2/3 sessions as "static".
+trialCondition(config.features);
 
 const repo = new Repository(config.dbPath, config.rawDir, config.seed, config.gazeDir);
 const app = await createServer(repo, { logger: false });

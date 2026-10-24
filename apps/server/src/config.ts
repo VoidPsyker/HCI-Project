@@ -20,5 +20,10 @@ export const config = {
   rawDir: resolveFromRoot(process.env.RAW_DATA_DIR ?? "data/raw"),
   gazeDir: resolveFromRoot(process.env.GAZE_DATA_DIR ?? "data/gaze"),
   exportDir: resolveFromRoot("exports"),
+  // Study 2/3 are out of pilot scope; see conditions.ts. Both must stay false for the pilot.
+  features: {
+    study2: process.env.FEATURE_STUDY2 === "true",
+    study3: process.env.FEATURE_STUDY3 === "true"
+  },
   webDist: path.join(ROOT, "apps", "web", "dist")
 };

@@ -36,6 +36,24 @@ it("does not link another session or a post-trial check to the trial", () => {
   ])).toMatchObject({ reported_state: "", manipulation_check_passed: "" });
 });
 
+it("exports trials, check-ins and questionnaires as JSONL with the CSV columns", () => {
+  const repo = {
+    allEvents: () => [], allCheckins: () => [checkin],
+    allTrials: () => [{ trial_id: "t1", session_id: "session-1", block_id: "block-1", state_label: "happy", path_json: "[]", first_click_ok: null, task_description: "a, b" }],
+    allQuestionnaires: () => [], allAssignments: () => []
+  } as unknown as Repository;
+  const bundle = buildExportBundle(repo);
+  const csvHeader = (name: string) => bundle.find((f) => f.name === name)!.content.split("\r\n")[0]!.split(",");
+  for (const kind of ["trials", "checkins", "questionnaires"]) {
+    const jsonl = bundle.find((f) => f.name === `${kind}.jsonl`)!;
+    const rows = jsonl.content.trim() ? jsonl.content.trim().split("\n").map((line) => JSON.parse(line)) : [];
+    expect(rows).toHaveLength(jsonl.rows);
+    for (const row of rows) expect(Object.keys(row)).toEqual(csvHeader(`${kind}.csv`));
+  }
+  const trial = JSON.parse(bundle.find((f) => f.name === "trials.jsonl")!.content);
+  expect(trial.task_description).toBe("a, b");
+});
+
 it("links a qualifying post-induction report to its session and block", () => {
   expect(trialRow([{ ...checkin, meta: { ...checkin.meta, frustrated: 2 } }]))
     .toMatchObject({ state_label: "happy", reported_state: "happy", manipulation_check_passed: "1" });

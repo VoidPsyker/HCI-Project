@@ -1,0 +1,14 @@
+{
+  "eyebrow": "How the session works",
+  "title": "Four short scenarios, twelve searches",
+  "lede": "You will practice all six menu layouts once, then complete four blocks. Each block starts with a short scenario, a check-in, and three search trials using three different menus. Every menu appears exactly twice. We are testing the website, not you, so please say candidly what you notice.",
+  "cards": [
+    { "title": "Think aloud", "text": "Say what you are looking for and what you notice. The researcher may prompt you but will not help you find products." },
+    { "title": "Search naturally", "text": "Use the menu as you would in a real shop. There is no time pressure beyond the 120-second trial limit." },
+    { "title": "Check in honestly", "text": "After each scenario, rate how you feel. If distress is above 6/10, the session stops immediately." },
+    { "title": "Stop anytime", "text": "The visible Stop control is always available. You do not need to give a reason." }
+  ],
+  "procedure": ["Consent", "Practice ×6", "4 × (scenario → check-in → 3 trials)", "Questionnaires", "Debrief"],
+  "estimate": "Estimated total: 45–75 minutes. Maximum 100 minutes.",
+  "start": "Start the six practice trials"
+}

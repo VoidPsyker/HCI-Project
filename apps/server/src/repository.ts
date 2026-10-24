@@ -5,7 +5,7 @@ import Database from "better-sqlite3";
 import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { SCHEMA_SQL } from "./schema";
-import { generateDesign, designSummary, type StudyDesign, type StateLabel } from "./design";
+import { generateDesign, designSummary, stratumSequenceIndex, type StudyDesign, type StateLabel } from "./design";
 
 type Db = InstanceType<typeof Database>;
 
@@ -205,6 +205,18 @@ export interface AdminSession {
   checkin_distress: number | null;
   checkin_dominant_state: string | null;
   stuck_seconds: number | null;
+  viewport_warning: string | null;
+}
+
+/** The stage is specified for a 1920 x 1080 viewport at device pixel ratio 1 (plan Table 4.2). */
+export function viewportWarning(meta: Record<string, unknown>): string | null {
+  const viewport = typeof meta.viewport === "string" ? meta.viewport : null;
+  const dpr = typeof meta.device_pixel_ratio === "number" ? meta.device_pixel_ratio : null;
+  const problems = [
+    viewport && viewport !== "1920x1080" ? `viewport ${viewport}` : null,
+    dpr !== null && dpr !== 1 ? `device pixel ratio ${dpr}` : null
+  ].filter(Boolean);
+  return problems.length ? `${problems.join(", ")} (expected 1920x1080 at 1x)` : null;
 }
 
 function parseMeta(json: string): Record<string, unknown> {
@@ -336,7 +348,11 @@ export class Repository {
 
       const assigned =
         sequenceOverride ??
-        (this.db.prepare("SELECT COUNT(*) AS n FROM assignments_audit WHERE stratum = ?").get(stratum) as { n: number }).n;
+        stratumSequenceIndex(
+          this.seed,
+          stratum,
+          (this.db.prepare("SELECT COUNT(*) AS n FROM assignments_audit WHERE stratum = ?").get(stratum) as { n: number }).n
+        );
       const design = generateDesign({
         sessionId,
         participantId: session.participant_id,
@@ -540,6 +556,8 @@ export class Repository {
       if (row.trial_id) trialIds.add(row.trial_id);
     }
     for (const trialId of trialIds) this.recomputeTrial(trialId);
+    // Re-sent events are expected (offline queue, unload beacon); the QA report shows how many were absorbed.
+    if (duplicates) this.setMeta("duplicate_event_ids", String(Number(this.getMeta("duplicate_event_ids") ?? 0) + duplicates));
     return { accepted: acceptedRows.length, duplicates, trialEndConflicts };
   }
 
@@ -717,6 +735,9 @@ export class Repository {
         if (Number.isFinite(ms) && ms > 0) stuckSeconds = Math.round(ms / 1000);
       }
       const latestMeta = latest ? parseMeta(latest.meta_json) : {};
+      const sessionStart = this.db
+        .prepare("SELECT meta_json FROM events WHERE session_id=? AND event_type='session_start' ORDER BY t_server DESC LIMIT 1")
+        .get(row.session_id) as { meta_json: string } | undefined;
       const distressRaw = checkinMeta.distress;
       const distress = typeof distressRaw === "number" ? distressRaw : null;
       return {
@@ -743,7 +764,8 @@ export class Repository {
         checkin_distress: distress,
         checkin_dominant_state:
           typeof checkinMeta.dominant_state === "string" ? checkinMeta.dominant_state : null,
-        stuck_seconds: stuckSeconds
+        stuck_seconds: stuckSeconds,
+        viewport_warning: sessionStart ? viewportWarning(parseMeta(sessionStart.meta_json)) : null
       };
     });
   }

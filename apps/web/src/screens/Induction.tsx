@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { StateLabel } from "@meridian/scoring";
 import type { EventLogger } from "../logger";
-import { INDUCTIONS, STATE_COPY } from "../content";
+import { INDUCTIONS, MEDIA, STATE_COPY, type InductionState } from "../content";
+import { LocalClip } from "../components/LocalClip";
 
-type InductionState = Exclude<StateLabel, "mixed">;
+const FILTER_SIZES = ["Any", "38 mm", "40 mm", "42 mm", "44 mm"];
 
 export function InductionScreen({
   state,
@@ -25,6 +25,7 @@ export function InductionScreen({
   const [remaining, setRemaining] = useState(duration);
   const [done, setDone] = useState(false);
   const [query, setQuery] = useState("");
+  const [sizeFilter, setSizeFilter] = useState(FILTER_SIZES[0]!);
   const [attempts, setAttempts] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [confirmedRows, setConfirmedRows] = useState<Set<number>>(new Set());
@@ -52,50 +53,36 @@ export function InductionScreen({
     return () => clearInterval(interval);
   }, [blockId, definition.durationSeconds, duration, fastMode, logger, state]);
 
-  useEffect(() => {
-    if (!done || endedRef.current) return;
+  /** Logs the induction_end for a timed or early finish; a stop is logged by the runner, which owns every stop path. */
+  const end = (meta: { completed: boolean; distress_stop: false; early_exit?: boolean }) => {
+    if (endedRef.current) return;
     endedRef.current = true;
     logger.log({
       event_type: "induction_end",
       block_id: blockId,
       state_label: state,
-      meta: {
-        completed: true,
-        duration_ms: Math.round(performance.now() - startedRef.current),
-        distress_stop: false
-      }
+      meta: { ...meta, duration_ms: Math.round(performance.now() - startedRef.current) }
     });
-  }, [blockId, done, logger, state]);
+  };
+
+  useEffect(() => {
+    if (done) end({ completed: true, distress_stop: false });
+    // `end` is idempotent; the timer reaching zero is the only trigger here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 
   const distressStop = () => {
-    if (!endedRef.current) {
-      endedRef.current = true;
-      logger.log({
-        event_type: "induction_end",
-        block_id: blockId,
-        state_label: state,
-        meta: {
-          completed: false,
-          duration_ms: Math.round(performance.now() - startedRef.current),
-          distress_stop: true
-        }
-      });
-    }
+    endedRef.current = true;
     onDistressStop();
   };
 
-  const continueAfter = () => {
-    if (!endedRef.current) {
-      endedRef.current = true;
-      logger.log({
-        event_type: "induction_end",
-        block_id: blockId,
-        state_label: state,
-        meta: { completed: true, duration_ms: Math.round(performance.now() - startedRef.current), distress_stop: false }
-      });
-    }
+  const continueAfter = (earlyExit = false) => {
+    end(earlyExit ? { completed: false, distress_stop: false, early_exit: true } : { completed: true, distress_stop: false });
     onComplete(Math.round(performance.now() - startedRef.current));
   };
+
+  const frustrated = INDUCTIONS.frustrated;
+  const searchesLeft = attempts < frustrated.maxAttempts;
 
   const seconds = Math.ceil(remaining / 1000);
   const progress = 1 - remaining / duration;
@@ -124,8 +111,7 @@ export function InductionScreen({
         <div className="task-banner">{definition.task}</div>
         {state === "happy" ? (
           <div className="happy-media">
-            <img src="/assets/happy-placeholder.svg" alt="Local abstract sunrise placeholder for the pleasant clip" />
-            <p className="small-note">Local placeholder. Replace with the approved clip before data collection. No network requests.</p>
+            <LocalClip slot={MEDIA.happy_clip} testId="happy-clip" />
           </div>
         ) : null}
 
@@ -142,9 +128,21 @@ export function InductionScreen({
                   autoComplete="off"
                   maxLength={120}
                 />
+                <select
+                  aria-label="Case size filter"
+                  value={sizeFilter}
+                  onChange={(event) => setSizeFilter(event.target.value)}
+                  data-testid="induction-filter"
+                >
+                  {FILTER_SIZES.map((size) => (
+                    <option key={size}>{size}</option>
+                  ))}
+                </select>
                 <button
                   type="button"
                   className="button primary"
+                  disabled={!searchesLeft}
+                  data-testid="induction-search"
                   onClick={() => {
                     const next = attempts + 1;
                     setAttempts(next);
@@ -152,8 +150,9 @@ export function InductionScreen({
                       event_type: "search_attempt",
                       block_id: blockId,
                       state_label: state,
-                      meta: { attempt: next, query_length: query.length, results: 0 }
+                      meta: { induction: "frustrated", attempt: next, query_length: query.length, filter: sizeFilter, results: 0, filter_reset: true }
                     });
+                    setSizeFilter(FILTER_SIZES[0]!);
                   }}
                 >
                   Search
@@ -161,12 +160,14 @@ export function InductionScreen({
               </div>
             </label>
             {attempts > 0 ? (
-              <div className="search-result" role="status">
-                <strong>No exact match.</strong> Try a different term. The index is slow to update.
-                {attempts >= 3 ? <p>This search index is intentionally unreliable in the pilot. You can wait for the timer.</p> : null}
+              <div className="search-result" role="status" data-testid="induction-search-result">
+                <strong>{frustrated.noResults}</strong>
+                {!searchesLeft ? <p>{frustrated.afterLastAttempt}</p> : null}
               </div>
             ) : null}
-            <p className="small-note">Attempts: {attempts}/3. The search is designed to be mildly annoying, not impossible.</p>
+            <p className="small-note">
+              Attempts: {attempts}/{frustrated.maxAttempts}.
+            </p>
           </div>
         ) : null}
 
@@ -174,12 +175,7 @@ export function InductionScreen({
           <div className="confusion-task">
             <p className="task-copy">Which single category is closest to the target?</p>
             <div className="confusion-grid">
-              {([
-                ["formal", "Formal / evening", "Dress watches with leather straps"],
-                ["outdoor", "Outdoor / active", "Rugged watches for trail and water"],
-                ["everyday", "Everyday / smart", "Versatile watches for work and weekends"],
-                ["gift", "Gift / statement", "Distinctive watches for special occasions"]
-              ] as const).map(([id, label, detail]) => (
+              {INDUCTIONS.confused.categories.map(({ id, label, detail }) => (
                 <button
                   key={id}
                   type="button"
@@ -212,10 +208,10 @@ export function InductionScreen({
           <div className="bored-task">
             <p className="task-copy">Confirm the listed price for each strap. The same value repeats.</p>
             <div className="bored-list">
-              {Array.from({ length: 30 }, (_, index) => (
+              {Array.from({ length: INDUCTIONS.bored.items }, (_, index) => (
                 <div key={index} className="bored-row">
                   <span>Strap blank #{String(index + 1).padStart(2, "0")}</span>
-                  <span className="bored-price">£240</span>
+                  <span className="bored-price">{INDUCTIONS.bored.price}</span>
                   <button
                     type="button"
                     className={confirmedRows.has(index) ? "button tiny confirmed" : "button tiny"}
@@ -233,7 +229,7 @@ export function InductionScreen({
                       });
                     }}
                   >
-                    {confirmedRows.has(index) ? "Confirmed" : "Confirm £240"}
+                    {confirmedRows.has(index) ? "Confirmed" : `Confirm ${INDUCTIONS.bored.price}`}
                   </button>
                 </div>
               ))}
@@ -248,7 +244,12 @@ export function InductionScreen({
         </button>
         <div className="induction-actions-right">
           <span className="small-note">{done ? "The scenario is over. Continue when ready." : "Continue unlocks when the timer ends."}</span>
-          <button type="button" className="button primary" disabled={!done} onClick={continueAfter} data-testid="induction-continue">
+          {state === "bored" && !done ? (
+            <button type="button" className="button secondary" onClick={() => continueAfter(true)} data-testid="induction-early-exit">
+              {INDUCTIONS.bored.earlyExit}
+            </button>
+          ) : null}
+          <button type="button" className="button primary" disabled={!done} onClick={() => continueAfter()} data-testid="induction-continue">
             Continue to check-in
           </button>
         </div>
