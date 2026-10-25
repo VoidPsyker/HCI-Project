@@ -1,0 +1,179 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=16mm]{geometry}
+\usepackage{tabularx,booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{textcomp}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlist{nosep,leftmargin=*}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{7pt}{2pt}
+\renewcommand{\arraystretch}{1.1}
+
+\begin{document}
+
+{\LARGE\bfseries Experimental Plan: Emotion-Contingent Navigation}\par
+\vspace{2pt}
+HCI Project, Semester 7 \textperiodcentered{} 25 October 2026\\
+Running application: \url{https://github.com/VoidPsyker/HCI-Project}
+
+\section{Research questions}
+
+Online shops show every visitor the same menu, whatever mood they are in. We want to know
+whether the best menu layout depends on how the shopper feels. If a frustrated shopper finds
+a watch faster with a mega menu and a confused shopper does better with a sidebar, a shop
+could switch its menu to suit the shopper's state.
+
+We ask two questions. First, which of six menu structures helps people find products fastest
+and most reliably in each of four emotional states? Second, can a model trained on clicks
+and timing predict which state a shopper is in, well enough to choose the menu for them?
+
+Hypothesis H1 says menu structure and emotional state interact, so the ranking of the menus
+changes in at least some states. We do not decide in advance which menu suits which state;
+the data decide. If one menu wins everywhere, that still answers the question: keep one
+stable menu. Hypothesis H5 says the model will beat a majority-class baseline, though with
+real uncertainty.
+
+\section{The test application}
+
+We built a fictional watch store, Meridian Timepieces, with 72 watches. A made-up brand
+stops participants relying on what they know about real shops. All six menus show the same
+4 departments, 12 subcategories, labels and products; only the structure changes. Search is
+off during trials, so participants have to use the menu.
+
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Menu & How it works \\
+\midrule
+A. Horizontal bar & Top bar, then a dropdown, then a side flyout (3 clicks) \\
+B. Vertical sidebar & A category tree on the left that expands in place (3 clicks) \\
+C. Mega menu & One large panel shows every subcategory and product type (2 clicks) \\
+D. Fractal tiles & A $2\times2$ grid that zooms in level by level, with a breadcrumb (3 clicks) \\
+E. Icon grid & Colour-coded rounded cards with icons at each level (3 clicks) \\
+F. Radial lattice & Four compass sectors with deeper levels on outer rings (3 clicks) \\
+\bottomrule
+\end{tabularx}
+
+\section{Emotional states and how we induce them}
+
+Each block starts with a mild, 90-second activity.
+
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+State & Induction \\
+\midrule
+Happy & A short comedy clip plus the scenario ``you just found a great deal'' \\
+Frustrated & A search box that returns ``No results'' for a valid query (three attempts at most) \\
+Confused & Placing a watch into one of four overlapping categories, none of which fits \\
+Bored & Checking the same \pounds240 price on 30 identical straps, with an option to stop early \\
+\bottomrule
+\end{tabularx}
+
+Afterwards the participant rates how pleasant (1--9) and how alert (1--9) they feel and picks
+the state that fits best. These self-reports tell us whether the induction worked and give
+the model its labels. We never read emotion from faces or the webcam.
+
+\section{Design and procedure}
+
+Every participant uses all six menus in all four states (within-subjects). We counterbalance
+state order with a $4\times4$ Latin square and menu order with a $6\times6$ Williams square,
+and we rotate target products across six sets. The server assigns each sequence, so the
+browser never picks a condition. Each watch has one finding task, such as ``Titanium dive
+watch, 300\,m, deep blue dial'', rated easy, medium or hard by menu depth, how closely the
+wording matches the label, and how many similar watches compete with it.
+
+A pilot session takes about 90 minutes:
+\begin{enumerate}
+  \item Consent, separate eye-tracking consent, and screen and distance measurements.
+  \item Demographics, a baseline mood check-in, instructions and six practice trials.
+  \item Nine-point eye-tracking calibration. Error above 1.5\textdegree{} ends the session
+        before scoring.
+  \item Four blocks, each with an induction, a check-in, three trials, a second check-in with
+        a fatigue rating, and a 60-second neutral reset.
+  \item Questionnaires (SUS for each menu, NASA-TLX), a short interview and a debrief.
+\end{enumerate}
+
+A trial ends at the correct product page, at ``I can't find it'', or at 120 seconds. Feedback
+stays neutral (``Response recorded'') so praise or error messages do not shift the mood.
+
+\section{Data collection}
+
+The app logs every action with a timestamp and the participant's pseudonymous ID, block,
+trial, task, menu and assigned state. That covers each menu item opened or clicked (with
+its screen position and level), back steps, wrong product pages, give-ups, check-ins and
+questionnaire answers. The server stores everything in a database and also writes each
+session's raw events to a separate backup file. Gaze samples go to a restricted store of
+their own, and webcam video is never saved. The researcher exports CSV and JSONL files with
+a checksum for each, so we can show later that no file changed. Rehearsal sessions with
+synthetic data are flagged and excluded from analysis.
+
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Type & What we measure \\
+\midrule
+Performance (per trial) & Success within 120\,s, completion time, wrong clicks, backtracking, path length \\
+Emotional state & Pleasantness, alertness and dominant state after each induction and block \\
+Experience & SUS for each menu, NASA-TLX at the end, open comments \\
+Eye tracking & Fixations and dwell time on each menu area \\
+\bottomrule
+\end{tabularx}
+
+\section{Model training: predicting the emotional state}
+
+Study 1 gives us labelled behaviour. For each trial we compute features from the logs:
+timing (time to first click, pauses, total time), clicking (click count, click rate, repeat
+clicks on one item), navigation (back steps, category switches, menu openings, wrong
+products, depth reached) and context (difficulty, menu, trial number). The context features
+stop the model from learning the task instead of the mood. The label is the state the
+participant reported (happy, frustrated, confused, bored or mixed), not the one we tried to
+induce.
+
+Our main model is an L2-penalised multinomial logistic regression with balanced class
+weights. We chose it because its weights are readable and its probabilities can be
+calibrated. Gradient boosting (LightGBM) serves as a check for non-linear gains. We validate
+with leave-one-participant-out cross-validation, so the model is always tested on people it
+never saw. We report macro-F1, balanced accuracy and the confusion matrix against a
+majority-class baseline, and check calibration with the Brier score. H5 holds if macro-F1
+beats the baseline by at least 0.10. We then freeze the model. In Study 3 it may switch the
+menu only between tasks, only when it is at least 70\% confident, and the participant can
+keep the current menu. A simulation over the Study 1 results will show how accurate the
+model must be before switching beats a fixed menu. The model predicts what people report,
+which is not the same as what they feel, and we will say so.
+
+\section{Participants and phases}
+
+The pilot has 8--10 participants with 12 scored trials each (3 per block). It tests the
+method, not the hypotheses, and its data stay out of the main analysis. To move on, every
+menu must reach 80\% practice success, at least 60\% of inductions must produce the intended
+state with no distress rating above 6/10, overall success must fall between 75\% and 90\%,
+and sessions must stay under 100 minutes with under 5\% missing data. Study 1 then runs 48
+participants (72 if recruitment allows), aged 18--65 with normal or corrected vision, on 24
+trials each: one per menu in every state. Studies 2 and 3, which test switching with known
+and then predicted states, come after this semester.
+
+\section{Analysis}
+
+We model log completion time with a linear mixed-effects model and success with a logistic
+one. Menu, state and their interaction are fixed effects; trial position and difficulty are
+covariates; participant and target are random effects. A likelihood-ratio test on the
+interaction tests H1, and we report effect sizes with 95\% confidence intervals. To pick a
+menu for each state we fixed a rule in advance: keep menus within 5 percentage points of the
+best success rate, then take the fastest. If no menu is clearly better, use the best overall.
+
+\section{Ethics and risks}
+
+We will not recruit until the ethics committee approves the study; the consent text and clips
+in the app are placeholders until then. Participants can stop at any time, and a distress
+rating above 6/10 sends them straight to the debrief. We never store names or webcam video,
+and withdrawal deletes all of a participant's data. Mood carry-over is the main risk, which
+the neutral reset and counterbalancing address. If sessions run long we will split Study 1
+into two visits. Webcam eye tracking ran at about 48 frames per second on our laptop, just
+under the 50\,fps target, so we will retest it on the lab machine.
+
+\end{document}

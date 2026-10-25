@@ -63,6 +63,7 @@ Not participant-ready. Open items:
 
 ## Documentation
 
+- [Experimental plan](docs/experimental-plan/experimental-plan.pdf) (LaTeX source alongside): two-page summary of how we run the experiments.
 - [Researcher guide](docs/researcher-guide.md): running a session, swapping clips, exporting.
 - [Assumptions and departures from the plan](ASSUMPTIONS.md).
 - [Task difficulty rule](docs/difficulty.md).
