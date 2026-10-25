@@ -1,8 +1,8 @@
 # Deploying to Vercel
 
 Vercel builds `Dockerfile.vercel` at the repo root and runs it as a container function.
-Default URL: `https://hci-project.vercel.app` (Vercel adds a suffix if that name is taken; the
-project's Domains tab shows the real one).
+URL: `https://emotion-nav.vercel.app` (`hci-project.vercel.app` is taken, so step 6 adds this
+name).
 
 ## Steps
 
@@ -15,6 +15,8 @@ project's Domains tab shows the real one).
 4. Press **Deploy**. The first build takes a few minutes.
 5. Open `/api/health` on the new URL to check the server, then `/` for the app and `/admin`
    for the researcher console.
+6. In the project, open **Settings → Domains**, type `emotion-nav.vercel.app`, press **Add**
+   and assign it to Production. It goes live within seconds.
 
 Every push to `main` redeploys automatically.
 
