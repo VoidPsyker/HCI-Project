@@ -30,7 +30,7 @@ interface PartialEvent {
   meta?: Record<string, unknown>;
 }
 
-const QUEUE_LIMIT = 5000;
+const BATCH_SIZE = 100;
 
 function uuid(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -40,10 +40,9 @@ function uuid(): string {
 export class EventLogger {
   readonly participantId: string;
   readonly sessionId: string;
-  private buffer: EventInput[] = [];
   private queue: EventInput[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
-  private flushing = false;
+  private flushing: Promise<boolean> | null = null;
   private context: LoggerContext = {
     block_id: null,
     trial_id: null,
@@ -62,7 +61,7 @@ export class EventLogger {
   private consoleErrors: string[] = [];
   private queueKey: string;
 
-  constructor(participantId: string, sessionId: string) {
+  constructor(participantId: string, sessionId: string, private readonly onStorageError?: (message: string) => void) {
     this.participantId = participantId;
     this.sessionId = sessionId;
     this.queueKey = `meridian.events.queue.${sessionId}`;
@@ -76,7 +75,7 @@ export class EventLogger {
       const raw = localStorage.getItem(this.queueKey);
       if (!raw) return;
       const parsed = JSON.parse(raw) as EventInput[];
-      if (Array.isArray(parsed)) this.queue = parsed.slice(-QUEUE_LIMIT);
+      if (Array.isArray(parsed)) this.queue = parsed;
     } catch {
       // A corrupt queue is ignored; the current buffer is still sent.
     }
@@ -85,9 +84,9 @@ export class EventLogger {
   private saveQueue(): void {
     try {
       if (this.queue.length === 0) localStorage.removeItem(this.queueKey);
-      else localStorage.setItem(this.queueKey, JSON.stringify(this.queue.slice(-QUEUE_LIMIT)));
+      else localStorage.setItem(this.queueKey, JSON.stringify(this.queue));
     } catch {
-      // Storage may be unavailable in private mode; keep the in-memory queue.
+      this.onStorageError?.("This browser could not keep a recovery copy of the study data. Keep this page open and ask the researcher for help.");
     }
   }
 
@@ -163,8 +162,9 @@ export class EventLogger {
           : {})
       }
     };
-    this.buffer.push(payload);
-    if (this.buffer.length > 100) void this.flush();
+    this.queue.push(payload);
+    this.saveQueue();
+    if (this.queue.length > BATCH_SIZE) void this.flush();
   }
 
   private startFrames(): void {
@@ -206,40 +206,41 @@ export class EventLogger {
     return response.ok;
   }
 
-  async flush(): Promise<void> {
-    if (this.flushing) return;
-    if (this.buffer.length === 0 && this.queue.length === 0) return;
-    this.flushing = true;
-    const pending = [...this.queue, ...this.buffer];
-    this.buffer = [];
-    this.queue = [];
-    try {
-      const ok = await this.send(pending);
-      if (!ok) {
-        this.queue = [...pending, ...this.queue].slice(-QUEUE_LIMIT);
-        this.saveQueue();
-      } else {
-        this.saveQueue();
+  flush(): Promise<boolean> {
+    if (this.flushing) return this.flushing;
+    if (this.queue.length === 0) return Promise.resolve(true);
+    this.flushing = this.drain().finally(() => { this.flushing = null; });
+    return this.flushing;
+  }
+
+  private async drain(): Promise<boolean> {
+    while (this.queue.length > 0) {
+      const pending = this.queue.slice(0, BATCH_SIZE);
+      try {
+        if (!await this.send(pending)) return false;
+      } catch {
+        return false;
       }
-    } catch {
-      this.queue = [...pending, ...this.queue].slice(-QUEUE_LIMIT);
+      const acknowledged = new Set(pending.map((event) => event.event_id));
+      this.queue = this.queue.filter((event) => !acknowledged.has(event.event_id));
       this.saveQueue();
-    } finally {
-      this.flushing = false;
     }
+    return true;
   }
 
   beacon(): void {
-    const pending = [...this.queue, ...this.buffer];
-    this.buffer = [];
-    this.queue = [];
-    try {
-      const blob = new Blob([JSON.stringify({ events: pending })], { type: "application/json" });
-      if (typeof navigator !== "undefined" && "sendBeacon" in navigator) navigator.sendBeacon("/api/events", blob);
-      else void this.send(pending, true);
-    } catch {
-      this.queue = pending.slice(-QUEUE_LIMIT);
-      this.saveQueue();
+    this.saveQueue();
+    if (this.queue.length === 0) return;
+    // A beacon only confirms browser acceptance; retain events until server acknowledgement.
+    if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+      try {
+        const blob = new Blob([JSON.stringify({ events: this.queue.slice(0, BATCH_SIZE) })], { type: "application/json" });
+        navigator.sendBeacon("/api/events", blob);
+      } catch {
+        // The durable queue will be retried when this session resumes.
+      }
+    } else {
+      void this.flush();
     }
   }
 
@@ -254,7 +255,6 @@ export class EventLogger {
   }
 
   discard(): void {
-    this.buffer = [];
     this.queue = [];
     if (this.timer) clearInterval(this.timer);
     this.timer = null;

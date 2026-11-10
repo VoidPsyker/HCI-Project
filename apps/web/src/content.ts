@@ -1,4 +1,5 @@
 import type { StateLabel } from "@meridian/scoring";
+import sessionTiming from "../content/session-timing.json";
 import checkin from "../content/checkin.json";
 import consent from "../content/consent.json";
 import debrief from "../content/debrief.json";
@@ -54,3 +55,5 @@ export const CREDIBILITY_ITEMS = questionnaires.credibility;
 
 export const DEBRIEF_PARAGRAPHS = debrief.paragraphs;
 export const TEST_MODE_NOTICE = debrief.test_mode_notice;
+
+export const SESSION_TIMING = sessionTiming;

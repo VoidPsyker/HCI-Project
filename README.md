@@ -45,6 +45,17 @@ Demo deployment on Vercel (no persistent data): see [docs/deploy-vercel.md](docs
 (`?fast=1`). It replaces the camera tracker with a scripted gaze source, so it proves the flow
 and data pipeline, not human gaze accuracy.
 
+## Short pilot timing
+
+The pilot activities target approximately 15 minutes, with no automatic session cutoff.
+It keeps four states, six practices and twelve scored trials. Timed activities occupy at most
+9 minutes 45 seconds; allow approximately 5 minutes 15 seconds for reading, check-ins,
+questionnaires and transitions. Participants can finish every activity if they need longer.
+Camera setup, calibration and consent should be allowed additional time.
+
+See [short pilot protocol](docs/short-pilot.md) for the timing budget, research limitations and
+save verification. Older PDFs describe the earlier protocol.
+
 ## Eye tracking
 
 Eye tracking requires separate consent, measured screen dimensions and viewing distance, nine

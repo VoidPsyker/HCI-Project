@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_COLOUR_MAPPING, LEAVES, NODE_BY_ID, type TaxonomyNode } from "@meridian/taxonomy";
 import type { EventLogger } from "../src/logger";
@@ -68,6 +68,29 @@ function renderTrial(targetId: string) {
 }
 
 describe("TrialRunner", () => {
+  it.each([{ practice: false, seconds: 20 }, { practice: true, seconds: 15 }])(
+    "records a real timeout at the $seconds-second limit (practice=$practice)",
+    ({ practice, seconds }) => {
+      vi.useFakeTimers();
+      try {
+        const fake = fakeLogger();
+        const target = LEAVES.find((leaf) => leaf.productId)!;
+        render(<TrialRunner spec={{ ...baseSpec(target.productId!), practice }} colourMapping={DEFAULT_COLOUR_MAPPING}
+          logger={fake.logger} fastMode={false} onComplete={vi.fn()} />);
+        fireEvent.click(screen.getByTestId("start-trial"));
+        act(() => vi.advanceTimersByTime(seconds * 1000 - 1));
+        expect(fake.finishTrial).not.toHaveBeenCalled();
+        act(() => vi.advanceTimersByTime(1));
+        expect(fake.finishTrial).toHaveBeenCalledTimes(1);
+        expect(eventOf(fake.log, "timeout")).toMatchObject({ meta: { practice, limit_ms: seconds * 1000 } });
+        expect(eventOf(fake.log, "trial_end")).toMatchObject({ meta: expect.objectContaining({ success: false, terminal: "timeout" }) });
+        expect(screen.getByRole("dialog", { name: "Trial timed out" })).toHaveTextContent(`The ${seconds}-second limit`);
+      } finally {
+        vi.useRealTimers();
+      }
+    }
+  );
+
   it("returns from a wrong product on browser Back without ending the trial", () => {
     const target = LEAVES.find((leaf) => leaf.productId) as TaxonomyNode;
     const wrong = LEAVES.find((leaf) => leaf.productId && leaf.productId !== target.productId) as TaxonomyNode;

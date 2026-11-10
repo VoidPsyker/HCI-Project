@@ -5,3 +5,5 @@
 - Media: copy the approved clip into `apps/web/public/media/` and set `src` in `media.json`, for
   example `"src": "/media/happy-clip.mp4"`. With `src: null` the bundled placeholder is shown.
   Files must be local; the instrument makes no external requests.
+
+- Short pilot timing: `session-timing.json` controls trial limits and resets; induction durations are in `inductions.json`. These shorter activities need pilot validation with the existing mood check-ins. The 15-minute total is a target including setup, not an enforced consent or calibration deadline.

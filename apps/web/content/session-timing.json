@@ -1,0 +1,7 @@
+{
+  "protocolVersion": "short-pilot-v1",
+  "targetSeconds": 900,
+  "scoredTrialSeconds": 20,
+  "practiceTrialSeconds": 15,
+  "neutralResetSeconds": 15
+}

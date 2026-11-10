@@ -37,14 +37,14 @@ pixel ratio; that warning is never shown to the participant.
 ## 3. During the session
 
 The participant works through: consent → eye-tracking consent and screen measurement →
-demographics → baseline check-in → instructions (think aloud) → six practice trials → four
-blocks (scenario → check-in → three trials → check-in with fatigue → 60-s neutral reset) →
-questionnaires → debrief. Eye-tracking calibration runs before the first scored trial;
+demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
+blocks (scenario → check-in → three trials → check-in with fatigue → 15-s neutral reset) →
+questionnaires → debrief. Eye-tracking calibration runs before the first induction;
 failing the 1.5° gate ends the session before any scored trial.
 
 On the admin dashboard, the session row shows the phase, latest menu and trial, and flags:
 
-- **stuck Ns**: the current trial has run for 60 s or more. Offer help only from this point.
+- **stuck Ns**: the current trial has reached the short-pilot help threshold. Keep any assistance neutral.
 - **distress N/10**: a check-in reported distress above 6. The session has already stopped
   and gone to the debrief; stay with the participant (plan §15.3).
 - **viewport warning**: the browser is not at 1920 × 1080 at 1×.
@@ -77,6 +77,9 @@ All other participant wording (consent, scripts, items, debrief) is in `apps/web
 - `npm run audit:balance` prints the chi-square randomisation balance report.
 - Pilot analysis scripts and their limits: `packages/analysis/docs/pilot-analysis.md`.
   Pilot data are excluded from confirmatory analysis.
+
+See [short pilot protocol](short-pilot.md) for the 15-minute activity target and revised
+pilot acceptance checks. The historical dashboard criteria still reference the original plan.
 
 ## 7. Go/no-go
 

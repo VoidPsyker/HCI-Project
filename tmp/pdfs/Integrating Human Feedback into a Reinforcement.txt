@@ -1,0 +1,1089 @@
+Integrating Human Feedback into a Reinforcement
+Learning-Based Framework for Adaptive User Interfaces
+Daniel Gaspar-Figueiredo
+Universitat Politècnica de València and Instituto
+Tecnológico de Informática
+Valencia, Spain
+dagasfi@epsa.upv.es
+Marta Fernández-Diego
+Universitat Politècnica de València
+Valencia, Spain
+marferdi@omp.upv.es
+Silvia Abrahão
+Universitat Politècnica de València
+Valencia, Spain
+sabrahao@dsic.upv.es
+Emilio Insfran
+Universitat Politècnica de València
+Valencia, Spain
+einsfran@dsic.upv.es
+Abstract
+Adaptive User Interfaces (AUI) play a crucial role in modern soft-
+ware applications by dynamically adjusting interface elements to
+accommodate users’ diverse and evolving needs. However, existing
+adaptation strategies often lack real-time responsiveness. Rein-
+forcement Learning (RL) has emerged as a promising approach
+for addressing complex, sequential adaptation challenges, enabling
+adaptive systems to learn optimal policies based on previous adapta-
+tion experiences. Although RL has been applied to AUIs,integrating
+RL agents effectively within user interactions remains a challenge.
+In this paper, we enhance a RL-based Adaptive User Interface
+adaption framework by incorporating personalized human feed-
+back directly into the leaning process. Unlike prior approaches that
+rely on a single pre-trained RL model, our approach trains a unique
+RL agent for each user, allowing individuals to actively shape their
+personal RL agent’s policy, potentially leading to more personal-
+ized and responsive UI adaptations. To evaluate this approach, we
+conducted an empirical study to assess the impact of integrating
+human feedback into the RL-based Adaptive User Interface adap-
+tion framework and its effect on User Experience (UX). The study
+involved 33 participants interacting with AUIs incorporating hu-
+man feedback and non-adaptive user interfaces in two domains:
+an e-learning platform and a trip-planning application. The results
+suggest that incorporating human feedback into RL-driven adapta-
+tions significantly enhances UX, offering promising directions for
+advancing adaptive capabilities and user-centered design in AUIs.
+CCS Concepts
+• Software and its engineering→ Software design engineer-
+ing; • Human-centered computing→ User interface design; Em-
+pirical studies in HCI ; • Computing methodologies→ Rein-
+forcement learning.
+Keywords
+Adaptive Systems, Adaptive User Interfaces, User Experience, Rein-
+forcement Learning, Human Feedback.
+1 Introduction
+Adaptive systems and Adaptive User Interfaces (AUI) address usabil-
+ity challenges by dynamically adjusting interface elements [3, 34].
+Existing adaptation approaches, including recommendation sys-
+tems and configurable UIs [18, 24, 36], often struggle with complex,
+long-term adaptation and holistic interface optimization. Most ex-
+isting research has focused on adapting isolated UI elements, such
+as menus [9, 29, 32], rather than holistically optimizing the entire
+interface. This limitation highlights the need for approaches capable
+of handling the inherent complexity of adapting the entire interface
+dynamically. Furthermore, many existing adaptation strategies rely
+on pre-defined rules or offline models, which lack the flexibility to
+support real-time user interactions.
+Recent advancements in Artificial Intelligence (AI), particularly
+Machine Learning (ML), offer promising avenues to support more
+effective UI adaptation. Among these, Reinforcement Learning (RL)
+has emerged as a robust solution for managing the complexities of
+adaptive interfaces. Unlike traditional ML approaches that optimize
+specific UI features using static adaptation models (or do not learn
+from past actions over time), RL enables an agent to learn adaptive
+policies that evolve over time by continuosly refining its decisions
+based on past interactions, which can be useful to guide changes
+across the entire interface. By modeling the UI adaptation problem
+as a sequential decision-making process, an RL agent can optimize
+key quality attributes, such as User Experience (UX), over extended
+interaction periods, by maximizing cumulative rewards that reflect
+overall user experience.
+However, designing effective RL-based UI adaptations requires
+careful consideration of the reward function, which quantifies the
+success of each adaptation and guides the agent toward beneficial
+adjustments. A poorly designed reward function can lead to sub-
+optimal behaviors, where the agent prioritizes factors that do not
+align with user needs. To address this problem, a new and growing
+area of RL research explores the integration of human feedback
+(HF), where humans directly influence the agent’s learning process
+by providing input on its decisions. Human feedback offers a mech-
+anism to refine the reward signal, ensuring that the agent’s learned
+adaptations align more closely with user preferences. Despite its
+potential, effectively incorporating human feedback into RL-based
+adaptation remains an open challenge.
+Building upon the RL-based UI adaptation framework proposed
+by Gaspar-Figueiredo et al. [16], we aim to address its limitations
+by incorporating human feedback directly into the learning and
+adaptation process. The original framework lacked mechanisms for
+arXiv:2504.20782v1  [cs.HC]  29 Apr 2025
+EASE 2025, 17–20 June, 2025, Istanbul, Türkiye Gaspar-Figueiredo et al.
+capturing user preferences and was solely evaluated in simulated
+environments, limiting its applicability to real-world interactions.
+Our initial extension [15] introduced human feedback but applied
+a single HF model across all users, failing to account for individual
+preferences and resulting in suboptimal adaptation outcomes.
+Neglecting individualized human feedback in adaptive systems
+can result in user interfaces that fail to respond effectively to actual
+user preferences. Without direct user input, RL agents must rely on
+generalized data or simulated feedback, which often fails to capture
+individual behaviors and contextual requirements. This limitation
+reduces the system’s ability to fine-tune adaptations based on real-
+world interactions, potentially missing opportunities for deeper
+personalization [5]. Addressing this gap requires leveraging human
+feedback mechanisms to refine RL agents at an individual level,
+ensuring that adaptive UI strategies align more closely with user
+preferences and ultimately improve user satisfaction..
+In this paper, we therefore enhance the RL-based framework for
+UI adaptations proposed by Gaspar-Figueiredo et al. [16] by inte-
+grating human feedback directly into the learning and adaptation
+process, enabling users to shape adaptations in real-time. Addi-
+tionally, to evaluate the effectiveness of this approach, we report
+the results of an empirical study aimed at evaluating the impact
+of Human Feedback on RL-based UI adaptations and their effect
+on user experience, using non-adaptive interfaces as a baseline for
+comparison. Since non-adaptive systems provide a fixed and con-
+sistent experience, they serve as a suitable benchmark for assessing
+the effectiveness of RL-based AUIs.
+This paper is organized as follows: Section 2 review existing
+empirical studies on adaptive user interfaces. Section 3 provides an
+overview of the original RL-based UI adaptation framework and de-
+tails our extension to incorporate human feedback at an individual
+level (by each user). Section 4 describes the design and execution of
+the empirical study, while Section 5 presents the results and explores
+their implications for research and practice. Section 6 addresses
+potential threats to the validity of the findings. Finally, Section 7
+concludes the paper and outlines future research directions.
+2 Related Work
+The Software Engineering (SE) and Human-Computer Interaction
+(HCI) communities communities have made significant progress
+in advancing the design and evolution of AUIs by leveraging AI
+techniques. Despite positive results in some studies [39], challenges
+remain, including unpredictability, detrimental adaptations, inaccu-
+rate interpretation of user needs, and limited user involvement. A
+fundamental aspect of applying RL to AUIs is defining an appro-
+priate reward function, which is challenging, especially when user
+goals are ambiguous or the impact of actions is unclear.
+Prior research has explored various RL approaches for UI adapta-
+tion. Langerak et al. [23, 24]proposed a multi-agent RL framework.
+Vidmanov and Alfimtsev [35] integrated a usability reward model.
+Todi et al. [32] employed Monte Carlo Tree Search (MCTS) with
+predictive HCI models. The authors in [16] integrated predictive
+HCI models into a RL-based approach, demonstrating RL’s poten-
+tial to automate UI adaptation based on usability metrics. However,
+this study relied on simulations, failing to capture the complexities
+and variability of real-world user behavior.
+Prior research has explored various RL approaches for UI adap-
+tation. Langerak et al. [23, 24] proposed a multi-agent RL frame-
+work in which a user agent learns to interact with the UI while
+an interface agent learns to adapt it. Vidmanov and Alfimtsev [35]
+extended this approach by integrating a usability reward model,
+enabling cooperative adaptation of UI elements to enhance user
+experience. Similarly, Todi et al. [32] employed Monte Carlo Tree
+Search (MCTS) combined with predictive HCI models to simulate
+and evaluate UI adaptation strategies. By leveraging a pretrained
+value network, their approach mitigated the computational cost of
+online simulations while maintaining a high success rate.
+Similarly, in [16], the authors integrated predictive HCI models
+into a RL-based approach for AUIs. This study trained and evaluated
+RL agents in a simulated environment to assess their effectiveness in
+adapting UIs, specifically aiming to maximize user engagement. The
+results demonstrated RL’s potential to automate UI adaptation based
+on general-purpose usability metrics. However, a major limitation
+of this study was its reliance on simulations, without involving
+user interactions. Consequently, the study was unable to capture
+the complexities and variability of user behavior that occur in real-
+world scenarios, where individual preferences and interactions can
+vary widely.
+To the best of our knowledge, no prior work has applied Rein-
+forcement Learning with Human Feedback (RLHF) to AUIs. Build-
+ing on this foundation, we extended the framework [16] by incor-
+porating human feedback, distinguishing our approach from prior
+work by explicitly integrating user preferences into the adaptation
+process. While previous studies have explored RL-based UI adap-
+tation through predictive models and automated agents, our work
+emphasizes direct human feedback to refine adaptation strategies,
+thereby aligning the adaptations more closely with user needs.
+In a previous empirical study [ 15], we used a general model,
+trained solely on feedback provided by the experimenter (when
+training the RL models), to incorporate human feedback into the
+adaptation process. This approach aimed to assess whether user
+feedback, even provided only by the experimenters, could enhance
+user satisfaction and user engagement when interacting with AUIs.
+Specifically, the study compared AUIs which used predictive HCI
+models and AUIs which used predictive HCI models augmented
+with human feedback to non-adaptive interfaces. The findings sug-
+gested a potential for human feedback to improve user satisfaction
+and engagement, despite lacking statistical significance. However,
+the study had limitations, primarily due to the use of a general
+feedback model that may have been insufficiently sensitive to in-
+dividual user preferences. The experimenter’s preferences, which
+shaped the model, may not have accurately reflected the diversity
+of the participant base.
+This paper addresses the limitations of using a general prefer-
+ence model by incorporating personalized RL agents trained by
+each user. Unlike the previous study [15], where a general model
+was trained based on experimenter-provided feedback, we now
+introduce models that learn directly from individual users, allowing
+the system to adapt more precisely to their unique preferences
+and needs. By comparing AUIs with personalized feedback models
+to non-adaptive interfaces, this study aims to deepen our under-
+standing of how user-specific adaptations impact user satisfaction
+and engagement. This progression illustrates the evolution of the
+Integrating Human Feedback into a Reinforcement Learning-Based Framework for Adaptive User Interfaces EASE 2025, 17–20 June, 2025, Istanbul, Türkiye
+framework—from initial simulations, to general feedback, and now
+to a fully personalized, “human-in-the-loop” adaptation strategy.
+3 RL-Based UI Adaptation Framework
+This section presents the RL-based UI adaptation framework. First,
+we provide an overview of the original framework [1], detailing its
+components and their functions. Subsequently, we explain how we
+extended this framework to incorporate human feedback directly
+into the learning process.
+3.1 Overview of the Original Framework
+As shown in Figure 1, the framework consists of four main parts:
+Context of Use, Software System, Intelligent UI Adaptor, and External
+Sources.
+The Context of Use represents the user(s) interacting with their
+platform or device in any physical environment [11]. The Monitor
+component senses and abstracts relevant data into model fragments
+(Context Model) within theSoftware System. The user model captures
+end-user data (e.g., gender, age, interaction history, abilities, pref-
+erences, emotional state). The platform model captures platform
+data (e.g., screen resolution, sizes, interaction capabilities, CPU
+availability). The environment model captures environmental data
+influencing the UI (e.g. location, light, noise level) [1].
+Within this architecture, the Intelligent UI Adaptor includes key
+elements that drive the adaptation process: theAdaptation Manager,
+Adaptation Engine and Adaptation Machine Learning (subsequently
+formalized as a Reinforcement Learning Agent in [16]). This agent
+operates within a Markov Decision Process (MDP), optimizing
+adaptations based on state information (drawn from the UI Model
+and Context Model ), actions (defined by Adaptation Capabilities),
+and reward (sourced from External Sources).
+The Adaptation Manager orchestrates the adaptation process,
+managing initiation, execution, and completion to align adaptations
+with user needs. The manager works with the RL agent to execute
+adaptations based on learned policies, using the adaptation logic in
+the Adaptation Engine, which is usually implemented in the form of
+adaptation rules. The Adaptation Manager also monitors adaptation
+outcomes, providing feedback to theRL agent to refine its strategies.
+This real-time feedback loop allows the RL agent to evaluate the
+success of its decisions and refine its strategies, ensuring that the
+system learns which adaptations are most effective and preferred
+by the user.
+3.2 Extending the RL-based Framework for AUI
+We extended the original framework by introducing new com-
+ponents and mechanisms to support more personalized, human-
+centered adaptations. Key contributions include enhancements to
+AUIs, the inclusion of a Human Feedback Module to predict adapta-
+tion rewards through Reward Modelling, and its implementation.
+3.2.1 Adaptive User Interfaces. To illustrate the extended frame-
+work’s flexibility, consider an example implementation of adaptive
+user interfaces across different application domains 1. As part of
+the Software System, the user interface must include the Adaptation
+1Available at https://github.com/RESQUELAB/Adaptive-app
+Capabilities. These adaptations are guided by a RL agent trained to
+optimize user experience.
+For instance, the UI adaptive capabilities include:
+• Layout Adjustments: Reorganizing elements for readability
+or emphasis, such as vertical lists or grid layouts (e.g., two
+to five columns).
+• Font Size Modifications : Adjustments for readability, benefit-
+ing users with visual impairments.
+• Content Density Control : Adjusting the amount of informa-
+tion displayed, from detailed content to condensed sum-
+maries.
+• Theme Adjustments: Modifying the color scheme and visual
+theme to match user preferences and reduce eye strain.
+• Widget Customization: Adapting navigation menus between
+list and dropdown formats.
+By standardizing these adaptation actions across domains, the
+framework supports consistent evaluation and comparison of their
+impact on UX metrics. It is important to note that these represent
+examples of adaptations implemented for this study; however, the
+framework is not constrained to these specific actions. Its design
+allows for the incorporation of additional or alternative adaptations
+for other domains or application requirements.
+3.2.2 Reward Models and Human Feedback for AUIs . We
+extended the framework by integrating a dual-source reward [12]
+mechanism for the RL Agent, aligning the adaptation process with
+both general knowledge and user preferences. As shown in Figure 1,
+the Reward Model uses two types of sources. The first reward source
+uses baseline predictive Human Computer Interaction models , devel-
+oped using ML algorithms applied to data, information, wisdom,
+and knowledge from External Sources, to provide a belief about user
+status. The second reward source incorporates Human Feedback
+from the Human Feedback Module, serving as a reward modifier that
+directly influences adaptation outcomes to reflect user satisfaction
+and preferences. This feedback allows the RL Agent to refine its
+strategies.
+Human feedback is obtained through the Offline Feedback Col-
+lector, which supports multiple standardized feedback encoding
+formats, including comparative feedback, attribute feedback, evalu-
+ative feedback, visual feedback, and keypoint feedback (see [38] for
+detailed descriptions). To elicit this feedback, users are presented
+with a curated set of Adaptation Examples generated in advance,
+rather than during live system interaction. This design supports
+an offline learning process, where user preferences are gathered in
+batch and subsequently processed by aPreference Model. The model
+can be trained using various neural network architectures, such as
+Multilayer Perceptrons or Convolutional Neural Networks [38].
+Each user that provides feedback will have their own personal-
+ized Preference Model, which evolves dynamically as more feedback
+is collected. This model ensures that the adaptation process be-
+comes increasingly customized to the individual’s preferences over
+time, leading to a system capable of fine-tuning its decisions to
+align with the specific needs and expectations of each user.
+By embedding user feedback directly into the reward structure,
+the framework adopts a "human-in-the-loop" approach, transform-
+ing it into a cooperative interaction loop between the user and
+the system. This integration allows the adaptive system to move
+EASE 2025, 17–20 June, 2025, Istanbul, Türkiye Gaspar-Figueiredo et al.
+Software System
+Business Logic
+Context Model
+User Model
+Platform Model
+Environment Model
+Intelligent UI Adaptor
+User Platform
+Context of Use
+Monitor
+External Sources
+Data Information
+KnowledgeWisdom
+User Interface
+Action
+State
+Reward
+UI Model
+Adaptive Capabilities
+Human Feedback Module
+Adaptation 
+Examples
+Adaptation Manager
+Reinforcement 
+Learning Agent
+Offline Feedback 
+Collector
+Preference Model 
+…
+…
+…Preferences
+Reward Model
+Predictive 
+HCI models
+Human 
+Feedback
+Adaptation 
+Engine
+Figure 1: Extended intelligent UI adaptation framework from [ 1]. Human Feedback Module and Reward Model are the main
+contributions in this paper.
+beyond a generic adaptation strategy, creating a cooperative in-
+teraction loop where the agent continuously refines its decisions
+based on specific user input. By coupling baseline HCI metrics with
+human feedback, we aim to address the gap in intelligent UI adap-
+tation: the need for interfaces that are both technically efficient and
+meaningfully aligned with the human aspects of interaction [1].
+3.2.3 Implementation. We used the replication package pro-
+vided by Gaspar-Figueiredo et al. [16], which utilizes OpenAI Gym [7]
+to offer a structured environment for RL implementations. Using
+OpenAI Gym, we defined the system’s states (Context Model and UI
+Model), actions (Adaptation Capabilities), and reward mechanisms.
+These elements ensure compatibility with RL algorithms such as
+Q-Learning [16] and Monte Carlo Tree Search [8]. The extended
+framework is available here: https://github.com/RESQUELAB/RL-
+Based-Framework
+4 Experimental Study
+Following the GQM template for goal definition [10], the goal of
+this study is to analyze the integration of Human Feedback from
+individual users into a RL-based UI adaptation approach with the
+purpose of assessing its impact as regards adapting UIs with re-
+spect to its ability to improve the user experience from the point-
+of-view of both novice developers and researchers interested in
+adaptive user interfaces.
+The study involves Master’s students in Computer Science at
+the Universitat Politècnica de València (UPV) , interacting with UIs
+from two domains: an e-learning system and a trip-planning system.
+These domains test UI adaptation and show how domain specificity
+influences user feedback and adaptations.
+4.1 Research Question and Hypothesis
+We aim to investigate the extent to which incorporating human
+feedback into RL-based UI adaptations affects the user experience
+across different domains. User experience is operationalized in
+terms of user satisfaction and user engagement (see the next sub-
+section for details). The research question (RQ) and hypotheses
+guiding the investigation are as follows:
+RQ1: How does incorporating human feedback into a reinforce-
+ment learning-based UI adaptation affect the overall user experi-
+ence?
+• 𝐻𝑛1: There is no significant difference in user satisfaction
+between AUIs that use predictive HCI models with person-
+alized human feedback and non-adaptive UIs.
+• 𝐻𝑛2: There is no significant difference in user engagement
+between AUIs that use predictive HCI models with person-
+alized human feedback and non-adaptive UIs.
+The statistical analysis aims to reject these hypotheses and accept
+the alternative ones (e.g.,𝐻𝑎1 =¬𝐻𝑛1). These two-sided hypotheses
+do not postulate any effect from different adaptation strategies.
+Non-adaptive interfaces serve as a baseline to evaluate the im-
+pact of RL-based UI adaptations, isolating the contributions of RL
+mechanisms and human feedback. This approach also reflects real-
+world applications where static designs are common. Prior work
+showed no statistically significant difference among Adaptive and
+non-adaptive approaches, highlighting the need for further research
+on how RL-based adaptations and human feedback influence user
+experience.
+4.2 Variables
+This section outlines the variables, measurement scales, and their
+operationalization.
+4.2.1 Independent Variables. The main independent variable
+is the UI adaptation strategy , a nominal variable with two levels:
+Adaptive UI with human feedback (Adaptive) and Non-Adaptive
+UI (NA). The secondary independent variable is the application
+domain, a nominal variable with two levels: Trips (a travel planning
+application) and Courses (an e-learning system).
+4.2.2 Dependent Variables. The primary dependent variable is
+UX, defined by ISO 9241-210: 2010 as "a person’s perceptions and
+Integrating Human Feedback into a Reinforcement Learning-Based Framework for Adaptive User Interfaces EASE 2025, 17–20 June, 2025, Istanbul, Türkiye
+responses that result from the use and/or anticipated use of a product,
+system, or service. " Unlike task-oriented interactions, UX encom-
+passes a broader focus on “experience, ” which includes hedonic
+qualities, emotions, and effects (e.g., feelings of interest, enthu-
+siasm, or irritation) that users encounter while interacting with
+software systems. Given its multifaceted nature, UX can be opera-
+tionalized in various ways. In this study, we assessed UX through
+two key dimensions: user satisfaction and user engagement.
+User satisfaction is a measure of the quality of UX and reflects the
+extent to which a user’s expectations are met [31]. It was assessed
+using the Questionnaire for User Interaction Satisfaction (QUIS) [26],
+evaluating user acceptance of a computer interface across factors
+like ease of use, consistency, system capability, and learnability,
+rated on a 10-point scale, and an aggregated score was calculated
+for each participant.
+User engagement reflects the quality of user interaction with
+software systems, including aesthetics, sensory appeal, perceived
+control, time awareness, motivation, and emotional responses [13,
+25, 27]. It was measured using the User Engagement Scale (UES)
+questionnaire [28], a 31-item questionnaire assessing six dimensions:
+focused attention, perceived usability, aesthetic appeal, endurability,
+novelty, and involvement. Each item was rated on a five-point Likert
+scale, and an aggregated user engagement score was calculated for
+each participant.
+4.3 Subjects
+Participants were recruited using convenience sampling, a non-
+probability method selecting individuals based on availability [6].
+The study targeted Master’s students in computer science at the
+Universitat Politècnica de València.
+A total of 33 participants (23 male, 7 female, and 3 Non-Binary)
+were recruited. 15 participants work as software developers. Partic-
+ipation was voluntary, and participants received informed consent
+detailing the study’s purpose and procedures. The study was con-
+ducted on-site and adhered to the UPV’s IRB protocol. The consent
+form explicitly stated that no personal data would be collected; if
+any data were to be collected, it would not be published and would
+be destroyed after the study’s conclusion.
+4.4 Design
+Figure 2 provides an overview of our study methodology and out-
+comes, which unfold across three sessions. In Session 1 (User Feed-
+back), participants’ preferences regarding AUIs are collected. Ses-
+sion 2 (RL Agent Training) involves training a personalized RL agent
+for each participant, incorporating both predictions from an HCI
+model and individual preferences from Session 1. Finally, in Session
+3 (User Interaction), participants interact with both adaptive and
+non-adaptive UIs to evaluate their impact on UX. The following
+sections detail each session.
+4.4.1 User Feedback Session . To collect human feedback, we
+developed a web app2 that facilitates the display of video clips show-
+casing multiple adaptations in sequence. We chose comparative
+feedback for its simplicity and universality [38]. In this implementa-
+tion, video clips were presented for pairwise comparisons, allowing
+2Available at https://github.com/RESQUELAB/RL-Teacher-UIAdaptation
+users to directly provide feedback on their preferences through
+relative comparisons. Each video depicted the evolution of a user
+interface through various adaptations, including changes in layout,
+font size, content density, theme, and widget type. These adapta-
+tions were shown across two domains: Courses and Trips. A total
+of 64 video clips (32 per domain) were generated by the experi-
+menter and reviewed by another researcher with expertise in UI
+design. The participants evaluated multiple pairs of video clips,
+with the system using a red-black tree [ 14] to organize the clips
+and iteratively requested feedback from participants to rank them
+according to their preferences. Participants continued evaluating
+pairs of clips until all clips were sorted and ranked. They assessed
+each adaptation based on usability and aesthetic appeal perceptions.
+Each clip lasted approximately four seconds to minimize fatigue
+and maintain engagement.
+4.4.2 RL Agent Training Session . RL agents were trained us-
+ing the GA3C (GPU Asynchronous Advantage Actor-Critic) algo-
+rithm [4], an extension of A3C (Asynchronous Advantage Actor-
+Critic) with GPU acceleration. GA3C handles high dimensional state
+and action spaces in UI adaptation by processing multiple asynchro-
+nous agents in parallel on GPU threads, incorporating user-specific
+preferences from feedback. The actor-critic framework refines the
+policy (actions taken) and value estimates (expected outcomes)
+based on participant input.
+Personalized adaptation behavior was achieved using a dual
+reward structure [12]. The primary reward was based on a predic-
+tive HCI model for general user interaction patterns. The reward
+modifier, generated by a Fully Connected Multi-Layer Perceptron
+trained on feedback from the video comparison session (Section
+4.4.1), adjusted the baseline reward to align the agent’s behavior
+with user preferences, creating a unique RL agent for each user.
+4.4.3 User Interaction Session . A balanced within-subject two-
+treatment factorial crossover design was used, where each partici-
+pant interacted with adaptive and non-adaptive techniques across
+two domains (Courses and Trips). The order of techniques is ran-
+domized to control for ordering effects. Each session was followed
+by QUIS and UES questionnaires. This design addresses small sam-
+ple sizes and increases the sensitivity of experiments [33].
+In a balanced crossover design, the measures are taken from a
+participant several times (i.e. a participant is assigned to a sequence
+of treatments). The crossover design was defined by following the
+guidelines proposed by Vegas et al. [33]. We specifically analyzed
+not only the effects of the treatments (i.e. Adaptive, NA) on the de-
+pendent variables, but also the effects of critical crossover variables
+(i.e. period, sequence and carryover).
+Each group followed a different sequence of adaptation tech-
+niques and domains, producing four different sequences (see Table
+1). In the first period 1, participants in Group 1 began their interac-
+tion with the non-adaptive system in the Courses domain, while
+Group 4 also used the non-adaptive system but within the Trips
+domain. In contrast, in the same period, participants in Group 2
+interacted with the adaptive app in the Trips domain, and Group
+3 used the adaptive app in the Courses domain. Following these
+interactions, each of the four groups completed the QUIS and UES
+questionnaires to assess their levels of satisfaction and engagement
+with the respective adaptation technique and domain.
+EASE 2025, 17–20 June, 2025, Istanbul, Türkiye Gaspar-Figueiredo et al.
+1) User Feedback Session 2) RL Agent Training Session 3) User Interaction Session
+Participants’ 
+Preferences
++
+Courses System Trips System
+Feedback on UI Adaptations
+(Adaptive vs. Non-Adaptive Uis)
+RL Agent with GA3C
+Reward Modifier 
+(Individual Preferences
+HCI Models
+(General Preferences)
+Reward Model
+User 
+Interacting 
+with AUIs
+ QUIS
+ UES
+Experimental 
+Data
+Trained 
+RL Agent
++
+User Satisfaction 
+Score
+User Engagement 
+Score
+Findings
+Figure 2: Experimental methodology: 1) Feedback collection; 2) Individualized RL agent training; and 3) User interaction with
+AUIs and non-adaptive UIs
+Table 1: Study design for session 3
+Group Period 1 Period 2Technique Domain Technique Domain
+1 NA Courses Adaptive Trips
+2 Adaptive Trips NA Courses
+3 Adaptive Courses NA Trips
+4 NA Trips Adaptive Courses
+Techniques: Adaptive / Non-Adaptive (NA)
+Domains: E-learning (Courses) / Trip-planning (Trips)
+The second period, maintained a similar structure, with Groups
+2 and 3 switching to the non-adaptive systems, specifically using
+the Courses and Trips domains, respectively. Meanwhile, Groups 1
+and 4 transitioned to the adaptive systems in the Trips and Courses
+domains, respectively. Similarly, after their interactions, the four
+groups completed the QUIS and UES questionnaires.
+These sequences were carefully selected to ensure that potential
+order effects would be minimized. This crossover design makes it
+possible to detect carryover effects by analyzing the data separately
+for each order to see whether it had an effect on the results, thus
+ensuring that any potential bias due to the sequence of treatments
+can be identified and accounted for.
+4.5 Instrumentation
+The experimental setup included framework implementation (Sec-
+tion 3), registration, consent agreements, and task instructions. The
+registration process assigned each participant to a personalized RL
+agent. Participants completed a demographic form and provided
+informed consent, outlining the study’s objectives, data protection,
+and ethical standards compliance. Participants received instructions
+for tasks in each application domain (Trips and Courses), including
+key interactions such as consulting personal information, browsing
+items, and making selections. User experience was assessed using
+standardized questionnaires (Section 4.2.2).
+4.6 Execution
+The empirical study spanned two weeks, with two phases. Phase 1
+involved preparatory tasks, including feedback collection and RL
+agent training. Phase 2 involved the user study, where participants
+interacted with Adaptive and NA interfaces across the Courses and
+Trips domains. Each participant attended two sessions in total,
+ensuring balanced exposure to the different interfaces and domains.
+4.6.1 Feedback Session. The human feedback collection phase
+involved participants evaluating pre-generated UI adaptation clips
+from simulation environments.
+Participants registered in a system linking them to an RL agent.
+Each participant reviewed 64 UI adaptation clips ( 32 from each
+domain: Courses and Trips) and provided pairwise comparisons to
+indicate their preferred adaptation. This resulted in 8, 356 human
+feedback responses. Responses were balanced using a red-black
+tree structure, a type of self-balancing binary search tree [14], so
+the number of responses per participant varied.
+4.6.2 RL Agent Training Session . The RL agent training phase
+was conducted on a high-performance computer equipped with
+an Intel Core i9-13900KF CPU, 64 GB DDR5 RAM, and an NVIDIA
+GeForce RTX 4090 GPU to handle the computational demands.
+Over three days, each participant’s RL agent underwent1,000,000
+training steps using the GA3C algorithm. The training process
+employed a dual-reward system: a predictive HCI model trained
+on interaction data collected from 25 users interacting with an e-
+commerce interface under various UI configurations (e.g., grid vs.
+list layout, light vs. dark theme), used to model general engagement
+patterns [15]; and a personalized reward modifier trained on indi-
+vidual feedback. This iterative approach ensured that each RL agent
+was uniquely tailored to reflect its assigned participant’s specific
+preferences.
+4.6.3 User Interaction Session. Participants used their pre-assigned
+RL agent. Participants, already registered and assigned to a group,
+accessed the adaptive or non-adaptive systems in the sequence
+(domain and technique) based on their group.
+Each session consisted of the following steps:
+Integrating Human Feedback into a Reinforcement Learning-Based Framework for Adaptive User Interfaces EASE 2025, 17–20 June, 2025, Istanbul, Türkiye
+(1) Introduction and explanation of the task: The experimenter
+introduced the session and explained the task to the partici-
+pants.
+(2) Task execution: The participants performed the tasks using
+the UI and the technique assigned to them. The tasks to be
+performed included:
+• Trip Planner system: Participants were asked to imagine
+planning a 5-day trip with a limited budget and explore
+the system for the best option.
+• Course Management system: Participants were asked to
+imagine they wanted to take online courses to improve
+their skills in a specific area, with a limited budget to add
+as many courses as possible. The experimenter offered
+clarifications to avoid confusion.
+(3) Post-task questionnaires: Upon completion of each session,
+participants filled out the QUIS and UES questionnaires
+through a dedicated page in the adaptive application, evalu-
+ating their satisfaction and engagement with each UI.
+Sessions 1 and 3 were conducted in a controlled lab environment,
+with uniform equipment and software configurations. Each par-
+ticipant was provided with a desk setup consisting of a computer
+screen, mouse, and keyboard. The order of the experimental ses-
+sions was counterbalanced to control for potential order effects.
+Each session lasted, a most, 120 minutes, though participants were
+given as much time as they needed to complete their tasks without
+time constraints.
+4.7 Analysis Plan
+QUIS and UES questionnaire responses were analyzed to assess
+participants’ perceptions of engagement and satisfaction. Internal
+consistency was tested using Cronbach’s alpha (threshold 𝛼 ≥
+0.70) [19].
+We employed a combination of descriptive statistics, violin plots,
+and statistical tests to analyze the data collected during the ex-
+periment. Since the study utilized a crossover design, in addition
+to analyzing the primary experimental factors, it was essential to
+include period, sequence, and potential carryover effects. Hypothe-
+ses were tested using a Linear Mixed Model (LMM), following the
+guidelines established by Vegas et al. [33]. In the model, the follow-
+ing fixed factors were included: adaptation technique (treatment),
+domain (experimental object), and group or sequence (which was
+confounded with carryover and treatment*period interaction). Sub-
+ject was included as a random factor nested within the sequence.
+The LMM allowed us to determine whether these factors signif-
+icantly influenced the results. Assumptions for LMMs were thor-
+oughly tested and reported. Specifically, we confirmed that the
+residuals of the models met the normality requirement by applying
+the Shapiro-Wilk test [33]. Additionally, we used the Levene’s test
+for equality of variances to ensure homogeneity among residuals.
+The LMM was applied to each dependent variable in order to
+assess whether the technique, domain or sequence (confounded
+with carryover and treatment*period interaction) had statistical
+significance. This represents the probability that the result could
+have occurred by chance due to a Type I error.
+4
+6
+8
+10
+Adaptive Non−Adaptive
+Technique
+User Satisfaction (1−10)
+2
+3
+4
+5
+Adaptive Non−Adaptive
+Technique
+User Engagement (1−5)
+Figure 3: Violin plots of User Satisfaction and User Engage-
+ment by Technique. The blue dashed line represents the neu-
+tral midpoint for each scale. The red cross marker indicates
+the mean value for each technique.
+5 Results
+This section presents the quantitative analysis of the empirical study
+results. All data analyses were conducted in R version 4.4.0 [ 30].
+The linear mixed model analysis was run using the lmerTest pack-
+age [21], which provides p-values for tests for fixed effects.
+5.1 Descriptive Statistics and Exploratory Data
+Analysis
+Table 2 summarizes the descriptive statistics for User Satisfaction
+and User Engagement, grouped by the Adaptive UI with human
+feedback (Adaptive) and Non-Adaptive UI (NA) techniques. Both
+variables showed a higher mean for the adaptive interface, indi-
+cating a tendency toward increased satisfaction and engagement
+when using the adaptive UI compared to the non-adaptive UI.
+The distribution of scores is further illustrated through violin
+plots in Figure 3, which provides a visual comparison of User Satis-
+faction and User Engagement scores between the two techniques.
+The User Satisfaction scores, measured on a scale from 1 to 10, show
+distinct distributions between the two techniques, indicating differ-
+ences in perceived satisfaction. Similarly, User Engagement scores,
+assessed on a scale from 1 to 5, also demonstrate variation, with the
+Adaptive technique appearing to elicit more consistent and higher
+levels of engagement compared to the Non-Adaptive approach. The
+blue dashed line in each plot represents the midpoint of the respec-
+tive scales. Both techniques exceed this threshold suggesting that,
+regardless of the observed differences, users generally rated their
+satisfaction and engagement as favorable.
+Table 2: Descriptive statistics for User Satisfaction and User
+Engagement by Technique
+Variable Technique Min Max Mean Med Std.
+User
+Satisfaction
+Adaptive 4.61 8.98 6.90 7.02 1.11
+NA 3.27 7.00 5.93 6.02 0.79
+User
+Engagement
+Adaptive 2.26 4.43 3.41 3.46 0.61
+NA 1.90 4.64 3.18 3.19 0.57
+EASE 2025, 17–20 June, 2025, Istanbul, Türkiye Gaspar-Figueiredo et al.
+Table 3: Fixed Effects Estimates of the LMMs.
+User Satisfaction User Engagement
+Predictors Estimates Lower CI Upper CI p-value Estimates Lower CI Upper CI p-value
+(Intercept) 6.50 5.85 7.14 <0.001 *** 3.27 2.90 3.64 <0.001 ***
+domain [trips] -0.06 -0.29 0.17 0.600 -0.07 -0.25 0.12 0.458
+technique [Non-Adaptive] -0.97 -1.20 -0.74 <0.001 *** -0.23 -0.41 -0.04 0.016 *
+group [2] 0.88 -0.04 1.79 0.060 0.45 -0.06 0.96 0.085
+group [3] 0.64 -0.24 1.53 0.152 0.17 -0.33 0.66 0.504
+group [4] 0.29 -0.55 1.13 0.498 0.11 -0.36 0.58 0.631
+Note: * p <0.05; ** p <0.01; *** p <0.001
+5.2 Hypotheses Testing
+Model assumptions were evaluated for both dependent variables
+(User Satisfaction and User Engagement). The Shapiro-Wilk test was
+used to confirm the normality of residuals, indicating no significant
+deviation from normality (𝑝 > 0.05). Homogeneity of variances
+was assessed using Levene’s test, with results (𝑝 > 0.05) verifying
+that variances were consistent across conditions. These findings
+confirm that the assumptions required for conducting the Linear
+Mixed Model analysis were satisfactorily met.
+Following the descriptive analysis and assumption testing, we
+built a Linear Mixed Model for each dependent variable. The results
+of the fixed effects are shown in Table 3. On the one hand, the analy-
+sis showed that the technique used had a significant impact onUser
+Satisfaction, with non-adaptive technique resulting in lower satis-
+faction levels (Estimate =−0.97,𝑝 < 0.001). This finding supports
+the hypothesis that users would express higher satisfaction with
+adaptive techniques compared to the non-adaptive one. Conversely,
+the domain variable did not exhibit a significant effect (Estimate
+=−0.06,𝑝 = 0.602), indicating that User satisfaction did not sig-
+nificantly differ between the Courses and Trips domains. Since
+group was confounded with carryover and the technique*period
+interaction, we can conclude that none of these variables are sig-
+nificant. Thus, there is no carryover effect between the techniques.
+On the other hand, for the engagement model, the technique used
+also demonstrated a significant effect, with the non-adaptive tech-
+nique associated with a lower engagement level (Estimate =−0.23,
+𝑝 = 0.016). This result supports the hypothesis that adaptive tech-
+niques would lead to higher engagement levels compared to the
+non-adaptive one. As with satisfaction, the domain variable did not
+produce a statistically significant effect on engagement (Estimate =
+−0.07,𝑝 = 0.458), suggesting that engagement levels were consis-
+tent across both the Courses and Trips domains. Similarly to User
+Satisfaction, there is no carryover effect between the techniques.
+Table 4 shows the mean random effects variance ( 𝛼 2) of the
+model and random intercept variance (𝜏00) which indicates how
+much subjects differ from each other. The ICC (Intraclass Corre-
+lation Coefficient) of 76% and 55% indicates good and moderate
+reliability [20] for User Satisfaction and User Engagement respec-
+tively, i.e. a single individual produces consistent measurements.
+In other words, it means more difference among individuals than
+within them, justifying the individual differences modeled by ran-
+dom effects. Besides, the 𝑅2 values provide further insight into
+the explained variance for each model. For User Satisfaction, the
+Conditional𝑅2 was 0.828, indicating that 82.8% of the variance is
+explained by both fixed and random factors, with the Marginal𝑅2
+at 0.281, suggesting that the fixed effects alone account for 28.1% of
+this variance. This points out to a the role of individual differences
+in User Satisfaction. Similarly, for User Engagement, the Conditional
+𝑅2 was 0.605, showing that 60.5% of the variance is explained by
+both fixed and random effects, while the Marginal𝑅2 of 0.113 indi-
+cates that fixed factors account for only 11.3% of the variance. This
+finding emphasizes the greater influence of individual differences
+on user satisfaction relative to user engagement.
+Table 4: Random Effects of the LMMs.
+Random Effects User Satisfaction User Engagement
+𝛼 2 0.21 0.14
+𝜏00 0.68 user 0.17 user
+ICC 0.76 0.55
+N 33 user 33 user
+Observations 66 66
+Marginal𝑅2 0.281 0.113
+Conditional𝑅2 0.828 0.605
+In summary, these findings suggest that the adaptation strategy
+used in this experiment, namely Adaptive UI with individualized
+human feedback which create a unique RL Agent for each user,
+significantly enhances both User Satisfaction and User Engagement,
+independent of domain, thereby supporting the hypothesis that
+this adaptation technique positively impact user experience.
+5.3 Discussion
+This study provides valuable insights into individualized prefer-
+ence models in AUIs. Differing from our previous experiment [15],
+which found no significant differences between adaptive and non-
+adaptive interfaces, the current study underscores the value of
+adaptation strategies informed by individual user data. Unlike the
+earlier study, which used a generalized human feedback model,
+trained by an experimenter for all participants, the present study
+employed individualized preference models, leveraging both pre-
+dictive HCI models and human feedback to train a unique RL agent
+for each user. This resulted in statistically significant improvements
+in user satisfaction and engagement, emphasizing the effectiveness
+of personalized adaptation strategies.
+To the best of our knowledge, a broader insight is the absence of
+standardized methodologies to address the core challenges associ-
+ated with AUIs. Key challenges include defining the AUI problem,
+Integrating Human Feedback into a Reinforcement Learning-Based Framework for Adaptive User Interfaces EASE 2025, 17–20 June, 2025, Istanbul, Türkiye
+developing adaptation strategies, evaluating adaptations, and sys-
+tematically collecting and integrating human feedback. This lack
+of standards represents a significant gap in the field. In contrast,
+domains like large language models (LLMs) have greatly benefited
+from well-defined standards for tasks such as feedback collection,
+model evaluation, and adaptation, which have unlocked the full po-
+tential of human feedback [17, 22]. To bring AUIs to a similar level of
+progress, the development of shared frameworks and benchmarks
+would be highly beneficial. Specifically, establishing standardized
+approaches for representing AUIs and gathering human feedback
+could enhance both the consistency and comparability of research,
+5.4 Implications for Research and Practice
+This study offers broader implications for both researchers and
+practitioners. For researchers, it provides a framework for cap-
+turing user feedback and incorporating it into a decision-making
+system that adapts the UI according to individual user preferences.
+The systematic approach outlined in this paper serves as a guide
+for future studies aimed at refining RL-based methodologies for
+collecting and applying human feedback. These insights could con-
+tribute to the development of more sophisticated UI adaptation
+algorithms. In addition, the experimental design and materials de-
+fined in this study have been made available for replication at
+https://figshare.com/s/4b93d59ee39853aeaa88.
+For developers, the findings underscore the practical benefits of
+integrating individualized preference models into adaptive systems.
+By employing such models, software applications can dynamically
+respond to user preferences, enhancing personalization and deliv-
+ering a more efficient user experience. This capability is especially
+valuable in domains where user diversity and task complexity re-
+quire highly flexible and responsive systems.
+Additionally, the study provides a framework for how user feed-
+back can shape the design of adaptive systems, offering a systematic
+approach to guide future UI adaptation strategies. Researchers may
+leverage our findings to refine research methodologies for gath-
+ering actionable feedback that informs UI adaptation algorithms,
+while developers can apply these insights to improve their software
+applications’ responsiveness to user preferences, thereby delivering
+more personalized and efficient user experiences.
+Ultimately, this study reinforces the importance of human-centered
+design principles in the development of adaptive systems. The im-
+provements observed in user satisfaction and engagement highlight
+the transformative potential of individualized preference models,
+which not only advance adaptive UI strategies but also contribute
+to shaping the broader landscape of user interaction design. These
+findings inspire further exploration into personalized adaptation
+techniques.
+6 Threats to Validity
+This section addresses potential threats to the experiment’s validity
+and how we attempted to mitigate them [37], categorized as internal,
+conclusion, construct, and external.
+Internal validity threats, which concern influences on the inde-
+pendent variables, primarily included learning effects, the Hawthorne
+effect [2], and maturation effects. To mitigate these, we ensured
+all participants interacted with both Adaptive and non-adaptive
+UIs, and a balanced crossover design was employed to control for
+sequence effects. Participants were instructed to behave naturally
+to minimize the Hawthorne effect, and breaks were incorporated
+to reduce maturation effects.
+Conclusion validity threats, related to the accuracy of inferences
+drawn from the experiment, were addressed through robust experi-
+mental practices. These included recruiting an adequate sample size
+to ensure sufficient statistical power and selecting appropriate sta-
+tistical tests based on data characteristics and assumptions [19, 33].
+Construct validity threats , concerning the ability to generalize
+results to the supporting theory, focused on the validity and relia-
+bility of questionnaires. Strong reliability was demonstrated with
+Cronbach’s alpha for QUIS (0.97) and UES (0.90), indicating excel-
+lent internal consistency. Item-total correlations were also analyzed,
+showing acceptable values.
+External validity threats, related to the generalizability of find-
+ings to broader contexts, were limited by the focus on specific tasks
+and controlled conditions, which may not fully replicate the com-
+plexity of real-world interactions. Mitigation involved designing
+realistic and relevant tasks for the e-learning and trip planning
+domains. However, generalizing to more diverse contexts, such as
+different platforms or environments, remains a limitation. Future
+work should consider a wider range of contextual factors, such as
+platform and environmental variability, to enhance generalizability.
+7 Conclusions and Further Work
+We extended a RL-based framework for AUIs by incorporating in-
+dividualized human feedback into the reward modeling process of
+RL agents, enabling the creation of personalized adaptation strate-
+gies. We evaluated this extended framework through an empirical
+study with human participants, who initially provided feedback
+on various UI adaptations. This feedback was then used to train
+personalized RL agents for each participant. Participants interacted
+with two systems (a trip planning platform and an e-learning plat-
+form) each employing two techniques: a RL-based AUI utilizing
+the personalized agents and a non-adaptive interface. The findings
+suggest that incorporating individualized models derived from hu-
+man feedback significantly enhances both user satisfaction and user
+engagement.
+Further work should explore the scalability of these individu-
+alized models across more domains to improve generalizability
+and investigate real-time feedback integration. Additionally, in-
+vestigating the feasibility of training a single preference model
+to develop cluster-based models using shared user profile charac-
+teristics would be valuable. We also plan experiments to enhance
+the transparency and explainability of our RL-based framework
+for AUIs. Moreover, unlike other domains with established stan-
+dards for ML model development and human feedback collection,
+AUIs currently lack such standardized approaches. Establishing a
+standardized approach could create a baseline for more scalable
+and consistent solutions, making AI-driven UI adaptation more
+feasible and improving system efficiency and effectiveness across
+applications.
+EASE 2025, 17–20 June, 2025, Istanbul, Türkiye Gaspar-Figueiredo et al.
+Acknowledgments
+This work was funded by the GVA under the AKILA project (CIAICO/
+2021/303) and by the AEI under the UCI-Adapt project (PID2022-
+140106NB-I00). D. Gaspar-Figueiredo is funded by the GVA (ACIF/
+2021/172), which is cofunded by the EU through the ESF.
+References
+[1] Silvia Abrahão, Emilio Insfrán, Arthur Sluÿters, and Jean Vanderdonckt. 2021.
+Model-based intelligent user interface adaptation: challenges and future direc-
+tions. Software and Systems Modeling 20, 5 (2021), 1335–1349. doi:10.1007/s10270-
+021-00909-7
+[2] John G Adair. 1984. The Hawthorne effect: a reconsideration of the methodologi-
+cal artifact. Journal of applied psychology 69, 2 (1984), 334.
+[3] Pierre A. Akiki, Arosha K. Bandara, and Yijun Yu. 2014. Adaptive Model-Driven
+User Interface Development Systems. ACM Comput. Surv. 47, 1, Article 9 (may
+2014), 33 pages. doi:10.1145/2597999
+[4] Mohammad Babaeizadeh, Iuri Frosio, Stephen Tyree, Jason Clemons, and Jan
+Kautz. 2017. Reinforcement Learning through Asynchronous Advantage Actor-
+Critic on a GPU. arXiv:1611.06256 [cs.LG] https://arxiv.org/abs/1611.06256
+[5] Tita Alissa Bach, Amna Khan, Harry Hallock, Gabriela Beltrão, and Sonia Sousa.
+2024. A systematic literature review of user trust in AI-enabled systems: An HCI
+perspective. Int. J. Hum. Comput. Interact. 40, 5 (2024), 1251–1266.
+[6] Sebastian Baltes and Paul Ralph. 2022. Sampling in software engineering research:
+a critical review and guidelines. Empirical Software Engineering 27, 4 (28 Apr
+2022), 94. doi:10.1007/s10664-021-10072-8
+[7] Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John
+Schulman, Jie Tang, and Wojciech Zaremba. 2016. OpenAI Gym.
+arXiv:arXiv:1606.01540
+[8] Cameron B. Browne, Edward Powley, Daniel Whitehouse, Simon M. Lucas, Pe-
+ter I. Cowling, Philipp Rohlfshagen, Stephen Tavener, Diego Perez, Spyridon
+Samothrakis, and Simon Colton. 2012. A Survey of Monte Carlo Tree Search
+Methods. IEEE Transactions on Computational Intelligence and AI in Games 4, 1
+(2012), 1–43. doi:10.1109/TCIAIG.2012.2186810
+[9] Duncan P. Brumby and Susan Zhuang. 2015. Visual Grouping in Menu Interfaces.
+In Proceedings of the 33rd Annual ACM Conference on Human Factors in Com-
+puting Systems (Seoul, Republic of Korea) (CHI ’15). Association for Computing
+Machinery, New York, NY, USA, 4203–4206. doi:10.1145/2702123.2702177
+[10] Victor R Basili1 Gianluigi Caldiera and H Dieter Rombach. 1994. The goal question
+metric approach. Encyclopedia of software engineering 1 (1994), 528–532.
+[11] Gaëlle Calvary, Joëlle Coutaz, David Thevenin, Quentin Limbourg, Laurent Bouil-
+lon, and Jean Vanderdonckt. 2003. A Unifying Reference Framework for multi-
+target user interfaces. Interacting with Computers 15, 3 (06 2003), 289–308.
+[12] Paul Christiano, Jan Leike, Tom B. Brown, Miljan Martic, Shane Legg, and
+Dario Amodei. 2023. Deep reinforcement learning from human preferences.
+arXiv:1706.03741 [stat.ML] https://arxiv.org/abs/1706.03741
+[13] Kevin Doherty and Gavin Doherty. 2018. Engagement in HCI: conception, theory
+and measurement. ACM Computing Surveys (CSUR) 51, 5 (2018), 1–39.
+[14] Amr Elmasry, Mostafa Kahla, Fady Ahdy, and Mahmoud Hashem. 2019. Red–
+black trees with constant update time. Acta Informatica 56, 5 (01 Jul 2019),
+391–404. doi:10.1007/s00236-019-00335-9
+[15] Daniel Gaspar-Figueiredo, Marta Fernández-Diego, Silvia Abrahão, and Emilio
+Insfrán. 2025. A Comparative Study on Reward Models for UI Adaptation with Re-
+inforcement Learning. Accepted in Empirical Software Engineering Journal(EMSE)
+(2025). Available at: https://figshare.com/s/da9556a26a047fb44e4b.
+[16] Daniel Gaspar-Figueiredo, Marta Fernández-Diego, Ruben Nuredini, Silvia Abra-
+hao, and Emilio Insfran. 2024. Reinforcement Learning-Based Framework for the
+Intelligent Adaptation of User Interfaces. InSymposium on Engineering Interactive
+Computing Systems (EICS ’24) . 40–48. doi:10.1145/3660515.3661329
+[17] Alexander Havrilla, Maksym Zhuravinskyi, Duy Phung, Aman Tiwari, Jonathan
+Tow, Stella Biderman, Quentin Anthony, and Louis Castricato. 2023. trlX: A
+Framework for Large Scale Reinforcement Learning from Human Feedback. In
+Conference on Empirical Methods in Natural Language Processing, Houda Bouamor,
+Juan Pino, and Kalika Bali (Eds.). Association for Computational Linguistics,
+Singapore, 8578–8595. doi:10.18653/v1/2023.emnlp-main.530
+[18] Wiard Jorritsma, Fokie Cnossen, and Peter MA van Ooijen. 2015. Adaptive
+support for user interface customization: a study in radiology. International
+Journal of Human-Computer Studies 77 (2015), 1–9.
+[19] Maxwell K.D. 2002. Applied Statistics for Software Managers. Applied Statistics
+for Software Managers (2002), . https://cir.nii.ac.jp/crid/1573668924056253312
+[20] Terry K. Koo and Mae Y. Li. 2016. A Guideline of Selecting and Reporting
+Intraclass Correlation Coefficients for Reliability Research.Journal of Chiropractic
+Medicine 15, 2 (2016), 155–163. doi:10.1016/j.jcm.2016.02.012
+[21] Alexandra Kuznetsova, Per B. Brockhoff, and Rune H. B. Christensen. 2017.
+lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical
+Software 82, 13 (2017), 1–26. doi:10.18637/jss.v082.i13
+[22] Viet Lai, Chien Nguyen, Nghia Ngo, Thuat Nguyen, Franck Dernoncourt, Ryan
+Rossi, and Thien Nguyen. 2023. Okapi: Instruction-tuned Large Language Models
+in Multiple Languages with Reinforcement Learning from Human Feedback. In
+Conference on Empirical Methods in Natural Language Processing , Yansong Feng
+and Els Lefever (Eds.). Association for Computational Linguistics, Singapore,
+318–327. doi:10.18653/v1/2023.emnlp-demo.28
+[23] Thomas Langerak, Sammy Christen, Mert Albaba, Christoph Gebhardt, and
+Otmar Hilliges. 2022. MARLUI: Multi-Agent Reinforcement Learning for Goal-
+Agnostic Adaptive UIs. arXiv preprint arXiv:2209.12660 , (2022), .
+[24] Thomas Langerak, Sammy Christen, Mert Albaba, Christoph Gebhardt, Christian
+Holz, and Otmar Hilliges. 2024. MARLUI: Multi-Agent Reinforcement Learning
+for Adaptive Point-and-Click UIs. Proc. ACM Hum.-Comput. Interact. 8, EICS,
+Article 253 (June 2024), 27 pages. doi:10.1145/3661147
+[25] Janette Lehmann, Mounia Lalmas, Elad Yom-Tov, and Georges Dupret. 2012.
+Models of User Engagement. In User Modeling, Adaptation, and Personalization ,
+Judith Masthoff, Bamshad Mobasher, Michel C. Desmarais, and Roger Nkambou
+(Eds.). Springer Berlin Heidelberg, Berlin, Heidelberg, 164–175.
+[26] Kent L Norman, Ben Shneiderman, B Harper, and L Slaughter. 1998. Question-
+naire for user interaction satisfaction. Available at: https://site.unibo.it/hfrs/en/
+questionnaire-and-scales-2/quis.
+[27] Heather L O’Brien and Elaine G Toms. 2008. What is user engagement? A
+conceptual framework for defining user engagement with technology. Journal of
+the American society for Information Science and Technology 59, 6 (2008), 938–955.
+[28] Heather L. O’Brien, Paul Cairns, and Mark Hall. 2018. A practical approach to
+measuring user engagement with the refined user engagement scale (UES) and
+new UES short form. International Journal of Human-Computer Studies 112 (2018),
+28–39. doi:10.1016/j.ijhcs.2018.01.004
+[29] Gaëlle Calvary Sara Bouzit and Denis Chêne et al. 2016. A Comparison of
+Shortcut and Step-by-Step Adaptive Menus for Smartphones.European Workshop
+on Imagery and Cognition (2016), 1–12. doi:10.14236/ewic/HCI2016.26
+[30] R Core Team. 2013. R: A language and environment for statistical computing. R
+Foundation for Statistical Computing. (No Title) (2013), .
+[31] Ergonomics of human-system interaction Technical Committee ISO/TC 159.
+Subcommittee SC 4. 2018. ISO 9241-11:2018 Ergonomics of Human-system
+Interaction: Egonomie de L’interaction Homme-système. Usability : definitions
+and concepts. Utilisabilité : définitions et concepts. Part 11. Partie 11 . ISO, .
+https://books.google.es/books?id=Uc8dygEACAAJ
+[32] Kashyap Todi, Gilles Bailly, Luis Leiva, and Antti Oulasvirta. 2021. Adapting
+User Interfaces with Model-Based Reinforcement Learning. In Proceedings of the
+2021 CHI Conference on Human Factors in Computing Systems (Yokohama, Japan)
+(CHI ’21). Association for Computing Machinery, New York, NY, USA, Article
+573, 13 pages. doi:10.1145/3411764.3445497
+[33] Sira Vegas, Cecilia Apa, and Natalia Juristo. 2015. Cross-Over Designs in Software
+Engineering Experiments: Benefits and Perils. IEEE Transactions on Software
+Engineering 42 (01 2015), 1–1. doi:10.1109/TSE.2015.2467378
+[34] Gianni Viano, Andrea Parodi, James Alty, Chris Khalil, Inaki Angulo, Daniele
+Biglino, Michel Crampes, Christophe Vaudry, Veronique Daurensan, and Philippe
+Lachaud. 2000. Adaptive User Interface for Process Control Based on Multi-
+Agent Approach. In Proc. of the Working Conference on Advanced Visual Interfaces
+(Palermo, Italy) (A VI ’00). Association for Computing Machinery, New York, NY,
+USA, 201–204. doi:10.1145/345513.345316
+[35] Dmitry Vidmanov and Alexander Alfimtsev. 2024. Mobile User Interface Adapta-
+tion Based on Usability Reward Model and Multi-Agent Reinforcement Learning.
+Multimodal Technologies and Interaction 8, 4 (2024), . doi:10.3390/mti8040026
+[36] Wei Wang, Hourieh Khalajzadeh, John Grundy, Anuradha Madugalla, and
+Humphrey O. Obie. 2024. Adaptive User Interfaces for Software Supporting
+Chronic Disease. In International Conference on Software Engineering (Lisbon,
+Portugal) (ICSE-SEIS’24). Association for Computing Machinery, New York, NY,
+USA, 118–129. doi:10.1145/3639475.3640104
+[37] Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell, and
+Anders Wesslén. 2012. Empirical Strategies. Springer Berlin Heidelberg, Berlin,
+Heidelberg, 9–36. doi:10.1007/978-3-642-29044-2_2
+[38] Yifu Yuan, Jianye Hao, Yi Ma, Zibin Dong, Hebin Liang, Jinyi Liu, Zhixin Feng,
+Kai Zhao, and Yan Zheng. 2024. Uni-RLHF: Universal Platform and Benchmark
+Suite for Reinforcement Learning with Diverse Human Feedback. arXiv preprint
+arXiv:2402.02423 (2024), .
+[39] Lamia Zouhaier, Yousra BenDalyHlaoui, and Leila Ben Ayed. 2023. Adaptive user
+interface based on accessibility context. Multimedia Tools and Applications 82, 23
+(01 Sep 2023), 35621–35650. doi:10.1007/s11042-023-14390-5

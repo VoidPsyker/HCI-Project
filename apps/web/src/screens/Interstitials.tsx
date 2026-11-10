@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { INDUCTIONS, INSTRUCTIONS, MEDIA, STATE_COPY, type InductionState } from "../content";
+import { INDUCTIONS, INSTRUCTIONS, MEDIA, SESSION_TIMING, STATE_COPY, type InductionState } from "../content";
 import { LocalClip } from "../components/LocalClip";
 
 export function InstructionsScreen({ onStart }: { onStart: () => void }) {
@@ -49,25 +49,25 @@ export function BlockIntroScreen({
       </div>
       <h1>{INDUCTIONS[state].title}</h1>
       <p className="lede">
-        The next scenario lasts up to 90 seconds. It is designed to create a mild version of one everyday browsing
+        The next scenario lasts up to {INDUCTIONS[state].durationSeconds} seconds. It is designed to create a mild version of one everyday browsing
         feeling. It is not a test of you.
       </p>
       <div className="block-timeline">
         <div>
           <strong>Scenario</strong>
-          <span>up to 90 s</span>
+          <span>up to {INDUCTIONS[state].durationSeconds} s</span>
         </div>
         <div>
           <strong>Check-in</strong>
-          <span>about 1 min</span>
+          <span>rate how you feel</span>
         </div>
         <div>
           <strong>Three searches</strong>
-          <span>up to 6 min</span>
+          <span>up to {3 * SESSION_TIMING.scoredTrialSeconds} s searching</span>
         </div>
         <div>
           <strong>Neutral reset</strong>
-          <span>60 s</span>
+          <span>{SESSION_TIMING.neutralResetSeconds} s</span>
         </div>
       </div>
       <div className="warning-box soft">
@@ -93,7 +93,7 @@ export function NeutralResetScreen({
   state: InductionState;
   onContinue: () => void;
 }) {
-  const duration = fastMode ? 1_000 : 60_000;
+  const duration = fastMode ? 1_000 : SESSION_TIMING.neutralResetSeconds * 1000;
   const [remaining, setRemaining] = useState(duration);
   useEffect(() => {
     const start = performance.now();

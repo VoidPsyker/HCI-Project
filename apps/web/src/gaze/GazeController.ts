@@ -589,7 +589,11 @@ export class GazeController implements GazeTrialHandle {
     this.generation++;
     this.unwatchViewport?.();
     this.unwatchViewport = null;
-    if (this.state === "stopped" || this.state === "completed" || this.state === "withdrawn") return;
+    if (this.state === "completed" || this.state === "withdrawn") return;
+    if (this.state === "stopped") {
+      await this.uploader?.flushAll(1, 200);
+      return;
+    }
     this.setStatus("stopping");
     this.endActiveTrial();
     try {
@@ -597,13 +601,12 @@ export class GazeController implements GazeTrialHandle {
     } finally {
       try {
         await this.uploader?.flushAll(1, 200);
-      } catch {
-        // A stopped session may still have unsent data; the debrief reports it.
+      } finally {
+        this.uploader?.stop();
+        this.unsubscribe?.();
+        this.unsubscribe = null;
+        this.setStatus("stopped");
       }
-      this.uploader?.stop();
-      this.unsubscribe?.();
-      this.unsubscribe = null;
-      this.setStatus("stopped");
     }
   }
 

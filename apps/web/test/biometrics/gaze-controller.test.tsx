@@ -233,6 +233,20 @@ describe("GazeController regression tests", () => {
     return controller;
   }
 
+  it("reports stopped uploads and allows the retained samples to be retried", async () => {
+    const batch = vi.spyOn(api, "batch");
+    const controller = await calibratedController({ autoFlushMs: null, batchSize: 1000 });
+    await controller.beginTrial({ trial_id: "upload-trial", menu_id: "A", target_product_id: "prod-1" });
+    source.emit({ x_px: 500, y_px: 500, valid: true });
+    batch.mockRejectedValue(new Error("offline"));
+    await expect(controller.stop()).rejects.toThrow("offline");
+    expect(controller.status).toBe("stopped");
+    expect(controller.pendingUploads).toBeGreaterThan(0);
+    batch.mockImplementation(async (_sessionId, _token, payload) => ({ ok: true, accepted: payload.samples.length, duplicate: false, last_seq: payload.samples.at(-1)?.seq ?? 0 }));
+    await controller.stop();
+    expect(controller.pendingUploads).toBe(0);
+  });
+
   it("invalidates calibration and stops capture after a mid-trial viewport change", async () => {
     let viewport = TEST_VIEWPORT;
     const onError = vi.fn();

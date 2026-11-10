@@ -23,7 +23,7 @@ import { gazeApi } from "./gaze/gazeClient";
 import { WebGazerSource } from "./biometrics/webgazer";
 import { loadBundledWebGazer } from "./biometrics/webgazerLoader";
 import { grantGazeConsent } from "./biometrics/consent";
-import { GAZE_CONSENT_VERSION } from "./content";
+import { GAZE_CONSENT_VERSION, SESSION_TIMING } from "./content";
 
 const SERVER_PHASE: Partial<Record<string, string>> = {
   gaze_consent: "consent",
@@ -60,6 +60,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const gazeStartingRef = useRef(false);
   const gazeCalibratedRef = useRef(false);
   const gazeFinalizedRef = useRef(false);
+  const completionLoggedRef = useRef<string | null>(null);
   const [gazeAttempt, setGazeAttempt] = useState(0);
   const [gazeStarting, setGazeStarting] = useState(false);
   const [gazeStartError, setGazeStartError] = useState<string | null>(null);
@@ -91,7 +92,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
 
   useEffect(() => {
     if (!state.session || !state.session.participant_id) return;
-    const instance = new EventLogger(state.session.participant_id, state.session.session_id);
+    const instance = new EventLogger(state.session.participant_id, state.session.session_id, setBanner);
     loggerRef.current = instance;
     setLogger(instance);
     return () => {
@@ -118,7 +119,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
 
   useEffect(() => {
     return () => {
-      void gazeRef.current?.stop();
+      void gazeRef.current?.stop().catch(() => undefined);
       gazeRef.current = null;
     };
   }, []);
@@ -135,7 +136,9 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         device_pixel_ratio: window.devicePixelRatio,
         fast_mode: fastMode,
         taxonomy_hash: state.design?.taxonomyHash ?? null,
-        study: "pilot"
+        study: "pilot",
+        protocol_version: SESSION_TIMING.protocolVersion,
+        session_target_seconds: SESSION_TIMING.targetSeconds
       }
     });
     state.setStartedLogged(true);
@@ -205,7 +208,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     controller
       .start()
       .then(() => {
-        if (!cancelled && gazeRef.current === controller) setGazeReady(true);
+        if (!cancelled && gazeRef.current === controller && !useRunnerStore.getState().abortReason) setGazeReady(true);
       })
       .catch((startFailure: Error) => {
         if (cancelled || gazeRef.current !== controller) return;
@@ -237,7 +240,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     const controller = gazeRef.current;
     if (!controller) return;
     if (state.phase === "trial" || state.phase === "product" || state.phase === "calibration") return;
-    void controller.pause();
+    void controller.pause().catch(() => undefined);
   }, [state.phase]);
 
   const handleConsent = async (version: string) => {
@@ -246,6 +249,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       const response = await recordConsent(sessionId, version);
+      if (useRunnerStore.getState().abortReason) return;
       logger.log({ event_type: "consent", state_label: "mixed", meta: { version } });
       state.setSession(response.session);
       state.setParticipant({
@@ -307,10 +311,11 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const handleCalibrated = (report: CalibrationReport) => {
+    if (useRunnerStore.getState().abortReason) return;
     setGazeReport(report);
     if (report.passes === true && report.angular_available) {
       gazeCalibratedRef.current = true;
-      state.setPhase("trial_intro");
+      state.setPhase("block_intro");
       return;
     }
     state.setPhase("gaze_failed");
@@ -326,6 +331,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       const response = await submitDemographics(sessionId, data);
+      if (useRunnerStore.getState().abortReason) return;
       logger.log({
         event_type: "demographics",
         state_label: "mixed",
@@ -374,6 +380,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const handleInductionComplete = () => {
+    if (useRunnerStore.getState().abortReason) return;
     const block = state.design?.blocks[state.blockIndex];
     logger?.setContext({ block_id: block?.blockId ?? null, state_label: block?.stateLabel ?? "mixed" });
     state.setCheckinPhase("post_induction");
@@ -443,7 +450,9 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const finishPractice = () => {
+    const lastPractice = state.practiceIndex + 1 >= (state.design?.practiceTrials.length ?? 0);
     state.nextPractice();
+    if (lastPractice) state.setPhase("calibration");
   };
 
   const finishMainTrial = () => {
@@ -466,7 +475,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       await submitQuestionnaires(responses);
-      state.setPhase("debrief");
+      if (!useRunnerStore.getState().abortReason) state.setPhase("debrief");
     } catch (questionnaireError) {
       setBanner((questionnaireError as Error).message);
     } finally {
@@ -476,6 +485,17 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
 
   const finishDebrief = async () => {
     if (state.phase === "aborted" || state.abortReason) {
+      try {
+        await gazeRef.current?.stop();
+        gazeRef.current = null;
+      } catch {
+        setBanner("Eye-tracking data have not finished saving. Keep this page open and retry when connected.");
+        return;
+      }
+      if (!(await logger?.flush())) {
+        setBanner("Session data have not finished saving. Keep this page open and retry when connected.");
+        return;
+      }
       state.complete("STOPPED");
       return;
     }
@@ -502,15 +522,16 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         setBusy(false);
       }
     }
-    const code = makeCode();
-    logger?.setContext({ state_label: "mixed", block_id: null, trial_id: null, task_id: null, target_id: null, menu_id: null });
-    logger?.log({ event_type: "session_end", state_label: "mixed", meta: { completed: true, completion_code: code } });
-    try {
-      await patchSessionState(sessionId, { status: "completed", phase: "debrief" });
-    } catch {
-      // Ingestion of session_end already marks the session complete.
+    const code = completionLoggedRef.current ?? makeCode();
+    if (!completionLoggedRef.current) {
+      logger?.setContext({ state_label: "mixed", block_id: null, trial_id: null, task_id: null, target_id: null, menu_id: null });
+      logger?.log({ event_type: "session_end", state_label: "mixed", meta: { completed: true, completion_code: code } });
+      completionLoggedRef.current = code;
     }
-    await logger?.flush();
+    if (!(await logger?.flush())) {
+      setBanner("Session data have not finished saving. Keep this page open and retry when connected.");
+      return;
+    }
     state.complete(code);
   };
 

@@ -477,7 +477,7 @@ export class Repository {
         if (!session) throw new Error(`session not found: ${input.session_id}`);
         sessionCache.set(input.session_id, session);
         if (session.participant_id !== input.participant_id) throw new Error("participant/session mismatch");
-        if (input.event_type === "session_end" && session.status !== "completed") {
+        if (input.event_type === "session_end" && input.meta?.completed !== false && session.status !== "completed") {
           this.assertGazeFinalizedForCompletion(input.session_id);
         }
         if (input.event_type === "trial_end" && input.trial_id) {
@@ -534,9 +534,11 @@ export class Repository {
           .prepare("UPDATE sessions SET last_event_at=? WHERE session_id=?")
           .run(tServer, input.session_id);
         if (input.event_type === "session_end") {
+          const aborted = input.meta?.completed === false;
           this.db
-            .prepare("UPDATE sessions SET status='completed', phase='debrief', ended_at=? WHERE session_id=?")
-            .run(tServer, input.session_id);
+            .prepare("UPDATE sessions SET status=?, phase='debrief', ended_at=?, abort_reason=? WHERE session_id=?")
+            .run(aborted ? "aborted" : "completed", tServer,
+              aborted ? String(input.meta?.abort_reason ?? "stopped") : null, input.session_id);
         }
         if (input.event_type === "session_start") {
           this.db
@@ -544,18 +546,28 @@ export class Repository {
             .run(tServer, input.session_id);
         }
       }
+      const trialIds = new Set(acceptedRows.map((row) => row.trial_id).filter((id): id is string => id !== null));
+      for (const trialId of trialIds) this.recomputeTrial(trialId);
     });
     tx();
 
-    const trialIds = new Set<string>();
-    for (const row of acceptedRows) {
-      const archived = { ...row, meta: row.meta };
-      delete (archived as { meta_json?: string }).meta_json;
-      const line = JSON.stringify(archived) + "\n";
-      fs.appendFileSync(path.join(this.rawDir, `${row.session_id}.jsonl`), line, "utf8");
-      if (row.trial_id) trialIds.add(row.trial_id);
+    const archive = (row: EventRow) => {
+      const { meta_json, ...rest } = row;
+      return JSON.stringify({ ...rest, meta: parseMeta(meta_json) }) + "\n";
+    };
+    if (duplicates > 0) {
+      // A prior database commit may have succeeded before its archive write failed.
+      for (const sessionId of new Set(events.map((event) => event.session_id))) {
+        const rows = this.db.prepare("SELECT * FROM events WHERE session_id=? ORDER BY rowid").all(sessionId) as EventRow[];
+        const target = path.join(this.rawDir, sessionId + ".jsonl");
+        fs.writeFileSync(target + ".tmp", rows.map(archive).join(""), "utf8");
+        fs.renameSync(target + ".tmp", target);
+      }
+    } else {
+      for (const row of acceptedRows) {
+        fs.appendFileSync(path.join(this.rawDir, row.session_id + ".jsonl"), archive(row), "utf8");
+      }
     }
-    for (const trialId of trialIds) this.recomputeTrial(trialId);
     // Re-sent events are expected (offline queue, unload beacon); the QA report shows how many were absorbed.
     if (duplicates) this.setMeta("duplicate_event_ids", String(Number(this.getMeta("duplicate_event_ids") ?? 0) + duplicates));
     return { accepted: acceptedRows.length, duplicates, trialEndConflicts };

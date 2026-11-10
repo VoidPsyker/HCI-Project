@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ExperimentRunner } from "../../src/ExperimentRunner";
 import { useRunnerStore } from "../../src/store";
@@ -8,7 +8,11 @@ const mocks = vi.hoisted(() => ({
   start: vi.fn(),
   stop: vi.fn(),
   loadSession: vi.fn(),
-  patchSessionState: vi.fn()
+  patchSessionState: vi.fn(),
+  stopSession: vi.fn(),
+  log: vi.fn(),
+  flush: vi.fn(),
+  submitDemographics: vi.fn()
 }));
 
 vi.mock("../../src/api", () => ({
@@ -16,19 +20,19 @@ vi.mock("../../src/api", () => ({
   loadSessionStatus: vi.fn(async () => ({ status: "in_progress", phase: "calibration", abort_reason: null })),
   patchSessionState: mocks.patchSessionState,
   recordConsent: vi.fn(async () => ({ session: {} })),
-  stopSession: vi.fn(async () => ({ session: {} })),
-  submitDemographics: vi.fn(async () => ({ design: null, session: {} })),
+  stopSession: mocks.stopSession,
+  submitDemographics: mocks.submitDemographics,
   submitQuestionnaires: vi.fn(async () => ({ ok: true, accepted: 0 })),
   withdrawSession: vi.fn(async () => ({ ok: true }))
 }));
 
 vi.mock("../../src/logger", () => ({
   EventLogger: class {
-    log() {}
+    log(event: unknown) { mocks.log(event); }
     setContext() {}
     interruptTrial() {}
     beacon() {}
-    flush() {}
+    flush() { return mocks.flush(); }
     discard() {}
     destroy() {}
   }
@@ -57,6 +61,14 @@ vi.mock("../../src/biometrics/webgazer", () => ({
   }
 }));
 
+vi.mock("../../src/components/TrialRunner", () => ({
+  TrialRunner: ({ onComplete }: { onComplete: () => void }) => <button onClick={onComplete}>Complete practice</button>
+}));
+
+vi.mock("../../src/screens/Demographics", () => ({
+  DemographicsScreen: ({ onSubmit }: { onSubmit: (data: Record<string, unknown>) => void }) => <button onClick={() => onSubmit({})}>Submit demographics</button>
+}));
+
 vi.mock("../../src/biometrics/webgazerLoader", () => ({ loadBundledWebGazer: vi.fn() }));
 vi.mock("../../src/biometrics/consent", () => ({ grantGazeConsent: vi.fn() }));
 
@@ -79,7 +91,10 @@ const design = { blocks: [], practiceTrials: [], trials: [] } as unknown as Stud
 
 describe("ExperimentRunner calibration reload", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mocks.patchSessionState.mockResolvedValue({ session: {} });
+    mocks.stopSession.mockResolvedValue({ session: {} });
+    mocks.flush.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -170,4 +185,73 @@ describe("ExperimentRunner calibration reload", () => {
     });
     expect(useRunnerStore.getState().phase).toBe("debrief");
   });
+  it("keeps a run available after the 15-minute target", async () => {
+    const participant = { label: "Participant", consent_version: "v1", consented_at: new Date(Date.now() - 901_000).toISOString() };
+    mocks.loadSession.mockResolvedValue({ session: session(), participant, design });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("gaze-consent-screen");
+    fireEvent(window, new Event("focus"));
+    fireEvent(document, new Event("visibilitychange"));
+    expect(useRunnerStore.getState().abortReason).toBeNull();
+    expect(useRunnerStore.getState().phase).toBe("gaze_consent");
+    expect(mocks.stopSession).not.toHaveBeenCalled();
+  });
+
+  it("does not show completion while stopped session events remain unsaved", async () => {
+    const participant = { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() };
+    const stopped = { ...session(), status: "aborted", abort_reason: "participant_stop" };
+    mocks.loadSession.mockResolvedValue({ session: stopped, participant, design });
+    mocks.flush.mockResolvedValue(false);
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("debrief-screen");
+    fireEvent.click(screen.getByTestId("finish-session"));
+    expect(await screen.findByText(/have not finished saving/i)).toBeVisible();
+    expect(useRunnerStore.getState().phase).toBe("aborted");
+    mocks.flush.mockResolvedValue(true);
+    fireEvent.click(screen.getByTestId("finish-session"));
+    await waitFor(() => expect(useRunnerStore.getState().phase).toBe("complete"));
+  });
+
+  it("allows a pending form save to finish after the time target", async () => {
+    const participant = { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() };
+    mocks.loadSession.mockResolvedValue({ session: session(), participant, design });
+    let resolveSave!: (value: unknown) => void;
+    mocks.submitDemographics.mockImplementation(() => new Promise((resolve) => { resolveSave = resolve; }));
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("gaze-consent-screen");
+    act(() => useRunnerStore.getState().setPhase("demographics"));
+    fireEvent.click(screen.getByText("Submit demographics"));
+    act(() => useRunnerStore.getState().setParticipant({ ...participant, consented_at: new Date(Date.now() - 901_000).toISOString() }));
+    await act(async () => resolveSave({ session: session(), design }));
+    expect(useRunnerStore.getState().phase).toBe("baseline");
+    expect(useRunnerStore.getState().abortReason).toBeNull();
+  });
+
+  it("retries completion without emitting another completion code", async () => {
+    const participant = { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() };
+    mocks.loadSession.mockResolvedValue({ session: session(), participant, design });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("gaze-consent-screen");
+    act(() => useRunnerStore.getState().setPhase("debrief"));
+    mocks.flush.mockResolvedValue(false);
+    fireEvent.click(screen.getByTestId("finish-session"));
+    await screen.findByText(/have not finished saving/i);
+    mocks.flush.mockResolvedValue(true);
+    fireEvent.click(screen.getByTestId("finish-session"));
+    await waitFor(() => expect(useRunnerStore.getState().phase).toBe("complete"));
+    expect(mocks.log.mock.calls.filter(([event]) => event.event_type === "session_end")).toHaveLength(1);
+  });
+
+  it("calibrates after practice before starting the first induction", async () => {
+    const participant = { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() };
+    const practiceDesign = { ...design, practiceTrials: [{ practiceId: "P1", menuId: "A", taskId: "task", targetId: "target", taskDescription: "Find target", difficulty: "Easy" }] } as StudyDesign;
+    mocks.loadSession.mockResolvedValue({ session: session(), participant, design: practiceDesign });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("gaze-consent-screen");
+    act(() => useRunnerStore.getState().setPhase("practice_intro"));
+    fireEvent.click(screen.getByText("Complete practice"));
+    expect(useRunnerStore.getState().phase).toBe("calibration");
+    expect(mocks.log.mock.calls.filter(([event]) => event.event_type === "induction_start")).toHaveLength(0);
+  });
+
 });

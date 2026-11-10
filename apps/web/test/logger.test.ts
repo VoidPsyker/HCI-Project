@@ -256,6 +256,45 @@ describe("EventLogger", () => {
     logger.discard();
   });
 
+  it("reports unavailable browser recovery storage while still sending to the server", async () => {
+    const report = vi.fn();
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("quota exceeded"); });
+    const logger = new EventLogger("P-quota", "S-quota", report);
+    logger.log({ event_type: "session_start" });
+    expect(report).toHaveBeenCalledWith(expect.stringContaining("recovery copy"));
+    expect(await logger.flush()).toBe(true);
+    logger.discard();
+  });
+
+  it("persists events before sending and retains them until acknowledged", async () => {
+    let resolve!: (value: { ok: boolean }) => void;
+    fetchMock.mockImplementationOnce(() => new Promise((done) => { resolve = done; }));
+    const logger = new EventLogger("P-durable", "S-durable");
+    logger.log({ event_type: "session_start" });
+    const key = "meridian.events.queue.S-durable";
+    expect(storedEvents(key)).toHaveLength(1);
+    const flushing = logger.flush();
+    expect(storedEvents(key)).toHaveLength(1);
+    logger.log({ event_type: "session_end" });
+    expect(storedEvents(key)).toHaveLength(2);
+    resolve({ ok: true });
+    await flushing;
+    expect(storedEvents(key)).toHaveLength(0);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    logger.discard();
+  });
+
+  it.each([true, false])("retains beacon events for acknowledged retry (accepted=%s)", async (accepted) => {
+    Object.defineProperty(navigator, "sendBeacon", { configurable: true, writable: true, value: vi.fn().mockReturnValue(accepted) });
+    const logger = new EventLogger("P-beacon", "S-beacon");
+    logger.log({ event_type: "session_end" });
+    logger.beacon();
+    expect(storedEvents("meridian.events.queue.S-beacon")).toHaveLength(1);
+    await logger.flush();
+    expect(storedEvents("meridian.events.queue.S-beacon")).toHaveLength(0);
+    logger.discard();
+  });
+
   it("sends pending events with sendBeacon on beacon()", async () => {
     const beacon = vi.fn().mockReturnValue(true);
     Object.defineProperty(navigator, "sendBeacon", { configurable: true, writable: true, value: beacon });

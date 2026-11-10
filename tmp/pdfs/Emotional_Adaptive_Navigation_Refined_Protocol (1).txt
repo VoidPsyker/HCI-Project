@@ -1,0 +1,688 @@
+Emotional Adaptive Navigation
+ Revised Research Protocol & Implementation Plan
+Core idea: test distinct menu structures under different emotional contexts, identify which structures
+ work best for each context, and use those findings to drive emotion-contingent navigation.
+Decision
+Selected direction
+Platform
+Simulated e-commerce website / fictional watch store
+Navigation structures
+Horizontal menu, vertical sidebar, mega menu, and fractal/hierarchical menu
+Emotion measurement
+Interaction signals plus brief self-reports; no webcam or facial analysis
+Research scope
+Three linked studies: layout-by-emotion mapping, controlled adaptive-menu test,
+end-to-end system evaluation
+Important design principle. The project does not assume that a particular layout is best for a particular
+emotion. Study 1 estimates the mapping empirically; Study 2 tests whether using that mapping causally
+helps; Study 3 tests the complete system with imperfect emotion estimates.
+ Version 3.0  23 October 2026
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 2
+1. Executive summary
+This project investigates whether an e-commerce website can improve product-finding by adapting its navigation
+structure to a user’s current emotional context. Rather than only changing link priority or adding help text inside one
+fixed menu, the central experiment compares several genuinely different menu structures and asks which structure
+performs best under each measured emotional state.
+The test environment will be a fictional online watch store. Participants will complete controlled product-finding tasks
+using four candidate structures: a horizontal navigation bar, a vertical sidebar, a mega menu, and a
+fractal/hierarchical menu inspired by adaptive hierarchical navigation. The four emotional contexts are positive affect,
+frustration, confusion/lostness, and boredom/disengagement.
+The research is organised into three studies. Study 1 establishes a performance matrix across menu structures and
+emotional contexts. Study 2 tests whether adapting to the Study 1 mapping outperforms a static menu and an
+emotion-mismatched menu. Study 3 evaluates a live system that estimates state using interaction signals anchored
+by brief self-reports and applies the selected structure at safe task boundaries.
+ Sample sizes are provisional planning targets. A pilot and a formal power analysis are required before
+preregistration. The full factorial design may need to be simplified if pilot timing, fatigue, or power analysis
+shows it is too demanding.
+What makes this project distinctive
+  Structure is the main adaptation. The system can switch among different navigation architectures, not merely
+ reorder links within a fixed architecture.
+ Emotion-to-layout mapping is discovered experimentally. No layout is pre-labelled as the correct choice for
+ frustration, confusion, boredom, or positive affect.
+ Emotion inference is treated cautiously. Clicks and pauses are behavioural proxies, not objective proof of
+ emotion; brief self-reports provide the primary state labels.
+ Adaptation safety is part of the design. Whole-menu changes happen between tasks or at an explicit transition,
+ not abruptly while a participant is navigating toward a target.
+2. Research questions and hypotheses
+Primary research question
+Which e-commerce navigation structure best supports product-finding in each of four emotional contexts, and does
+adapting the structure according to that empirically derived mapping improve performance and user experience
+compared with static or mismatched navigation?
+Secondary research questions
+  Do the four menu structures differ in completion time, task success, navigation errors, backtracking, and perceived
+ usability?
+ Do the relative advantages of the menu structures change across emotional contexts, or is one structure
+ consistently best regardless of state?
+ Can interaction features predict self-reported emotional context on held-out participants better than a majority-class
+ baseline?
+ Does emotion-contingent structural adaptation remain beneficial when the system’s emotion estimate is imperfect?
+  Does changing structures create disorientation, loss of spatial memory, or lower user control?
+ 
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 3
+Hypotheses
+ ID
+Hypothesis
+Primary evidence
+H1
+Menu structure and emotional context will interact: relative layout
+performance will differ across at least some contexts.
+Structure × context interaction in
+mixed-effects model
+H2
+A policy that selects the layout supported by Study 1 will improve
+task performance versus a fixed layout.
+Matched adaptive vs static contrast in
+Study 2
+H3
+Emotion-matched adaptation will outperform emotion-mismatched
+adaptation.
+Matched vs mismatched contrast
+H4
+Interaction signals will predict self-reported state above a
+majority-class baseline, but with meaningful uncertainty.
+Participant-grouped validation; macro-F1
+and confusion matrix
+H5
+End-to-end benefits will be smaller than the oracle/known-label test
+and will depend on estimator confidence and transition stability.
+Study 3 compared with Study 2
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 4
+3. Emotional taxonomy and measurement
+Use four operational emotional contexts. They are simplified experimental categories, not a claim that real emotional
+experience is mutually exclusive or can be read directly from clicks. Record self-report ratings as continuous values
+where possible, then use a preregistered rule to identify the dominant context for condition assignment and analysis.
+State
+Operational definition
+Potential behavioural signals (not proof)
+Positive affect
+Participant reports positive valence / good mood
+after a brief positive-feedback or successful-task
+induction.
+More direct choices, fewer reversals; may also
+reflect familiarity or confidence.
+Frustration
+Participant reports irritation or frustration
+following a mild, controlled obstacle or
+unsuccessful interaction.
+Repeated clicks, rapid reversals, repeated
+menu open/close, pauses after failure.
+Confusion / lostness
+Participant reports uncertainty about where a
+product belongs or which navigation path to
+choose.
+Longer pauses, category switching,
+backtracking, repeated menu inspection,
+inconsistent paths.
+Boredom /
+disengagement
+Participant reports low interest or
+under-stimulation after a repetitive,
+low-challenge pre-task activity.
+Long idle gaps, unusually fast guesses,
+reduced exploration, lower engagement
+ratings.
+Measurement protocol
+  Collect brief state ratings immediately after each emotion induction and at selected trial boundaries; keep the
+ questionnaire short to reduce interruption.
+ Use a consistent rating scale for valence and discrete items for frustration, confusion, and boredom. Pilot the
+ wording and check whether participants understand the distinctions.
+ Log timestamps, menu openings, hover/focus events where available, clicks, misclicks, backtracks, category
+ switches, search use, task success, and completion time.
+ Do not label a single pause or backtrack as a particular emotion. Use multiple features, self-report anchors, and
+ uncertainty estimates.
+ No webcam, facial analysis, or biometric sensor is required for the core plan. Eye tracking may be considered only
+ as a separately scoped extension if equipment and approvals are available.
+Emotion induction and ethics
+Use mild, reversible inductions embedded in the task sequence. Avoid humiliating, highly stressful, or personally
+sensitive material. Participants may stop at any time. Debrief them that emotional states were studied as
+experimental contexts and that interaction signals are imperfect indicators. The protocol should be reviewed under
+the institution’s applicable ethics process before recruitment.
+4. Experimental platform: fictional watch store
+Build a controlled web prototype with approximately 100–120 fictional watches and a consistent product taxonomy.
+Product attributes can include price, intended use, style, strap material, case size, movement type, and water
+resistance. Avoid real logos and recognisable brands so prior brand familiarity does not dominate the task.
+Information architecture
+  Define the same categories, labels, products, and destination pages for every menu condition.
+  Use a stable hierarchy of top-level categories, subcategories, and product-level filters; ensure each target product
+ has an unambiguous route.
+ Create matched tasks across difficulty levels, such as finding a dress watch below a budget, a sports watch with a
+ required feature, or a product matching a material/size constraint.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 5
+ Keep visual styling, typography, colour, product cards, content, and page loading behaviour as similar as possible
+ across structures.
+ Log task ID, target ID, assigned menu structure, emotional context, condition order, and every navigation event.
+ 
+Candidate menu structures
+ Structure
+Implementation definition
+Design controls
+A. Horizontal bar
+Top-level categories appear in a horizontal top
+navigation; subcategories open through a consistent
+dropdown or second level.
+Same labels and hierarchy; no extra
+categories.
+B. Vertical sidebar
+Persistent vertical category tree on the left, with
+expandable/collapsible branches.
+Control sidebar width, nesting
+indicators, and expansion behaviour.
+C. Mega menu
+A top-level category opens a larger panel showing
+several related subcategories and selected links at
+once.
+Keep visible link inventory and
+grouping comparable; avoid adding
+information absent elsewhere.
+D. Fractal /
+hierarchical menu
+Progressive, focused navigation through nested levels,
+with clear parent/child relations and a consistent way to
+move back or zoom out.
+Specify exact interaction before
+implementation; preserve predictable
+backtracking and labels.
+The fractal menu must be operationally defined before data collection. The name alone is not enough:
+document its visual states, navigation transitions, hierarchy depth, and recovery path so it can be
+reproduced and fairly compared.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 6
+5. Overall study design
+The studies answer different questions and should not be collapsed into a single test. Study 1 discovers the
+layout-by-emotion performance pattern; Study 2 tests the causal value of using that pattern; Study 3 evaluates a
+realistic estimator and transition policy.
+Study
+Main question
+Design / planning target
+Output
+Pilot
+Are tasks, inductions, and layouts
+understandable and tolerable?
+6–8 participants; small usability
+pilot.
+Refined protocol, timing,
+task difficulty, technical
+fixes.
+Study 1: mapping
+Which structure works best in each
+emotional context?
+Within-participant layout × emotion
+design; planning target around 30
+participants, subject to power
+analysis and fatigue.
+Performance matrix and
+candidate
+emotion-to-layout
+policy.
+Study 2: causal
+test
+Does applying the mapping
+improve outcomes?
+Within-participant comparison of
+static, emotion-matched, and
+emotion-mismatched policies;
+planning target 36–48.
+Causal estimate of
+structural adaptation
+benefit.
+Study 3:
+end-to-end
+Does the system still help when
+state is estimated imperfectly?
+Feasibility study of static vs live
+hybrid adaptation; planning target
+24–36.
+Estimator performance,
+real-world benefit,
+transition/disorientation
+evidence.
+Design burden and feasibility
+Four structures × four emotional contexts creates 16 structure-context cells before adding repeated tasks, order
+counterbalancing, or comparison conditions. A fully repeated-measures Study 1 may be tiring and vulnerable to
+learning effects. The pilot should establish session length. If needed, use a balanced incomplete-block design or split
+the design across sessions while ensuring each cell has sufficient observations.
+Counterbalancing and controls
+  Counterbalance layout order and task order using a Latin-square or balanced sequence where feasible.
+  Use multiple matched tasks per cell so one unusually easy or hard target does not determine a layout’s ranking.
+  Record previous exposure to each structure, task difficulty, trial number, and order for analysis.
+  Use identical products, labels, hierarchy, and task instructions across layouts.
+  Predefine how ties will be resolved when two structures perform similarly; do not select the winner based only on
+ the smallest mean time.
+6. Pilot study
+Recruit 6–8 participants to test the prototype and protocol, not to make confirmatory claims. Check that all four
+layouts are usable, emotional inductions produce the intended self-reported variation without excessive distress,
+tasks have an appropriate difficulty range, event logs are complete, and the full session length is acceptable.
+Pilot checklist
+  Verify every target can be reached in each layout and all menu controls work with mouse and keyboard.
+  Check task wording does not accidentally reveal the route or category.
+  Measure induction effectiveness using self-report; revise weak or confusing inductions.
+  Inspect whether the four structures are sufficiently distinct yet comparable in information content.
+  Estimate within-person variability and missingness to inform power analysis and sample size.
+  Use participant feedback to identify visual or interaction confounds before the main studies.
+ 
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 7
+7. Study 1 — map emotional context to menu structure
+Objective: empirically determine how the four menu structures perform under each of the four emotional contexts.
+This is the key study that directly operationalises the original idea.
+Design
+Use a repeated-measures design where each participant experiences multiple menu structures and emotional
+contexts. Ideally, each participant contributes observations to all 16 cells, but use a balanced incomplete-block or
+multi-session design if fatigue or learning would undermine data quality. The emotional context is induced or
+prompted before the relevant task, then checked with a brief self-report. The order of structures, states, and tasks
+must be counterbalanced.
+Procedure per trial
+  Show a short instruction and apply the planned mild emotional-context induction.
+  Collect a brief state rating to check whether the intended context was experienced.
+  Present the assigned menu structure and a product-finding task using a matched target.
+  Record completion time, success, errors, backtracking, menu interactions, and any search use.
+  Collect a short usability/difficulty rating and, where scheduled, a brief state re-check.
+  Provide a neutral reset or break between inductions to reduce carry-over.
+ 
+Primary outcomes
+ Outcome
+Operationalisation
+Role
+Task success
+Correct target reached within a defined time limit.
+Primary / safety check
+Completion time
+Time from task start to correct target; unsuccessful trials
+handled by preregistered rule.
+Primary efficiency measure
+Navigation errors
+Misclicks, wrong branches, or invalid route transitions.
+Secondary
+Backtracking
+Returning to a previously visited category/level or reversing
+route.
+Secondary
+Perceived usability /
+workload
+Short post-task rating(s) with consistent wording.
+Secondary
+Self-reported emotional
+context
+Valence and discrete frustration/confusion/boredom ratings.
+Manipulation check / state
+label
+How to identify the best structure
+Analyse the layout × emotional-context interaction. Estimate the marginal performance of each structure within each
+context, with participant and task variability accounted for. The selected mapping should consider success first, then
+efficiency and errors, then subjective usability. If a layout is fastest but meaningfully increases failures or
+disorientation, do not label it the winner. Where differences are small or uncertain, treat the mapping as inconclusive
+or allow more than one acceptable layout.
+Study 1 deliverable
+ A documented 4 × 4 performance matrix, confidence intervals, and a preregistered selection rule producing
+the candidate mapping used in Study 2. The mapping is an empirical result, not a prewritten assumption
+such as “frustrated users need a sidebar.”
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 8
+8. Study 2 — test emotion-contingent structural
+adaptation
+Objective: test whether using the Study 1 mapping improves navigation, rather than merely confirming that layouts
+differ.
+Conditions
+ Condition
+What the participant experiences
+Purpose
+1. Static structure
+One preselected menu structure remains in use across
+emotional contexts. Select the baseline before confirmatory
+testing (e.g., the best overall structure from Study 1, not a
+post-hoc convenient choice).
+Baseline for ordinary
+non-adaptive navigation.
+2. Emotion-matched
+adaptation
+At safe task boundaries, the system selects the structure
+supported by Study 1 for the current self-reported/known
+experimental context.
+Test whether the mapping
+is useful.
+3.
+Emotion-mismatched
+adaptation
+The system selects a structure mapped to a different context
+according to a preregistered mismatch rule.
+Test whether matching
+context matters rather than
+any change helping.
+Use known/checked emotional labels in this study where possible. That isolates the effect of structural adaptation
+from errors made by an emotion estimator. The mismatch rule must be fixed before analysing outcomes; avoid
+choosing the most harmful mismatch after seeing the data.
+Procedure and controls
+  Use new but difficulty-matched tasks to reduce memorisation from Study 1.
+  Counterbalance the three conditions and task order.
+  Keep all menu content and product information constant; the intended independent variable is the structural policy.
+  Make transitions visible and predictable. Apply a new structure at the start of the next task, not mid-route.
+  Measure task performance, usability, perceived predictability, disruption, and whether the participant noticed or
+ understood the change.
+Primary contrasts
+  Emotion-matched adaptation vs static structure: does adaptation improve performance without reducing success?
+  Emotion-matched vs emotion-mismatched adaptation: does correct matching matter?
+  Static vs mismatched adaptation: is arbitrary structural switching harmful or merely neutral?
+ 
+Interpretation
+If matched adaptation does not outperform the static baseline, the correct conclusion may be that structural switching
+offers little benefit, that one structure works well across states, or that switching costs offset any state-specific
+benefit. Such outcomes are valuable and should not be hidden. Study 2 is the primary causal test of the original idea.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 9
+9. Study 3 — end-to-end adaptive navigation
+Objective: evaluate the complete system using interaction signals plus brief self-reports to estimate emotional
+context, select a structure using the Study 1 mapping, and apply it without unnecessary disruption.
+System pipeline
+ Step
+System behaviour
+1. Observe
+Collect low-cost interaction features: pauses, backtracks, menu open/close, misclicks, category
+switching, and task progress.
+2. Ask / anchor
+At predefined boundaries, collect a brief self-report; the design should not repeatedly interrupt
+users after every click.
+3. Estimate
+Combine interaction features and self-report where available. Return a state distribution or
+confidence score rather than only a hard label.
+4. Select
+Use the frozen Study 1 mapping to choose a candidate structure for the estimated context.
+5. Transition safely
+Offer the structural change between tasks or at a clear checkpoint; explain the change, allow the
+user to keep the current layout or revert.
+6. Evaluate
+Log estimate, confidence, selected structure, user acceptance/reversion, task outcomes, and
+any reported disorientation.
+Conditions
+  Static baseline: the same chosen structure remains throughout the session.
+  Hybrid adaptive: the system uses the interaction-signal + self-report estimator and the frozen emotion-to-structure
+ mapping.
+ If sample size and time permit, add an optional comparison in which only functional presentation changes within the
+ current structure (e.g., clearer guidance or prioritized links). Treat this as a secondary extension, not a replacement
+for structural adaptation.
+Adaptation safety and user control
+  Do not replace the entire menu while the participant is part-way through a navigation path.
+  Switch only at a task boundary or explicit transition, preserve the current target and progress, and provide a visible
+ explanation.
+ Provide a clear “keep current layout” or revert option; record its use rather than treating it as participant error.
+  Avoid rapid oscillation: use a confidence threshold, minimum dwell period, and/or require repeated evidence before
+ switching.
+ If confidence is low, keep the current structure and ask a brief self-report at the next appropriate boundary.
+ 
+Study 3 outcomes
+  Estimator: macro-F1, balanced accuracy, confusion matrix, calibration/confidence and participant-grouped
+ validation.
+ Navigation: task success, completion time, errors, backtracking and search use.
+  Experience: perceived control, predictability, usability, workload, disorientation and preference.
+  Adaptation behaviour: number of switches, accepted/reverted changes, time from estimate to transition, and
+ low-confidence fallback frequency.
+A hybrid estimator should be evaluated on held-out participants, not random trials from the same
+participants split across train and test. Otherwise, the model may learn person-specific habits and appear
+more generalisable than it is.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 10
+10. Implementation plan
+Recommended implementation
+Build the prototype as a web application with a shared product catalogue and a navigation component that can
+render each of the four structures. Use a common event schema so that interaction logs are comparable across
+layouts. Keep the emotion-induction logic separate from the menu rendering and the adaptation policy.
+Module
+Responsibilities
+Product catalogue
+Product IDs, attributes, categories, filters, target products, and task definitions.
+Layout renderer
+Render horizontal, sidebar, mega-menu, and fractal/hierarchical structures from the same
+taxonomy.
+Task runner
+Present task instructions, start/stop timers, record success/failure, and manage
+breaks/reset.
+Emotion check-in
+Collect brief state ratings and associate them with task/trial IDs.
+Event logger
+Timestamped events using one consistent schema; include participant pseudonym,
+condition, task, layout, state prompt, and event details.
+Adaptation policy
+In Study 2, use the frozen mapping and known labels; in Study 3, use estimator output,
+confidence threshold, safe transitions and revert handling.
+Analysis pipeline
+Clean logs, derive outcomes, run preregistered models, produce layout-by-state matrix and
+confidence intervals.
+Example event schema
+Each event should contain a timestamp, anonymous participant ID, study, trial ID, task ID, emotional-context
+prompt/label (where applicable), active layout, event type, element/category ID, and optional event-specific value.
+Avoid collecting names, emails, or unrelated personal information in the research log.
+Build order
+  1. Implement the product taxonomy and target tasks before styling menus.
+  2. Implement the four menu structures over the same data and verify functional parity.
+  3. Add event logging and automated checks for missing or impossible routes.
+  4. Add emotion check-ins and induction/task sequencing.
+  5. Implement Study 1 randomisation and exportable data.
+  6. After Study 1 analysis, freeze the mapping and build Study 2 policy conditions.
+  7. Add estimator and safe transition behaviour for Study 3 only after the first two studies are stable.
+ 
+11. Analysis plan
+Predefine outcome handling, exclusions, and the structure-selection rule before confirmatory analysis. Analyse task
+success and efficiency jointly enough to avoid selecting a layout based on speed alone.
+Study 1
+  Model completion time using a suitable mixed-effects model (often log-transformed if strongly right-skewed), with
+ menu structure, emotional context, and their interaction as fixed effects.
+ Include participant and task/target as random effects where supported by the data; include order/trial number as
+ covariates if prespecified.
+ Analyse success using a mixed-effects logistic model; analyse counts such as errors/backtracks with an appropriate
+ count model or robust alternative.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 11
+ Report effect estimates and confidence intervals, not only p-values. Correct for multiple comparisons in follow-up
+ contrasts.
+ Generate estimated marginal means for every structure × context cell and apply the preregistered selection rule.
+ 
+Study 2
+  Use mixed-effects models with condition as the main fixed effect and participant/task as grouping factors.
+  Predefine two primary contrasts: matched vs static and matched vs mismatched.
+  Treat task success as a guardrail/non-inferiority-style outcome if the main benefit is efficiency; choose an
+ acceptable margin only with justification.
+ Report adaptation-related disruption and user control alongside completion time.
+ 
+Study 3
+  Evaluate estimator performance using participant-grouped cross-validation or a held-out participant set.
+  Compare static and hybrid adaptive conditions on navigation outcomes and experience measures.
+  Explore whether benefits vary with estimator confidence, number of switches, or user reversion, clearly labelling
+ exploratory analyses.
+ Do not claim the estimator detects true internal emotion; state that it predicts self-reported experimental context
+ under the tested conditions.
+Power and sample size
+ The planning targets in this document are starting points only. Use pilot data to estimate within-person
+variance, task-level variability, expected effect sizes, and attrition/missingness. Run a power analysis for
+the primary interaction in Study 1 and the matched-vs-static contrast in Study 2. If the required sample is
+impractical, reduce the number of layouts or tasks only with a clear rationale and preserve the central
+research question.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 12
+12. Validity, risks, and mitigations
+ Risk / threat
+Why it matters
+Mitigation
+Learning and order
+effects
+Participants get faster as they learn the
+catalogue or menu patterns.
+Counterbalance layouts/tasks; use matched
+targets; model trial order.
+Induction carry-over
+A previous emotional context may
+influence the next trial.
+Use mild inductions, neutral resets, breaks, and
+state re-checks.
+Layout confounds
+One layout may reveal more links or
+use different labels, not just a different
+structure.
+Keep content inventory, labels, hierarchy, and
+visual style comparable.
+Fatigue
+Sixteen cells plus repeated tasks can
+make the session too long.
+Pilot timing; use blocks or a balanced
+incomplete-block design if necessary.
+Emotion misclassification
+Interaction behaviours are ambiguous
+and person-dependent.
+Use brief self-report anchors, multiple features,
+confidence, and held-out-participant validation.
+Switching cost
+Structural changes may disrupt spatial
+memory and learned behaviour.
+Switch at task boundaries; explain changes; allow
+keep/revert; log disorientation.
+Post-hoc mapping
+Choosing the mapping after inspecting
+results can overfit the data.
+Predefine a selection rule; freeze mapping before
+Study 2; report uncertainty.
+One structure wins
+globally
+There may be no useful state-specific
+mapping.
+Treat this as a valid finding; compare global best
+vs state-specific policy.
+Ethics and privacy
+  Obtain the required institutional review/approval before collecting participant data.
+  Use informed consent explaining task logging, brief emotion questions, and the right to withdraw.
+  Use pseudonymous participant IDs and store the ID key separately, if one is needed at all.
+  Collect only data needed for the research; set access controls and a retention/deletion schedule.
+  Avoid high-intensity emotional induction and provide a debrief and contact details for study questions.
+  Do not describe the system as diagnosing emotion or making psychological assessments.
+ 
+13. Expected contribution and interpretation
+The intended contribution is evidence about whether, when, and how navigation structure should vary with emotional
+context in e-commerce. The project can contribute a controlled comparison of multiple menu architectures, an
+empirically derived emotion-to-layout performance matrix, a causal test of structure matching, and an end-to-end
+prototype that accounts for imperfect state estimation and switching costs.
+
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 13
+Possible result patterns
+ Observed pattern
+Interpretation
+Different layouts lead in different emotional contexts,
+and matched adaptation helps.
+Supports state-contingent structural adaptation under the tested
+conditions.
+One layout is best across all contexts.
+A stable global layout may be preferable; emotion-based
+switching may be unnecessary.
+Study 1 shows differences, but Study 2 finds no
+adaptive benefit.
+Switching costs, task variation, or the mapping may offset the
+layout-specific gains.
+Matched adaptation helps with known labels but not
+with the hybrid estimator.
+Estimator reliability or transition policy is likely the bottleneck.
+Users frequently revert or report disorientation.
+User control and structural stability may outweigh performance
+benefits; redesign the transition policy.
+Do not frame a null or mixed result as failure. The central scientific question is whether emotion-contingent
+structural adaptation is beneficial compared with a stable interface, not whether adaptation can be made to
+look successful.
+14. Timeline and deliverables
+ Phase
+Work
+Deliverable / gate
+1. Scope & design
+Confirm taxonomy, four layouts, task taxonomy, state
+ratings, and ethics submission.
+Protocol and task matrix.
+2. Prototype
+Build catalogue, layout renderer, task runner, event logger,
+and check-in UI.
+Working prototype with validated
+logs.
+3. Pilot
+Run 6–8 participants; revise induction, task timing, and
+layout consistency.
+Pilot memo and power-analysis
+inputs.
+4. Study 1
+Collect layout × emotional-context observations and analyse
+the mapping.
+Performance matrix, uncertainty
+estimates, frozen mapping.
+5. Study 2
+Run static/matched/mismatched comparison with the frozen
+mapping.
+Causal comparison and
+usability/disruption results.
+6. Study 3
+Add estimator and safe transitions; compare static vs hybrid
+adaptation.
+End-to-end evaluation and
+estimator report.
+7. Reporting
+Document methods, exclusions, results, limitations, and
+reproducibility materials.
+Final report/thesis and
+presentation.
+15. Preregistration checklist
+  Primary research question, hypotheses, and primary outcome(s) for each study.
+  Exact definition and implementation of all four menu structures.
+  Emotional inductions, rating items, timing, and manipulation-check rule.
+  Randomisation/counterbalancing method and task equivalence plan.
+  Inclusion/exclusion rules, missing data handling, and trial timeout policy.
+  Study 1 mapping-selection rule and tie/uncertainty handling.
+  Study 2 mismatch rule, static baseline, and primary contrasts.
+  Study 3 estimator features, validation split, confidence threshold, transition policy, and fallback behaviour.
+  Power analysis and justified sample sizes.
+ 
+Emotional Adaptive Navigation — Revised Protocol
+Research plan  Version 3.0  23 October 2026
+Page 14
+ Ethics approval, consent wording, privacy, data retention, and debriefing.
+ 
+16. Literature grounding and limits
+The three supplied papers provide complementary motivation, but they do not by themselves establish that any
+particular menu structure is best for a particular emotional state. The proposed emotion-to-layout mapping is the
+project’s empirical question.
+Eye-tracking / e-commerce menu-format paper supplied by the user. Use it to motivate systematic comparison
+of menu formats and objective navigation/visual-attention measures. Verify the final publication metadata and full
+bibliographic details before including it in a thesis bibliography. Eye tracking is not required in this protocol because
+the selected measurement approach is interaction signals plus brief self-reports.
+Sahraoui, Vanderdonckt, and Kieffer, “Fractal Adaptive Menus: Concept, Engineering, and Use Case,” EICS
+Companion ’25. Use this work to inform the conceptual and implementation definition of the fractal/hierarchical
+candidate structure. The implementation in this project must still be specified precisely enough to reproduce.
+Gaspar-Figueiredo et al., “Integrating Human Feedback into a Reinforcement Learning-Based Framework for
+Adaptive User Interfaces,” EASE 2025 / arXiv:2504.20782. Use it to inform the role of human feedback and
+evaluation of adaptive interfaces. It does not remove the need to validate the emotion estimator or test adaptation
+against a static baseline.
+Related external work on vertical vs dynamic menus and adaptable/adaptive menus can support background
+framing, but cite only after verifying the exact bibliographic records and the specific claims used. Keep
+source-derived claims separate from this protocol’s hypotheses and design choices.
+Final positioning
+ The revised plan now follows the original concept directly: test several menu structures across emotional
+contexts → determine the best-supported structure for each context → test whether switching structures
+based on that mapping helps → evaluate a live system using interaction signals and self-reports.
+Functional changes such as link prioritisation or extra guidance can remain a secondary layer, but they no
+longer replace structural menu adaptation as the central research contribution.

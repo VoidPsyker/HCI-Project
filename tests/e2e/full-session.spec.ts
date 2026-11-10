@@ -132,6 +132,9 @@ test("@session a scripted participant completes the whole pilot session", async 
     await runTrial(page, { trialId: practice.practiceId, menuId: practice.menuId, targetId: practice.targetId }, "direct");
   }
 
+  await page.getByTestId("gaze-calibration-start").click();
+  await page.getByTestId("gaze-calibration-continue").click({ timeout: 60_000 });
+
   let mainIndex = 0;
   for (const block of design.blocks) {
     await page.getByTestId("start-induction").click();
@@ -152,10 +155,6 @@ test("@session a scripted participant completes the whole pilot session", async 
     }
     await checkIn(page, block.stateLabel);
 
-    if (mainIndex === 0) {
-      await page.getByTestId("gaze-calibration-start").click();
-      await page.getByTestId("gaze-calibration-continue").click({ timeout: 60_000 });
-    }
     for (const trialId of block.trialIds) {
       const trial = design.trials.find((t) => t.trialId === trialId)!;
       await runTrial(page, trial, mainIndex === 1 ? "give_up" : mainIndex === 4 ? "detour" : "direct");

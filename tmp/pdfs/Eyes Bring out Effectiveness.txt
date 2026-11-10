@@ -1,0 +1,1080 @@
+Eyes Bring out Effectiveness? Applying Eye-Tracking to Explore 
+Consumers’ Visual Perception of Horizontal and Vertical Menu Formats 
+in E-commerce Website Design
+1 INTRODUCTION
+In recent years, scholars have initiated inquiries into website menus (Naylor, 2016; Ouyang & Zhou, 2018), proposing 
+that the fundamental design of menus should underscore both breadth and depth (Naylor, 2016). With technological 
+progress, menus have undergone alterations in diverse presentation formats. In a prior investigation into medical website 
+design, it was determined that the quantity of screens necessary to navigate to the desired content exerted the most 
+significant influence on usability (Rotondi et al., 2021). Every website necessitates a rapid and effective navigation 
+system(Leuthold et al., 2011), as it is crucial for ensuring that users can easily and efficiently find the information they are 
+looking for, thereby enhancing their overall experience and satisfaction.. Many books on website or user interface design 
+broadly categorize navigation systems into two consecutive conceptual tasks (Deaton, 2003; Garrett, 2022; Kalbach, 2007; 
+Lynch et al., 1999; Rosenfeld & Morville, 2002; Shneiderman & Plaisant, 2010): (1) the task of organizing items into 
+meaningful clusters and (2) the task of tour design, which involves determining how to present the problem of linking with 
+other tour mechanisms to encourage users to navigate as efficiently and effectively as possible. Hence, the efficacy of the 
+navigation system plays an exceedingly important role on the website. Based on Just and Carpenter's eye-mind hypothesis 
+(Just & Carpenter, 1976), this study investigates perception and cognition, dividing them into distinct components. Eye 
+attention is a crucial design principle for attracting people's focus(Cuddihy & Spyridakis, 2012). In this study, Eye-tracking 
+gaze patterns provide primary data on users' visual movement and efficiently, while real-time user feedback during 
+operation offers secondary insights into immediate user cognition and overall effectively. A review of relevant literature 
+reveals that previous menu studies have predominantly focused on user interface design and user search behavior across 
+different task types, with limited in-depth exploration into perception and cognition of individual menu systems. Therefore, 
+the core of this study is to propose recommendations based on eye-tracking dynamics for user perception of mega menus.
+A well-designed navigation system not only resolves the issue of getting lost promptly but also enhances information-
+seeking efficiency. While the Internet continues to progress rapidly (Zheng, 2015), there remains a significant number of 
+websites employing ladder menus, also known as drop-down menus (Naylor, 2016). Consequently, recent research in 
+navigation systems has primarily focused on delving deeper into drop-down menus. Over the years, a diverse range of 
+menu types has been investigated (Hornof & Halverson, 2003; Kiger, 1984; Kreigh et al., 1990; Landauer, 1987; Naylor, 
+2016; Zaphiris, 2000). However, the relatively new mega menu has received less attention in research endeavors. Several 
+studies in the existing literature have investigated menu design in connection with mega menus. For instance, in Hornof 
+and Halverson's study, it was shown that the label menu and the mega menu are similar in terms of presentation formats. 
+Their findings demonstrated that the labeled layout resulted in faster search speeds compared to the unlabeled layout. 
+However, it is worth noting that the focus of Hornof and Halverson's study was primarily on search strategies and 
+categorization/tagging rather than the intricacies of menu design itself (Hornof & Halverson, 2003). In 2011, Leuthold 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+2
+conducted a study on task complexity in relation to menu design in navigation systems. The study revealed that vertical 
+menus promote quicker search behavior within a reduced timeframe. When juxtaposed with dynamic menus, vertical 
+menus demonstrated enhanced perceptual and cognitive efficiency (Leuthold et al., 2011). Nevertheless, the study solely 
+delved into task complexity concerning simple, vertical, and dynamic menus, providing limited insight into users' 
+physiological perceptions. The current utilized predominant menu type is the drop-down menu, typically arranged in a 
+vertical layout (Naylor, 2016). In recent times, the mega menu has gained traction, being implemented both vertically and 
+horizontally. Previous studies have demonstrated that vertical menus can effectively decrease user operation time and 
+enhance efficiency(Leuthold et al., 2011). However, research in this domain remains limited, with minimal exploration 
+into the physiological perceptions of users regarding both horizontal and vertical menu structures. In this study, mega 
+menus are defined as menu systems that can display lower-level links within the same screen area, providing a clear 
+hierarchical view of the menu structure. The research further explores the design and effects of both main menus and local 
+menus within this context.
+In the domain of human-computer interaction (HCI), substantial research and scrutiny into the aesthetics of user 
+interfaces gained momentum following the seminal study by Kurosu and Kashimura in 1995(Kurosu & Kashimura, 1995; 
+Tuch et al., 2012). Particularly within the realm of user experience (UX) research, the aesthetics of user interfaces has 
+emerged as a prominently discussed subject(Bargas-Avila & Hornbæk, 2011; Tuch et al., 2012). Despite numerous studies 
+highlighting a significant correlation between usability and aesthetics(Hartmann et al., 2008; Lavie & Tractinsky, 2004; 
+Quinn & Tran, 2010; Tractinsky et al., 2000), historical research findings still exist suggesting that aesthetics does not 
+significantly impact usability (Hassenzahl, 2004; Van Schaik & Ling, 2009). As a result, recent studies have indicated that 
+the presence of usability elements could potentially influence users' perceptions of a website's aesthetics. Furthermore, this 
+notion may extend to the concept that functionality and aesthetic appeal are closely intertwined, suggesting that effective 
+functionality is inherently aesthetically pleasing. Research on the relationship between usability and aesthetics has recently 
+gained traction in empirical studies. Ben-Bassat et al. (2006) and Lee and Koubek (2010) have highlighted the significant 
+impact of interface usability on users' perceptions of aesthetics. Their findings suggest that interfaces that are easier to use 
+tend to be perceived as more aesthetically pleasing (Ben-Bassat et al., 2006; Lee & Koubek, 2010). While previous research 
+has hinted at the notion that "beautiful things are easier to use," this idea is only partially supported by empirical evidence. 
+More recent scholars have started to posit that usability might exert a more direct influence on user interface evaluation 
+than aesthetics do, shaping users' overall perceptions of the interface. Therefore, while UI concentrates on the overall 
+presentation of the interface and holds significant importance, UX encompasses broader aspects such as system 
+accessibility, efficiency, and user enjoyment
+The advancement of Internet technology has hastened the increasingly shorter development cycles of the Web(Almeida, 
+2017). Furthermore, the rapid evolution of the Web has expedited the formation of people's behavioral patterns online, 
+particularly concerning the dissemination, sharing, and acquisition of information (Chang et al., 2022). In information 
+environments, IA plays a critical role in shaping the structural organization, navigation system, and categorization labels 
+(De Marsico & Levialdi, 2004; Peter Morville & Rosenfeld, 2006; Powell et al., 1998; Rosenfeld et al., 2015; Toms, 2002; 
+U.S. General Services Administration; Wurman & Richard Saul, 1996). The term "information architecture" was initially 
+defined in 1997 as "a simple set of auxiliary tools to resourcefully integrate users' needs with information"(Davenport & 
+Prusak, 1997). Abstractly conceptualized, IA provides a structured information framework or map that enables users to 
+navigate their individual paths to knowledge(Juvina, 2006; Wurman & Richard Saul, 1996). The menus within an 
+Information Architecture (IA) navigation system consist of links to various pages, and the arrangement of these linked 
+pages is commonly termed as a mini-IA, significantly influencing usability(Naylor, 2016). While menus represent just a 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+3
+portion of the overall IA, they serve as a condensed representation of the IA, encapsulating the primary IAs of the website 
+that users can access via the menus. Therefore, this study aims to synthesize insights gleaned from prior literature, 
+delineating them as follows:
+(1) Menus significantly contribute to the usability of a website.
+(2) Previous studies predominantly focused on drop-down menus as a menu format.
+(3) Adopting an effective menu format can enhance users' efficiency in navigating the website.
+(4) Vertical menus are particularly conducive to perceptual exploration.
+In 2011, Leuthold, Schmutz, and other researchers utilized eye-tracking technology to investigate disparities in visual 
+perception associated with employing simple menus, dynamic menus, and vertical menus. The study outcomes indicated 
+that users required reduced attention when interacting with vertical menus, leading to faster and more successful overall 
+navigation. Furthermore, the findings suggested that vertical menus are better suited for exploring user perception and 
+cognition(Leuthold et al., 2011). Presently, the scope of menu studies utilizing eye-tracking devices lacks diversity, 
+necessitating exploration of additional menu types for related research. As asserted by Jacob and Karn (2003) and supported 
+by Nielsen and Pernice (2010), eye-tracking represents a potent method for delving into navigation design intricacies, 
+facilitating comprehension of how users' eye movements and saccade patterns are deployed for information acquisition. 
+Previous investigations have demonstrated that incorporating known-item seeking, while maintaining task time within 
+manageable bounds for experimental efficacy, affords researchers deeper insights into individuals' behaviors throughout 
+the information retrieval process (Jacob & Karn, 2003; Nielsen & Pernice, 2010). Hence, drawing upon prior research and 
+literature, this study discerned that amalgamating both horizontal and vertical configurations within the mega menu 
+structure could notably amplify users' effectiveness in Known-item seeking information retrieval. Historically, eye-
+tracking studies have often depicted users' overall scanning patterns resembling the F-shaped (or E-, Z-shaped) when 
+navigating web pages(Nielsen, 2006; Nielsen Norman Group, 2009; Shrestha & Owens, 2009). This investigation seeks to 
+elucidate whether aligning menu formats (i.e., vertical versus horizontal) with human oculo-physiological scanning 
+tendencies constitutes a contributory factor in augmenting user efficiency. The F-shaped layout indicates that the primary 
+menu is displayed horizontally, while the secondary menu is displayed vertically. Diverging from traditional horizontal or 
+vertical layouts, this study aims to integrate the F-shaped concept into the visual breakpoints within the user experience 
+flow of menus. By introducing breakpoints, the overall efficiency of user interactions is thereby enhanced. 
+In the relevant domain, it was found that in 1988, scholars conducted a study involving six types of menu layouts, 
+ultimately demonstrating that a two-level menu structure could achieve optimal operational performance (Parkinson et al., 
+1988).  This optimal menu prototype bears resemblance to today's mega menu layout. However, in 2016, Naylor posited 
+that the type of menu does not affect search performance, a finding inconsistent with previous research (Naylor, 2016). 
+Nevertheless, upon reviewing past studies, there has been only preliminary discussion on mega menus, with most 
+experimental research relying on the duration of time to assess efficiency. Direct validation and discussion on the efficiency 
+of menus at higher levels remain scarce. Therefore, there exists untapped potential and scope for expansion in this field.
+2 LITERATURE REVIEW
+2.1 Information Architecture
+Information Architecture (IA) was first proposed by Richard Saul Wurman, who is known as the master of information 
+theory (Wurman & Richard Saul, 1996). In the book “Information Architecture for the World Wide Web”, it is mentioned 
+that 'we cannot ask users to take the time to learn to understand our information architecture, so we should do our best to 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+4
+build and design an information architecture that is accessible to users' (Peter Morville & Rosenfeld, 2006; Rosenfeld et 
+al., 2015; Rosenfeld & Morville, 2002). IA is an extension of Typology(Rosenfeld & Morville, 2002; Wodtke, 2011; 
+Wurman & Saul, 1996), which is composed of three main structures, namely context, content, and navigation. In 1997, IA 
+was defined as a set of simple assistive tools to integrate users' needs with information resources(Davenport & Prusak, 
+1997). The application of IA to websites is composed of four systems, namely, organizational systems, labeling systems, 
+navigation systems, and search systems.
+In 2017, scholars mentioned that IA is an important component of a website and that IA in a website significantly 
+affects its usability and user experience during navigation(Rosenfeld & Morville, 2002; Schmitt, 1999; Wan Mohd Isa et 
+al., 2007). It is even suggested that IA is not just a theory, but a strategy for a website as well as an application of best 
+practices. IA is the result of continuous iteration and negotiation between website designers and administrators (Dijck, 
+2003; Ruzza et al., 2017; Schmitt, 1999). In 2020, scholars emphasized the significance of information architecture within 
+websites and recommended that it be conscientiously integrated into website navigation systems during the development 
+phase (Tang et al., 2020). IA can be likened to a tree; with a solid foundation, the overall experience becomes more stable 
+and reassuring. Consequently, numerous scholars have emphasized the substantial influence of a well-crafted IA on the 
+overall user experience. In a navigation system, a menu represents a set of pages interconnected through a series of links. 
+This interconnected structure of linked pages is commonly termed as a mini-information architecture, exerting significant 
+influence on the usability of each touchpoint (Naylor, 2016). While the menu constitutes a subset of the overarching 
+information architecture, it functions as a microcosm thereof, encapsulating the primary data structure of the website and 
+facilitating rapid information retrieval for users via the menu interface. 
+The book categorizes users’ behaviors into two dimensions: integration and iteration and also outlines the four most 
+common ways of finding information, including exhaustive research, exploratory seeking, refinding, and known-item 
+seeking (Rosenfeld & Morville, 2002). Known-item seeking was initially introduced in the context of library materials 
+seeking and is defined as the assumption that the searcher knows the information and is looking for a specific item 
+(Wildemuth & O'Neill, 1995). In a 1989 study, the concepts of "known-item search" and "closed task" were investigated. 
+The study highlighted that the time required for an intentional information search was shorter compared to a random or 
+purposeless search. This phenomenon stems from the fact that focused tasks provide individuals with a clearer objective 
+for information retrieval. Conversely, aimless searches necessitate more time as they involve sifting through a broader 
+range of information (Marchionini, 1989). In contrast, a study in 1993 revealed that individuals engaging in Known-item 
+seeking were more inclined to employ personalized analyses and strategies during their searches (Qiu, 1993). Synthesizing 
+the aforementioned literature, Known-item seeking not only manages task duration, enhancing research efficiency, but also 
+illuminates the behavioral characteristics inherent in individuals during information retrieval processes. Thus,this research 
+aims to understand the user visual perception of known-item seeking behavior on information architecture of menu design.
+Numerous theoretical concepts and definitions concerning information-seeking behavior have been examined in 
+previous research. In 2003, scholars presented a white paper addressing four major areas critical to constructing 
+comprehensive website information: Knowledge elicitation, Organization and structure of information, Retrieval of 
+information, and Presentation of information (Proctor et al., 2003). Understanding users' expectations from a website 
+during information-seeking processes can significantly enhance website satisfaction (Ping et al., 1999). Therefore, this 
+study expands upon and delves into user-centered research to achieve a more profound understanding of website 
+information architecture from the perspectives of both users and experts.
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+5
+2.1.1 Navigation System: Information Seeking
+A navigation system plays a pivotal role in improving the usability of a website, a task inherently laden with cognitive 
+demands for users. According to Jul (2004), a navigation system comprises four cognitive subtasks: information gathering, 
+wayfinding, spatial knowledge acquisition, and mobility(Jul, 2004). In a web environment, when users struggle to locate 
+desired content, they often experience a loss of orientation and become disoriented within the information space (Chang et 
+al., 2022; Lazar et al., 2003; Levene, 2011; Nah & Davis, 2002), leading to user frustration (Lazar et al., 2003). This 
+frustration, in turn, impacts the website's brand image, increasing the likelihood of users seeking alternative websites (Krug, 
+2000; Naylor, 2016; Rosenfeld & Morville, 2002) for their information needs. Hence, throughout the website development 
+phase, strategic considerations must be given to augmenting user engagement, encouraging purchasing activities, and 
+fostering repeat visits, thereby bolstering the website’s overall integrity and commercial viability (Naylor, 2016; Nielsen, 
+1999). Besides underscoring the significance of user interface design (Tractinsky et al., 2000), a comprehensive approach 
+to evaluating the website's interactivity is crucial to sustain user retention, ensuring the website’s enduring functionality 
+and efficacy over time.
+Throughout the literature, diverse perspectives have been presented by scholars regarding information-seeking behavior. 
+In 1989, Marcia Bates introduced the "Berry-picking" model, which elucidates how users formulate information needs at 
+the outset of their search process and subsequently develop search parameters based on these needs. As the search unfolds 
+along intricate pathways, users progressively traverse these paths to access additional information (akin to picking 
+strawberries). Consequently, users gradually refine their understanding of their needs and modify their initial search criteria 
+(Bates, 1989). This perspective aligns with assertions made by scholars in 2015, who propose that navigation within the 
+information landscape is guided by individual conceptual frameworks. Users determine their subsequent actions based on 
+task objectives and contextual elements (Jul & Furnas, 1997; Zheng, 2015). In the navigation system, users can manifest a 
+higher degree of personal awareness in their information-seeking behavior. Users engaging in information seeking can be 
+classified into three primary groups: Low information seekers, High information seekers, and Selective information seekers. 
+Investigating the group of selective information seekers may reveal a greater degree of homogeneity compared to the high 
+or low information seeker groups.
+Fenichel’s (1981) research examined search performance within an online database system, revealing a noteworthy 
+correlation between users’ familiarity with a website and their search efficacy (Fenichel, 1981; Kim, 2001). Moreover, 
+users’ experiences during searches significantly influence their adopted search strategies (Kim, 2001). Synthesizing these 
+prior investigations, it becomes evident that navigation systems intricately intertwine with users’ behaviors throughout 
+information retrieval, consequently impacting their overall experience, search strategies, and efficiency. In essence, extant 
+literature underscores the pivotal role of navigation systems within information architectures, not only facilitating users’ 
+access to information but also steering them towards optimal exploration within the digital information domain. A well-
+designed navigation system not only resolves the issue of getting lost promptly but also enhances information-seeking 
+efficiency. Common navigation tools encompass menus, website maps, and navigation paths (Zheng, 2015). Despite the 
+increased emphasis on search systems in recent years, navigation systems remain fundamental and are often deemed the 
+"last mile" for users in accessing valuable information. Presenting website content and information structure in a 
+straightforward format (Danielson, 2002; Tedesco et al., 2008; Zhang & Salvendy, 2001; Zheng, 2015) constitutes one of 
+the pivotal factors contributing to a website's usability (Palmer, 2002; Zheng, 2015).
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+6
+2.1.2 Menu Format
+Menus, as a common method of website navigation, encompass a collection of functions interlinked with various pages. 
+The structural organization of these page links, often denoted as "information architecture," significantly influences the 
+usability of a website (Naylor, 2016). In 2015, Jack G. Zheng assessed navigation systems using a two-dimensional 
+framework, addressing both information structure and usability. This evaluation provided an exhaustive examination of 
+primary navigation tools and systems then in use, thereby offering a comprehensive analysis of menus within navigation 
+systems alongside an in-depth exploration of IA and usability. Zheng's work contributed to a more refined understanding, 
+description, and conceptualization of menus within navigation frameworks.
+In the past, the most commonly used type of menu was referred to as a Global Menu or Global Navigation, and it served 
+as one of the primary menu styles in navigation systems. Typically, this menu is displayed horizontally at the top of a 
+webpage or vertically on its left side. Global menus primarily provide links to the top-level pages of a website, with sub-
+level options appearing as needed (Zaphiris et al., 2002; Zheng, 2015), adhering to fundamental principles of sequential 
+menu design. However, global menus that display only select top-level links no longer align with contemporary trends. 
+Scholars have emphasized the importance of menus containing more information-structured content. Therefore, menus 
+incorporating multi-level structured content are termed Multi-level navigation menus or Structure Preview Designs (Zhang 
+& Salvendy, 2001). In addition to the drop-down menu, which is the most common menu in the past few years, a variety 
+of menu forms have begun to appear, such as fly-out menu (used for vertical menus on the left or right side), pop-up menu 
+(at the bottom of the page), multi-level navigation bar, mega menu, fat footer, HTML sitemap page, breadcrumbs and so 
+on. As such, this study compiles recent scholarly definitions of 'menu' and presents them in Table 1.
+Table 1 Menu Style and definition.
+Navigation system Style Definition
+Global Menu
+(global Navigation)
+It is an interface region reserved for design elements. It may 
+include titled sections, dropdown menu, tabs, buttons, search bars 
+and whole links. To provide a consistent means of traveling to 
+anywhere on the website(IxDF., 2020; Nielsen & Pernice, 2010). 
+Drop-down menu It provides hierarchical structure with mouse click (or mouse-
+over)(Andrea, 2012; Naylor, 2016; Yang & Chiu, 2022; Zheng, 
+2015).
+It is the most common form of menu(Naylor, 2016).
+Fly-out menu It is a horizontal layout of the drop-down menu, where the sub-
+menus ‘flyout’ from the side when you mouse-over (or mouse 
+click) the item(Andrea, 2012; Yang & Chiu, 2022; Zheng, 2015).
+It also called a dropdown menu and used to concise the alignment 
+of the website. This style menu is arranged to show one option at 
+the time when the user clicks on it(Eggert & Abou-Zahra, 2015; 
+Fatima, 2019).
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+7
+Navigation system Style Definition
+Pop-up menu It is context-sensitive and is triggered at specific locations within 
+the user interface(Pook et al., 2000). 
+That is hidden and doesn't appear until user right-mouse click.
+Mega menu (Fat menu) It also the dropdown menus that not only contain links but also 
+accommodate additional content(Andrea, 2012). 
+One of its advantages is that it exposes a lower-level menu 
+without requiring extensive navigation through nested 
+menus(Nielsen & Li, 2017; Ouyang & Zhou, 2018).
+Accordion menu It is the vertical menus in which clicking on the main item 
+expands the section beneath it. Clicking on the top link again 
+collapses the section(Andrea, 2012). 
+While longer pages can enhance user experience, accordions 
+streamline content presentation by reducing scrolling. However, 
+they also introduce an interaction cost by necessitating users to 
+make decisions regarding topic headings(Loranger, 2014).
+Tree menu Stacking information content through hierarchical structures to 
+establish a tree-like system architecture. However, an increasing 
+number of online retailers have abandoned the use of tree menus 
+as a means of user navigation. This is because excessive folding 
+and collapsing can lead to users losing their sense of 
+orientation(Kalbach, 2007; Rivers, 2020).
+Hierarchical menu It is based on hierarchy of facet attributes to creates a navigation 
+menu. It is typically employed for categories that contain 
+subcategories(Algolia, 2023).
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+8
+Navigation system Style Definition
+Labelled menu Like mega menu. Through clearly labeled layouts visual 
+hierarchy to group the items.(Hornof & Halverson, 2003)
+Hamburger Menu
+(Hidden Menu)
+Vertical version of drop-down menu completely provides the 
+hierarchical structure with mouse click actions(Yang & Chiu, 
+2022). Its icon like hamburger(FEDEWA, 2021; Khadka, 2021; 
+Yang & Chiu, 2022).
+When user clicks the hamburger icon, the menu will be closed. 
+Therefore, it also called the hidden menu.
+Tab Bars (menu) It is more applied on mobile application and quickly switch 
+between top-level item sections of the view(Developer, 2023; 
+Kalbach, 2007; Yang & Chiu, 2022). 
+Dropline Menus When users hover their mouse over or click on the main menu 
+item, a line will appear below the main menu in Dropline Menus, 
+displaying additional options(Andrea, 2012). 
+Fat footer It be found at the bottom of every page on the website nearly, 
+assuming various forms that correspond to the website's content. 
+Despite their diverse appearances, their importance remains 
+paramount, albeit often overlooked. (and highly 
+underrated)(Fessenden, 2019, 2020; Zheng, 2015).
+Giving a lot of navigation options at the bottom of the website, so 
+this type of the menu is also called the “safety net”(Imetska, 
+2016).
+Sitemap This type of menu is the visualization tool that is used 
+predominantly for planning purposes(Tankala, 2023).
+It offers users an alternative means of navigation, rescuing them 
+from getting lost amidst the clutter of a crowded website(Group, 
+2008; Zheng, 2015).
+Bread crumb It is always a secondary navigation aid. Through one line of text 
+to show a page's location in the website hierarchy(Kalbach, 2007; 
+Laubheimer, 2018; Nielsen, 2007).
+Its modest nature that people are becoming accustomed to 
+it(Nielsen, 2007).
+According to a study, in the past, websites often used drop-down menus as the standard for navigation systems(Naylor, 
+2016). Therefore, in recent years, with the rapid development of the Internet, developers have begun to adopt different 
+forms of menus in order to cater to the users' operating habits and enhance user experience. A collation of studies in 2017 
+found that more diverse forms of menus have appeared in recent years, no longer limited to the drop-down menus that 
+were more monotonous and familiar in the past (Comeaux, 2017; Naylor, 2016). As menu formats show a great deal of 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+9
+diversity, they need to be further extensively researched and explored. In recent years, there has been a burgeoning interest 
+in mega menus due to their capacity to present numerous options at a single level, exceeding the capabilities of traditional 
+drop-down menus. While mega menus share some similarities with expansive hierarchical menus, two distinct differences 
+set them apart: 1) mega menus can simultaneously display lower-level links within the same screen area while maintaining 
+a comprehensive view of the menu's depth, enabling users to grasp the entirety of the menu structure clearly. 2) In a Mega 
+Menu, the presentation of both breadth and depth allows users to directly navigate to their desired final goal (i.e., lower-
+level target) based on their specific needs. This direct access method facilitates users in reaching their final objectives 
+efficiently without the need for sequential selections. The concept of menu level correlation was initially introduced by 
+Miller in 1981. Experimental findings indicated that breadth surpassed depth in menu structure, resulting in the quickest 
+search times and fewest errors when utilizing a two-level menu format (Miller, 1981). Subsequent to the replication of 
+Miller's experiments by other scholars in 1983, the original study's limitations were addressed and rectified. This 
+subsequent study also underscored that expansive menus yielded more precise and expedited search results (Snowberry et 
+al., 1983). Furthermore, it has been demonstrated that broader menus structured in two levels yield the swiftest search 
+times (Kiger, 1984). 
+Although mega menus had not been applied to websites prior to these studies (Naylor, 2016), they provided subsequent 
+researchers with a conceptualization of the depth and breadth of menu levels. In 1988, scholars conducted a study involving 
+six types of menus, which ultimately showed that optimal operational performance could be achieved through two levels 
+of menus (Parkinson et al., 1988). And the prototype of the optimal menu has a similar layout to today's mega menus. In 
+2016, Naylor proposed that menu type does not affect search performance, a finding that is inconsistent with previous 
+research (Naylor, 2016). However, taking an overview of the past studies, there are only preliminary discussions on mega 
+menus, and most of the research experiments use the length of time to judge the efficiency, and fewer directly validate and 
+discuss the efficiency of the menus in a more advanced way. Therefore, there are possibilities and extensions to be explored 
+in this field. In this study, eye-tracking devices are used to sense the user experience and operation of the mega-menu.
+2.2 User Experience (UX)
+In 2006, Hassenzahl provided a comprehensive overview and analysis of user experience, illustrating that it extends 
+beyond mere technique to embody a subjective, contextualized, intricate, and dynamic encounter (Hassenzahl & Tractinsky, 
+2006). Google defines UX as a phenomenon where empathy assumes a pivotal role, and it emphasizes that UX consists of 
+usable, equitable, enjoyable, and useful attributes, all of which significantly impact both customers and businesses. Don 
+Norman and Nielsen in 2016 provided a definition of user experience (UX) as the foremost criterion for fulfilling users' 
+actual needs. This entails a comprehensive service design approach spanning various domains, including engineering, 
+operations, graphics, industrial design, and interface design, etc. The study emphasizes the critical distinction between user 
+experience (UX) and user interface (UI). While UI concentrates on the overall presentation of the interface and holds 
+significant importance, UX encompasses broader aspects such as system accessibility, efficiency, and user enjoyment, etc. 
+This differentiation underscores the necessity of separately addressing UX and UI for a holistic design approach. The 
+usability of a website pertains to the procedural aspects that a user engages with while navigating a website.  (Norman & 
+Nielsen, 2016).
+The primary objective of usability engineering is to comprehensively evaluate user interactions with a website and to 
+enhance the human-machine interface(Nielsen, 1994a, 1994b, 2012; Nielsen & Levy, 1994; Nielsen & Pernice, 2010). 
+Nielsen introduced fundamental concepts in usability engineering in 1994 and 2012, collaborating with Levy (1994) and 
+Pernice (2010) on related research and developments. According to Webster and Ahuja (2006), the organizational structure 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+10
+of a website profoundly influences its efficacy and user sentiment (Webster & Ahuja, 2006). When users experience 
+disorientation (Chang et al., 2022; Lazar et al., 2003; Levene, 2011; Nah & Davis, 2002). User Experience (UX) is akin to 
+a comprehensive strategy aimed at safeguarding users while navigating a site, and mitigating potential harm they may 
+inadvertently cause, recognizing that even minor elements can unsettle and disrupt their experience. Therefore, 
+synthesizing previous literature, user experience encompasses an additional layer of operational efficiency compared to 
+user interface. This study predicts that good operational efficiency will contribute to enhancing user experience, thereby 
+increasing user satisfaction.
+Nielsen advocated for observing user behavior by discerning the user's intentions or tasks, meticulously noting both 
+failures and successes, and establishing conducive environments for users to articulate their opinions. Observation serves 
+to comprehend the user perspective comprehensively, which is then complemented by substantive prototype testing and 
+numerous prototype iterations to attain the ultimate design outcome. Minor issues frequently arise during operation, 
+underscoring the importance of rigor in the process. Furthermore, attentiveness to user sentiments and thoughts is crucial. 
+Consequently, this study employs user interviews to aid in elucidating the physiological sensory process. In 2022, a report 
+by the N/N Group stated that eye-tracking devices are suitable tools for researchers to comprehend user behavior (Gordon 
+& Rohrer, 2022). Given the progress and evolution of technology, coupled with the growing complexity of consumer 
+behaviors (Rennie & Protheroe, 2020), eye-tracking devices have gained recognition as effective tools for investigating 
+consumer viewing behaviors. Hence, it is opportune to incorporate eye-tracking devices in this study, aiming not only to 
+yield more explicit data for exploring user experiences with menus but also to provide a visual reference for future 
+researchers.
+2.3 Eye-Tracking
+The reason why research efforts have not burgeoned despite significant improvements in eye-tracking technology over 
+the years is clearly explained in a study conducted in 2003. This limitation can be attributed to the necessity of individually 
+calibrating eye-tracking instruments for each subject, coupled with the fact that approximately 10-20% of subjects may 
+evade successful tracking. Moreover, a substantial amount of time is dedicated to the analysis and organization of data, 
+with uncertainties persisting in data interpretation. For instance, discerning whether prolonged or frequent fixation on a 
+subject by viewers signifies its importance or its complexity remains ambiguous (Jacob & Karn, 2003). In recent years, 
+due to technological advancements, research in the field of eye tracking has proliferated. Recent studies indicate that during 
+website browsing, people's visual attention typically conforms to an F-shape pattern (although some scholars have also 
+proposed E- or Z-shape patterns) when scanning the entire website (Nielsen, 2006; Nielsen Norman Group, 2009; Shrestha 
+& Owens, 2009). Moreover, scholars have posited that viewing priority typically begins at the top left corner, progresses 
+to the top right corner, then moves to the bottom left corner, and finally to the bottom right corner. It has also been suggested 
+that viewing behavior proceeds horizontally from left to right, followed by a vertical movement from top to bottom 
+(Djamasbi et al., 2011; Moran, 2020). From an ocular perspective, the horizontal trajectory exhibits greater regularity 
+compared to the vertical trajectory (Goldberg et al., 2002; Pan et al., 2004).
+Namoun indicated in 2018 highlighted that when an object (task) is positioned within a fixed area, it heightens the 
+concentration of attention during observation, consequently resulting in extensive coverage of the area of interest by eye-
+tracking, a phenomenon termed as depth scanning mode. The textual layout appears to influence the trajectory of the user's 
+gaze during viewing, with a columnar layout being more aesthetically pleasing than a grid layout. Nonetheless, prior 
+research has only tentatively suggested that a column layout garners visual attention, and its impact on information search 
+efficiency remains inconclusive (Namoun, 2018). According to the "eye-mind" hypothesis proposed by Just and Carpenter, 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+11
+when an individual fixates on a particular passage of text or a specific region, the brain concurrently processes the 
+corresponding information (Just & Carpenter, 1976). Put differently, eye movement data can furnish a dynamic trace of 
+the locus of a person's attention within a visual display during observation (Hung & Wang, 2021). 
+In 2011, Leuthold, Schmutz, et al. employed eye-tracking devices to investigate disparities in users' visual perceptions 
+among simple menus, dynamic menus, and vertical menus. The study's findings indicated that vertical menus require users 
+to glance less frequently, operate more swiftly, and achieve a higher success rate. Consequently, this research posits that 
+vertical menus are more conducive to exploring user perception and cognition (Leuthold et al., 2011). Nevertheless, the 
+scope of eye-tracking applications in menu studies remains somewhat limited, underscoring the necessity for future studies 
+to encompass a broader array of menu types. In 2003, Jacob and Karn highlighted the burgeoning interest in eye-tracking 
+research within the domain of human-computer interaction, particularly its relevance to investigating user perceptions 
+during menu item search processes. Their study synthesized findings from 20 usability studies, revealing a transition of 
+focus from traditional computer menu navigation towards web search activities and information extraction from web pages. 
+This evolution included a shift from targeted item searches within menus to exploratory browsing behaviors across websites 
+without predefined objectives(Jacob & Karn, 2003). Jacob and Karn's insights underscore the utility of eye-tracking studies 
+in informing navigation design and illuminating the role of eye gaze in information retrieval processes(Jacob & Karn, 
+2003; Nielsen & Pernice, 2010).
+2.4 Phase Summary
+Summarizing the foregoing literature review, this study aims to extend the future directions and address the gaps 
+identified by previous scholars. First, it underscores the significance of the menu within the navigation system as a pivotal 
+determinant of website usability. Second, it highlights the varying outcomes observed in prior research regarding the 
+efficacy of expansive menus in facilitating user search processes, underscoring the need for more comprehensive data 
+analysis in this regard. Thirdly, it advocates for a broader application of eye-tracking technology in menu research 
+encompassing diverse menu types. Fourth, it advocates for the further expansion of eye-tracking utilization. Specifically, 
+the integration of eye-tracking devices in menu research should encompass a wider spectrum of applications. Historically, 
+empirical investigations have identified Eye-tracking Measurement Methods (EMMs) as effective tools for probing user 
+search behavior and gaze patterns within navigation systems structured by information architecture (Nielsen & Pernice, 
+2010). Such methodologies enable profound analysis of physiological data, thereby enhancing researchers' comprehension 
+of user behaviors. Furthermore, eye-tracking technology plays a pivotal role in experimental settings, facilitating post-
+experimentation recall through the playback of eye movements and supporting semi-structured interviews (Bartels, 2019).
+This study commences by providing an initial clarification of the menu hierarchy, drawing upon Kalbach's (2007) 
+conceptualization of the hierarchical organization of a website (Kalbach, 2007). Within this framework, the elements 
+comprising the hierarchical structure are denoted as "Hierarchical Structure," with the uppermost tier designated as "Main 
+Navigation," and subsequent tiers referred to as "Local Navigation." Thus, in alignment with Kalbach's hierarchical model, 
+this study adopts the terminology of "Main Menu" for the primary level menu and "Local Menu" for the subordinate levels.
+3 METHODOLOGY
+This study underwent review and approval by the Ethics Committee at [National Cheng Kung University] (reference 
+number: [111-306]). All subjects participating in the study provided informed consent and adhered to the pertinent ethical 
+guidelines and safeguards.
+This study integrates perspectives from developers and users, incorporating expert interviews to offer a 
+comprehensive user-centric view. It evaluates the website’s strengths and weaknesses across various perspectives, aiming 
+to synthesize insights to improve the website's operational experience and efficiency. Additionally, an eye-tracking 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+12
+experiment was conducted using an iterated version of the menu. Forty participants were invited to navigate the website in 
+a laboratory setting, providing post-operation feedback on their psychological experiences for reference and data analysis 
+purposes. The study is therefore divided into two phases:
+Study 1: This phase involves investigating the current e-commerce menu format through user questionnaires and 
+expert interviews, followed by facilitating interactions among users via focus groups. These focus groups aid in refining 
+website redesign efforts by enhancing focus and elucidating operational challenges across diverse user backgrounds.
+Study 2: This phase builds upon the findings of Study 1 to create an adjusted redesign version. Additionally, it will 
+involve the participation of 40 test subjects in the experimental phase. Through discussions with Tobii experts on eye-
+tracking data, a more in-depth analysis will be conducted. This will lead to the proposal of more suitable versions for future 
+developers to reference.
+3.1  Study 1: Menu Iteration
+This study collected samples from B2C retail e-commerce platforms in the top five e-commerce countries globally, 
+namely China, the United States, the United Kingdom, and Japan, for questionnaire administration. The study utilized 
+website listings from the United States and the United Kingdom among Western nations, and Japan and Taiwan among 
+Eastern nations, for questionnaire purposes. E-commerce platforms spanning multiple countries were selected as 
+representative examples for this questionnaire. Taiwan’s e-commerce sector has exhibited a significant growth rate of 
+28.5% within a year (Min-jun, 2021), attributed in part to the preceding pandemic, indicating substantial potential for retail 
+expansion. Consequently, forthcoming studies will incorporate iterative updates featuring Taiwan’s e-commerce platform. 
+The questionnaire was administered through the Maze (www.Maze.com), which is an online platform access users’ 
+usability on the website and was completed by the user. Simultaneously, the platform recorded error rates, mouse-click 
+positions, and total time spent on each operation to offer researchers and experts an accurate benchmark for interviews.
+3.1.1  Questionnaire Construction
+This phase comprises four questionnaires, each assessing the usability and satisfaction of a cross-border e-commerce 
+website. Simultaneously, we employed the backend of the Maze platform to collect data, encompassing metrics such as 
+Homepage exit count (i.e., the number of users who abandoned the operation), Mis-click Rate, Avg Duration, Direct 
+Success, Indirect Success as well as Give-up / Bounce. We leveraged this data to pinpoint areas where test subjects were 
+prone to clicking incorrectly during operations, facilitating discussions with experts and the proposal of a prototype design 
+for revision.
+3.1.2  Expert Interviews
+Four experts were invited to participate in this phase of the study. We invited one interface designer, two front-end 
+engineers, and one back-end engineer, each with over three years of work experience. Initially, we commenced the 
+interviews by gaining insights into their pertinent backgrounds and experiences. Subsequently, we delved into trend 
+analyses and the perspectives of these experts across diverse fields concerning B2C cross-border e-commerce. Following 
+this, we investigated the impact of information architecture within this industry. Ultimately, we engaged in discussions 
+with the experts regarding the strengths and weaknesses of navigation systems across four e-commerce platforms. These 
+discussions were informed by the results gleaned from user-administered questionnaires and an examination of the menu 
+structures of each website. 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+13
+3.2 Study 2: Eye-tracking Experiments
+3.2.1 Eye-tracking Experiments
+Participant
+Based on prior research, it is imperative to ensure a sample size exceeding 30 participants to establish a valid oculomotor 
+thermogram (Nielsen & Pernice, 2010). Therefore, 40 participants were initially recruited for the within-subject design 
+experiment conducted in this study. Subsequently, one participant withdrew from the experiment due to personal reasons, 
+resulting in a final sample of 17 males and 22 females.
+Material (Stimuli)
+In this phase, we utilized Adobe XD for prototype design. We integrated feedback from previous experts and users 
+across four B2C e-commerce platforms to inform our prototype designs. The experiment employed purposive search 
+techniques to effectively manage task time, during which we focused on identifying a vacuum cleaner robot as the target 
+purchase. To avoid any bias stemming from participants' familiarity with robot vacuum cleaners, we excluded all product 
+logos from the images used in the study. Additionally, we selected robot vacuum cleaners with similar appearances to 
+minimize the potential for brand recognition by the participants. Each participant interacted with two versions of the 
+navigation system, one featuring the initial horizontal design iteration and another featuring the subsequent horizontal 
+design iteration, as well as the initial horizontal design iteration paired with the subsequent vertical design iteration. Before 
+commencing the experiment, we delineated the Areas of Interest (AOI) on both versions, streamlining subsequent data 
+analysis, particularly in evaluating menu efficiency. The following is a schematic diagram of the AOI (Figure 1):
+Figure 1 Menu Definition and Prototype
+Measurement
+In their 2003 study, Jacob and Karn noted that the definition of eye-tracking data lacked clarity. However, recent years 
+have witnessed rapid advancements and maturation in eye-tracking technology, leading to its widespread utilization in 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+14
+research (Holmqvist et al., 2011; Klein & Ettinger, 2019; Nakano et al., 2013; Nielsen & Pernice, 2010; Thoma & Dodd, 
+2019; Van Gompel, 2007). Eye-tracking devices have proven effective in aiding researchers' understanding of eye 
+movement patterns during reading (Van Gompel, 2007). Moreover, the neural circuits linked with rapid eye movements 
+have undergone extensive study in the medical field, particularly in humans where they are well-documented, while similar 
+physiological investigations have been conducted in non-human primates (Van Gompel, 2007).
+Previous studies have compiled and analyzed the applications of eye-tracking in various fields (Nielsen & Pernice, 
+2010; Van Gompel, 2007). Concerning human-computer interaction, research related to eye-tracking is also progressively 
+emerging. In a 2013 publication (p. 117) co-authored by Nakano, Conati, and Bader, it is noted that there are nearly fifty 
+extractable eye-movement features in eye-tracking device data. However, there remains a question as to whether a more 
+concise set of features can be employed to achieve comparable performance and thereby enhance computational efficiency 
+(Nakano et al., 2013). Hence, this study utilized data from Tobii Pro Lab to analyze five aspects, including Visit Duration, 
+Fixation Duration, Total Time of Interest Duration, Revisit Count, and Reach People. Additionally, the study engaged in 
+discussions with experts from Tobii to devise various methods for in-depth data exploration. The data of this study is 
+defined as Table 2 below:
+Table 2 The metric definitions of this study
+Metric Definition
+Heat Map It shows the combined fixations of total participants on the pages(Nielsen & Pernice, 2010).
+Gaze One gaze plot shows a single participant’s visit on the page. Each plot dot means a fixation. More 
+larger dot mean more longer fixation. The lines between the plot dots are saccades(Nielsen & 
+Pernice, 2010; Tobii, 2023).
+Fixations During fixations, the eyes come to a halt, ceasing the scanning of the visual scene, and remain 
+relatively immobile. This allows for maintaining focus on a stationary object of interest directly on 
+the fovea, facilitating detailed intake of visual information(Nielsen & Pernice, 2010; Tobii, 2023).
+Attention Ratio It is defined as a measure of the proportion or degree of focus allocation by individuals or groups in 
+a specific context or task.
+Fixation Duration/Total Time of Interest Duration
+Effective Focus It can be defined as the ability of individuals or group to concentrate and utilize time and resources 
+efficiently while accomplishing tasks.
+Fixation Duration/Visit Duration
+Reach Rate It refers to the percentage of the target participants reached or engaged within a specific timeframe.
+Number of People Paying Attention to this AOI / Total Number of Participants
+Revisit Rate It refers to the percentage of participants who revisit a AOI within a defined period of time.
+Revisit Count / Reach People
+Procedure
+Before the commencement of the experiment, researchers will prepare the task of locating the target for this study. This 
+research adopts a purposive search strategy based on the experiences of previous scholars to allow researchers to control 
+the operation time and to prevent excessive eye use by the participants, which could lead to eye fatigue. According to 
+Tobii's technical experts, when conducting eye-tracking experiments, it is advisable to limit the duration to within 30 
+minutes to avoid potential data quality degradation due to eye fatigue in the later stages. Prior to the start of the experiment, 
+researchers will describe the shopping scenario to the participants: "Today, the robot vacuum cleaner in your home is 
+broken, and you plan to purchase a new home appliance through online shopping. You have decided on an iRobot model 
+robot vacuum cleaner and will search for the product using the website menu. This experiment does not have a time 
+constraint; please proceed in the most comfortable and relaxed posture."
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+15
+In 2019, Tobii published a web article indicating that conducting thorough user interviews while utilizing an eye-
+tracking device facilitates post-analysis of collected data. Nonetheless, given that thinking aloud can evoke a sense of 
+artificiality in subjects, we advocated for a gentle encouragement of thinking aloud without coercion, thereby permitting 
+subjects to supplement their insights during task manipulation. This methodology, complemented by video playback at the 
+experiment's conclusion, rendered the detailed retrospective discussion more organic for both subjects and researchers 
+alike. Before commencing the experiment, every participant received detailed instructions from the researcher to complete 
+an informed consent form, ensuring their comprehension of the procedures and rights involved. At the onset of the 
+experiment, the purchase scenario appeared on-screen, accompanied by the researcher’s verbal description of the task, 
+ensuring its clear and effective communication to the participant. The researcher maintained non-intervention during task 
+execution, and participants subsequently completed usability scales and satisfaction questionnaires after each task. Lastly, 
+eye-movement playback was employed to facilitate Retrospective think aloud methodology, RTA (Retrospective think 
+aloud methodology, RTA) of cognitive processes. According to Tobii's proposal, participants involved in situational tasks 
+often exhibit more manipulative behaviors. Consequently, employing the Concurrent Think Aloud methodology (CTA) 
+may result in an unnatural level of attention. Ideally, the Retrospective Think Aloud methodology (RTA) should be utilized 
+for qualitative data collection. This approach enables the participant to concentrate on the eye movement experiment before 
+engaging in the RTA(Bartels, 2019). The researcher can playback a video of the gaze trajectory during manipulation, 
+enabling the participant to articulate their thoughts during the manipulation task while observing the video. Additionally, 
+the brief RTA session facilitates a suitable transition and adaptation period for the participant between the two tasks. Figure 
+2 shows the stages of the experiment.:
+Figure 2 The experimental procedure
+4 RESULTS
+4.1 Study 1: Iteration of Menu Prototypes
+4.1.1 Results: Users And Experts
+A total of 101 questionnaires were collected in this phase, with 100 valid questionnaires. Through the menu 
+manipulation of these questionnaires, we initially explored the data provided by the backend of the Maze platform (see 
+Table 3). In the UK, users spent less time on menu manipulation and had a higher success rate (78.3%). In comparison, the 
+US had a lower direct success rate, but it is worth noting that it excelled in indirect success rate, which was the best among 
+the four sites. This implies that the website possesses the capability to assist users in retracing their steps to the correct path 
+upon becoming disoriented. In the Taiwan segment of our study, we observed faster operation times and higher success 
+rates. However, we hypothesized that these outcomes might be attributed to respondent ethnicity, with a majority being 
+familiar with the Taiwan website. Analysis of open-ended questionnaire responses revealed that despite the higher success 
+rate on the Taiwan website, respondents generally provided less favorable feedback. Common complaints included the 
+complexity of menu navigation, overwhelming information volume, and unclear categorization. User feedback 
+predominantly centered on challenges related to menu complexity and overall site usability.
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+16
+Table 3 Data about menu manipulation
+Country Homepage exit count Misclick Rate Avg Duration Direct Success Indirect Success Give-up / Bounce
+United State 3 45.7% 14.1s 43.5% 21.7% 34.8%
+United Kingdom 4 37.8% 16.4s 78.3% 0% 21.7%
+Japan 8 48.3% 27.3s 67.7% 0% 32.3%
+Taiwan 4 28.3% 16.6s 73.9% 0% 26.1%
+The primary objective of information architecture is user-centricity. It is often stated by experts that while a good 
+User Interface (UI) is crucial, it does not automatically translate to a good User Experience (UX). However, UI serves as 
+the initial point to captivate users, with UX following to create a lasting positive impression. Only when both aspects are 
+well-executed can we effectively retain customers. In this research endeavor, we have focused on restructuring information 
+through text layout optimization and revamping the original menu specifically for Taiwan's version. Drawing from 
+previous eye-tracking studies, we identified the F-shaped reading pattern as a significant factor in iterative design 
+considerations for webpages. Our hypothesis posits that implementing the F-shaped visual hierarchy onto webpages, 
+particularly in navigating from the main menu to submenu areas, can enhance operational efficiency and usability, thus 
+improving overall user experience. At last, we have crafted two prototypes tailored for a Known-item seeking task, intended 
+for the subsequent phase of the eye-tracking experiment. In the original version (version 1), both the main menu and the 
+local menu were arranged horizontally. In response to feedback from users and experts, the second version retained the 
+horizontal alignment for the main menu, albeit refined into more succinct categories. Notably, the local menu was 
+reconfigured to a vertical orientation. Figure 3 shows a difference between the two versions of the menus:
+Figure 3 Two Versions Menu Layout
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+17
+Figure 4 Two Versions of Heat Map
+4.2 Results of Study 2
+4.2.1  Usability and Satisfaction
+Satisfaction and usability experienced significant improvement between the two versions iterations of the menu. 
+Previous studies have established a positive correlation between usability and satisfaction. Moving forward, we aim to 
+delve deeper into the connection between the main menu and local menu concerning their impact on satisfaction and 
+usability flow. Table 4 shows the correlation coefficients between initial usability and satisfaction between the two versions.
+Table 4 Pearson correlation coefficient Matrix between SUS and Satisfaction.
+Version SUS Satisfaction
+SUS 1 0.762**First Version
+Satisfaction 1
+SUS 1 0.750**Second Version
+Satisfaction 1
+** Correlation is significant at the 0.01 level (2-tailed).
+* Correlation is significant at the 0.05 level (2-tailed).
+4.2.2  Heat Map
+The preliminary heat map results indicate that red areas in the heat map of the main menu correspond to points of 
+interest for multiple subjects. In contrast to Version 2, the main menu in Version 1 was less populated. Initial interviews 
+suggest that the menu categories in Version 1 might have been overly complex, leading to confusion among respondents 
+during navigation. A more thorough data analysis would be carried out in the subsequent phase. In the open local menu, 
+the horizontal layout of the initial version increased difficulty in readability and caused subjects to become disoriented 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+18
+when searching for specific subcategories. Past research suggests that such disorientation can lead to confusion and 
+frustration among subjects (Chang et al., 2022; Lazar et al., 2003; Levene, 2011; Nah & Davis, 2002). The preliminary 
+heat map also revealed that changing the menu to a vertical format (Version 2) allowed subjects to focus better on larger 
+blocks of information. Therefore, we tentatively propose that a vertical menu format may enhance subjects' ability to 
+navigate information effectively. Figure 4 illustrates these findings.
+4.2.3  Data Analysis: Main Menu
+In the data analysis pertaining to the main menu, distinctions in Fixation Duration and Effective Focus were initially 
+assessed through an independent samples t-test. In the descriptive statistics, each version had 39 participants. In terms of 
+fixation duration, a significant difference was observed between Version 1 (M = 8.75, SD = 9.49) and Version 2 (M = 4.82, 
+SD = 3.58) (as in Table 5). Based on the results of the RTA, the subjects noted that the menu categories in the initial version 
+were overly subdivided. This resulted in numerous errors as they struggled to locate the appropriate category during the 
+task. Hence, we proceeded to deliberate on the efficacy of the simple category (Version 2) within the main menu, aiming 
+to augment users' operational experiences while elucidating notable variances in Effective Focus. Table 6 illustrates 
+significant discrepancies in Effective Focus between Version 1 (M = 0.90, SD = 0.18) and Version 2 (M = 0.36, SD = 0.39). 
+The revision in Version 2 significantly improved overall viewing efficiency, as evidenced by a higher performance in 
+attention span and viewing return rates compared to the condensed category (Version 2) (refer to  ). Interviews with subjects 
+revealed that excessive description and categorization heightened attention and Revisit. Their frequent revisits were 
+primarily due to uncertainties in the operational process. Subjects' repeated visits to the main menu not only demonstrated 
+hesitancy but also suggested that a higher proportion of returns to the main menu might lower viewing efficiency.
+Table 5 Independent Samples T-test of the two version of Fixation Duration and Effective Focus.
+Version t df p Mean Difference SE Difference
+Fixation Duration 2.421 76 0.018 3.930 1.624
+Effective Focus 8.078 76 0.000 0.540 0.067
+Specifically, as observed in Figure 5Effective Focus, the first version shows higher values compared to the second 
+version. According to the indicator definitions outlined in this study, Effective Focus is calculated based on the attention 
+duration and viewing time within the AOI (Area of Interest) drawn region. In comparison to Figure 5, the eye-tracking data 
+for the first version predominantly covers the entire AOI of the main menu. Conversely, in the second version, users' eye-
+tracking paths are more intuitive and focused within the AOI due to the clear description of menu categories (resulting in 
+a more concentrated heat map). Regarding Table 7, we hypothesize that the elongated Attention Ratio in the initial step of 
+the first version may contribute to a certain level of user satisfaction with the website.
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+19
+Figure 5 Data of Main Menu and Local Menu 
+4.2.4  Data Analysis: Local Menu
+Regarding the local menu, we found that only the local menu in version 1 had no significant differences in usability 
+and satisfaction with the physiological perceptions of the participants when they entered the local menu (i.e., clicked on 
+the local menu). Notably, in the Second version, the local menu (Total Time of Interest Duration, TTID) was presented in 
+a vertical orientation, leading to a negative correlation with satisfaction and usability (refer to Table 6), yet resulting in a 
+positive correlation with the time spent in the main menu. The current study posits a hypothesis in line with prior expert 
+theories: that User Interface (UI) serves to attract users, while User Experience (UX) encourages user retention. Engaging 
+users at the main menu tends to prolong their subsequent stay on the following page local menu. Nonetheless, prolonged 
+stays on the local menu can potentially result in diminished SUS and overall satisfaction.
+Based on the initial data analysis, notable correlations were identified within the redesigned interface. Subsequent data 
+analysis revealed that without activation of the local menu (i.e., Table 7 Main menu), Attention Ratio exhibited a positive 
+correlation with user satisfaction. Conversely, upon activation of the local menu (i.e., Table 7 Local menu), the Effective 
+Focus demonstrated a positive correlation with usability. Observations from users' Retrospective Think Aloud (RTA) 
+methodology indicated that when accessing the local menu, the vertical menu proved more effective for navigation and 
+locating target information, resulting in reduced time spent on the main menu. Consequently, the higher revisit rate in this 
+context (e.g., Figure 5) implies that vertical menus facilitate navigation and information retrieval—a departure from the 
+wandering revisit rates observed with only the main menu present (e.g., Figure 5). Furthermore, independent sample t-tests 
+were conducted to validate the hypothesis and assess differences between the two versions regarding regional menus in 
+this study. The findings revealed a significant disparity between the first version (M = 0.84, SD = 0.15) and the second 
+version (M = 0.89, SD = 0.05), t (76) = -2.082, p = .041, confirming the presence of distinct characteristics in regional 
+menus across the versions.
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+20
+Table 6 Pearson correlation coefficient Matrix for Version Two.
+Version Main Menu- TTID Local Menu-TTID SUS Satisfaction
+Main Menu- TTID 1 0.559** -0.122 -0.157
+Local Menu- TTID 1 -0.362* -0.349*
+SUS 1 0.750**
+Satisfaction 1
+Total Time of Interest Duration, TTID
+** Correlation is significant at the 0.01 level (2-tailed).
+* Correlation is significant at the 0.05 level (2-tailed).
+Table 7 Pearson correlation coefficient Matrix between Main Menu and Local Menu.
+Page Attention Ratio SUS Satisfaction
+Main menua Attention Ratio 1 0.246 0.364*
+SUS 1 0.750**
+Satisfaction 1
+Effective Focus SUS Satisfaction
+Local menub Effective Focus 1 0.322* 0.226
+SUS 1 0.750**
+Satisfaction 1
+aMain menu: The webpage just showed Main Menu.
+bLocal menu: The webpage simultaneously showed Main Menu and Local Menu.
+** Correlation is significant at the 0.01 level (2-tailed).
+* Correlation is significant at the 0.05 level (2-tailed).
+5 FINDINGS SUMMARY
+After adjusting to the feedback from users and experts, the update has been effective in improving the efficiency of 
+users in ordering meals. In Study 1, we found that user feedback was more concerned with the complexity of the menu 
+categories and the overall experience. After discussing with experts, we constructed an idea that "UI is the first step to 
+attract users, and UX is the second step to make a good impression. With both UI and UX strategies, we can drive customers 
+back." Therefore, through user feedback and previous eye-tracking results, we found that users are good at viewing flat 
+surfaces in an F-shape. Combining visual feedback and previous objective eye movement behaviour results, we ultimately 
+recommended that the main menu and local menu to be presented in a combination of horizontal and vertical formats in 
+the Study One. The results of Study One provided a good basis for a follow-up eye-tracking study, and through feedback 
+from experts and users, we iterated on a second version of the (horizontally-integrated-vertical) design.
+In Study 2, we divided the discussion into two parts: the main menu and the local menu. For the main menu, the result 
+showed that too much detail in the menu would increase the time required for users to understand and guess, which may 
+cause uncertainty in users' search for information. In the second version of the main menu, we simplified the layout of the 
+menu that helped improve users' comprehension and viewing efficiency, according to the study. As for the local menu, it 
+was found that the original version of the menu did not have a significant effect on usability and satisfaction; however, in 
+the updated version of the menu, the local menu improved the efficiency (Effective Focus) of the users in finding 
+information.
+The findings suggest that employing straightforward and succinct menu designs for main menus effectively enhances 
+users’ attention. Increased attention on main menus correlates with a higher likelihood of subsequent exploration, including 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+21
+engagement with local menu. Moreover, the research revealed that heightened interest in main menus corresponds with 
+greater user satisfaction, subsequently prompting engagement with local menu. However, it is important to note that if the 
+local menu takes too long to unfold, it may diminish user usability and satisfaction with the website. Lastly, this study 
+introduces a novel perspective for understanding the user's dynamic operational process within a navigation system. By 
+employing the previously utilized flat F-type heat map along the user experience viewing line, dynamic visual breakpoints 
+are identified through the amalgamation of horizontal and vertical directions, aimed at amplifying user operational 
+efficiency and experience.
+6CONCLUSION AND DISCUSSION
+In this study, mega menus are defined as those that can display lower-level links within the same screen area, providing 
+a clear view of the entire menu structure. This presentation of both breadth and depth enables users to efficiently navigate 
+directly to their desired targets, bypassing sequential selections. Drawing upon previous scholarly concepts of hierarchy 
+(Kalbach, 2007), this research explores both main menus and local menus.
+Therefore, it is important to recognize that excessive reliance on local menu may result in diminished user usability and 
+satisfaction with a website. This study introduces a novel perspective on user dynamics within a navigation system. This 
+approach adapts the traditional flat F-shaped heat map model to the user experience viewing line and establishes visual 
+breakpoints through horizontal and vertical integration, thereby enhancing operational efficiency within the user 
+experience. Menus represent a prevalent method for website navigation, comprising a series of links to various pages that 
+collectively form the website’s information structure, significantly influencing its usability (Naylor, 2016). Leuthold et al. 
+(2011) note that vertical menus lead to reduced gaze frequency, faster navigation speeds, and higher success rates, 
+underscoring their suitability for perception and cognition(Leuthold et al., 2011). Future research endeavors should 
+encompass diverse navigation systems to tackle the multifaceted challenges confronting present and future users in 
+navigation tasks. When confronted with intricate tasks, users tend to adapt navigation strategies (Leuthold et al., 2011) and 
+tailor their behavior according to their own experience or the information acquired during information retrieval (Jul & 
+Furnas, 1997; Zheng, 2015). Fenichel (1981) was one of the earliest to indicate that users' website search experience 
+influences their search performance (Fenichel, 1981; Kim, 2001). Hence, building upon previous research, this study 
+centers on enhancing user experience efficiency through menu design to alleviate users' cognitive processing load during 
+information retrieval. Previous studies have frequently discussed the phenomenon of individuals following F or Z-shaped 
+trajectories during visual perception, primarily within static planar viewing contexts. This study extends the concept of F-
+shaped trajectories to dynamic operations through experimental manipulation. In the design of the main menu, a horizontal 
+layout is more effective in capturing viewers’ attention, while for the local menu, a vertical F-shaped layout is integrated 
+into the design considerations. As anticipated, the second version of the local menu presented in a vertical format 
+demonstrated superior visual efficiency. This outcome reinforces the critical role of UI design in initial user engagement, 
+with UX being paramount in user retention.
+This study synthesizes input from both users and experts, providing a foundational framework for subsequent research 
+on the validation of Version 2. Initial heat map analysis clearly reveals that participants exhibited enhanced eye focus when 
+presented with a vertically oriented local menu. Additionally, our investigation found a marked decrease in concentration 
+at the first level of the main menu, in contrast to the engagement elicited by static images. Considering the concept of 
+'Known-item seeking,' users typically seek information in the most efficient and expedient manner possible to facilitate 
+decision-making. We aim to reduce the time spent in the search process overall. Version 2 of the platform demonstrated 
+enhanced efficiency in viewing and proved to be more effective than the multi-category format, as indicated by statistical 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+22
+analysis of viewing time and return viewing percentages. Retrospective interviews revealed that the multi-category menu 
+caused confusion among respondents, leading to increased navigation time and feelings of confusion. Concerning local 
+menu, users tend to access them more frequently when they find the content of the main menu intriguing. Nevertheless, 
+when users navigate these local menus to seek information, the efficiency of the menu interface plays a crucial role. 
+Investing an appropriate amount of time in navigating local menu can enhance usability and user satisfaction. Conversely, 
+prolonged search times may diminish the user’s perception of the site’s usability and satisfaction levels. Skillful design of 
+local menu further enhances user efficiency, subsequently contributing to the overall smoothness of site navigation (refer 
+to Table 7).
+Based on prior research, this study investigates the contributions of mega-menus to navigation systems within 
+information architecture, delineated as follows: (1) a comprehensive assessment of the efficacy of mega-menus in 
+enhancing users' search efficiency, utilizing eye-tracking data; (2) a more thorough and multifaceted exploration within 
+the realm of menu design; (3) precise delineations of each menu type; and (4) the integration of the visual trajectory  (F-
+shaped) of the former flat plane into the dynamic operation process to present the main and local menus both horizontally 
+and vertically. Furthermore, the study underscores the significance of usability within navigation systems (Palmer, 2002; 
+Zheng, 2015). Despite the technological boom in the field of human-computer interaction, comprehensive research on 
+menus remains scarce. While most users rely on search systems to locate information, menus serve as navigational aids 
+akin to maps. In situations where search systems are unavailable, navigation systems become crucial tools for information 
+retrieval. Despite being a passive tool, navigation systems are indispensable, enabling users to navigate websites with 
+confidence. Even in the event of search system failure, navigation systems offer a dependable alternative.
+"Is Beautiful Design Correlated with Enhanced Usability?" (Tractinsky et al., 2000). While it is acknowledged that an 
+aesthetically pleasing interface can evoke positive user sentiments, it constitutes merely a fraction of the overall user 
+experience. The functionality of the interface gains prominence once users engage with it. Consequently, as asserted by 
+experts, "User Interface (UI) serves as the initial enticement for users, while User Experience (UX) is pivotal in fostering 
+a favorable impression. It is only when both elements are seamlessly integrated that customer retention can be effectively 
+achieved." This study contributes valuable insights for subsequent developers based on feedback from both experts and 
+users. A positive user experience plays a crucial role in shaping a favorable perception of a brand (Krug, 2000; Naylor, 
+2016; Rosenfeld & Morville, 2002). Given the multitude of elements within a website that can influence user behavior, it 
+is imperative to meticulously consider the impact of each detail during the development phase. This consideration becomes 
+even more pertinent in light of the proliferation of cross-border e-commerce enterprises, particularly influenced by recent 
+epidemics. Consequently, a comprehensive focus on the overall user experience becomes imperative not only for enhancing 
+business gains but also for fostering customer loyalty retention.
+This study focuses on exploring the menus of B2C retail e-commerce platforms. Given that the retail e-commerce 
+industry encompasses a diverse and extensive range of products and services, it is more suitable to present the overall menu 
+using mega menus to increase user operational efficiency. Consequently, this study only investigates the current trend of 
+mega menus, lacking a broader exploration. However, due to the rapid development of internet technology, many different 
+types of menus have been phased out without in-depth exploration. While traditional menus have disappeared in the fast-
+evolving internet era, they may provide valuable insights for future menu architecture. Although this study conducts a 
+literature review and defines traditional menus, it has not performed further user research on various menu types. Future 
+research should focus on reviewing relevant studies and comprehensively exploring different types of menus. Additionally, 
+to simplify the investigation of how menu formats are perceived and experienced psychologically by users, this study 
+overlooks related website elements such as color schemes, advertising displays, and brand influences. However, 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+23
+constructing a complete e-commerce platform relies on the integration of various elements. Therefore, future in-depth 
+studies on menus should timely incorporate related elements to understand the mutual influences between menus and other 
+elements. Lastly, catalyzed by the COVID-19 pandemic, cross-border e-commerce platforms have become battlegrounds 
+among businesses. Under different cultural backgrounds, the development and planning of cross-border e-commerce may 
+also emerge as an indispensable element. In B2C e-commerce platforms, the retail industry is the most complex and 
+information-rich. Therefore, this study focuses more on exploring mega menus in B2C retail e-commerce platforms. 
+However, it lacks a comprehensive discussion of other types of websites, such as brand websites and showcase websites.
+ACKNOWLEDGMENTS
+This research is supported by Taiwan National Science and Technology Council. The Grant number is MOST 111-
+2410-H-006-106.
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+24
+REFERENCES
+Algolia. (2023). HierarchicalMenu. Algolia. https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/react/
+Almeida, F. (2017). Concept and dimensions of web 4.0. International journal of computers and technology, 16(7). 
+Andrea, E. (2012). Dropdown vs Flyout vs Dropline vs Mega vs Accordion Menus. OSTraining. 
+https://www.ostraining.com/blog/webdesign/different-types-of-multi-level-menu/
+Bargas-Avila, J. A., & Hornbæk, K. (2011). Old wine in new bottles or novel challenges: a critical analysis of empirical 
+studies of user experience. Proceedings of the SIGCHI conference on human factors in computing systems, 
+Bartels, M. (2019). Why the retrospective think-aloud interview is a game-changer in qualitative research. 
+https://www.tobii.com/blog/retrospective-think-aloud-interview-is-a-game-changer
+Bates, M. J. (1989). The design of browsing and berrypicking techniques for the online search interface. Online review. 
+Ben-Bassat, T., Meyer, J., & Tractinsky, N. (2006). Economic and subjective measures of the perceived value of aesthetics 
+and usability. ACM Transactions on Computer-Human Interaction (TOCHI), 13(2), 210-234. 
+Chang, T.-M., Kao, H.-Y., Wu, J.-H., Hsiao, K.-W., & Chan, T.-F. (2022). Integrated ontology-based approach with 
+navigation and content representation for health care website design. Computers in Human Behavior, 128, 
+107119. https://doi.org/https://doi.org/10.1016/j.chb.2021.107119 
+Comeaux, D. J. (2017). Web Design Trends in Academic Libraries—A Longitudinal Study. Journal of Web Librarianship, 
+11(1), 1-15. https://doi.org/10.1080/19322909.2016.1230031 
+Cuddihy, E., & Spyridakis, J. H. (2012). The effect of visual design and placement of intra-article navigation schemes on 
+reading comprehension and website user perceptions. Computers in Human Behavior, 28(4), 1399-1409. 
+https://doi.org/https://doi.org/10.1016/j.chb.2012.03.002 
+Danielson, D. R. (2002). Web navigation and the behavioral effects of constantly visible site maps. Interacting with 
+computers, 14(5), 601-618. 
+Davenport, T. H., & Prusak, L. (1997). Information ecology: Mastering the information and knowledge environment. 
+Oxford University Press on Demand. 
+De Marsico, M., & Levialdi, S. (2004). Evaluating web sites: exploiting user's expectations. International Journal of 
+Human-Computer Studies, 60(3), 381-416. 
+Deaton, M. (2003). The elements of user experience: user-centered design for the Web. Interactions, 10(5), 49-51. 
+Developer, A. (2023). Tab bars. Apple Developer. https://developer.apple.com/design/human-interface-guidelines/tab-
+bars
+Dijck, P. v. (2003). Information architecture for designers: structuring websites for business success. (No Title). 
+Djamasbi, S., Siegel, M., & Tullis, T. (2011). Visual hierarchy and viewing behavior: An eye tracking study. Human-
+Computer Interaction. Design and Development Approaches: 14th International Conference, HCI International 
+2011, Orlando, FL, USA, July 9-14, 2011, Proceedings, Part I 14, 
+Eggert, & Abou-Zahra. (2015). Fly-out Menus. W3C Web Accessibility Initiative. 
+Fatima, R. (2019). Web Terminology: Flyout Menu…. https://medium.com/@rezafatima2000/web-terminology-flyout-
+menu-df5709551a39
+FEDEWA, J. (2021). What Is a Hamburger Menu Button? How-to Geek. https://www.howtogeek.com/720214/what-is-a-
+hamburger-menu-button/
+Fenichel, C. H. (1981). Online searching: Measures that discriminate among users with different types of experiences. 
+Journal of the American Society for Information Science, 32(1), 23-32. 
+Fessenden, T. (2019). Footers 101: Design Patterns and When to Use Each. 
+https://www.nngroup.com/articles/footers/?source=post_page-----a1d25657bdc4--------------------------------
+Fessenden, T. (2020). Footers Are Underrated. https://www.nngroup.com/videos/footers/
+Garrett, J. J. (2022). The elements of user experience. マイナビ出版. 
+Goldberg, J. H., Stimson, M. J., Lewenstein, M., Scott, N., & Wichansky, A. M. (2002). Eye tracking in web search tasks: 
+design implications. Proceedings of the 2002 symposium on Eye tracking research & applications, 
+Gordon, K., & Rohrer, C. (2022). A Guide to Using User-Experience Research Methods.  Retrieved from 
+https://www.nngroup.com/articles/guide-ux-research-methods/
+Group, N. N. (2008). Site Map Usability. https://www.nngroup.com/reports/site-map-usability/
+Hartmann, J., Sutcliffe, A., & Angeli, A. D. (2008). Towards a theory of user judgment of aesthetics and user interface 
+quality. ACM Transactions on Computer-Human Interaction (TOCHI), 15(4), 1-30. 
+Hassenzahl, M. (2004). The interplay of beauty, goodness, and usability in interactive products. Human–Computer 
+Interaction, 19(4), 319-349. 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+25
+Hassenzahl, M., & Tractinsky, N. (2006). User experience - a research agenda. Behaviour & Information Technology, 
+25(2), 91-97. https://doi.org/10.1080/01449290500330331 
+Holmqvist, K., Nyström, M., Andersson, R., Dewhurst, R., Jarodzka, H., & Van de Weijer, J. (2011). Eye tracking: A 
+comprehensive guide to methods and measures. oup Oxford. 
+Hornof, A. J., & Halverson, T. (2003). Cognitive strategies and eye movements for searching hierarchical computer 
+displays. Proceedings of the SIGCHI conference on Human factors in computing systems, 
+Hung, J. C., & Wang, C.-C. (2021). Exploring the website object layout of responsive web design: results of eye tracking 
+evaluations. The Journal of Supercomputing, 77(1), 343-365. 
+Imetska, R. (2016). Fat vs. Slim Footers. Progress Software Corporation. https://www.progress.com/blogs/fat-vs.-slim-
+footers?source=post_page-----a1d25657bdc4--------------------------------
+IxDF., I. D. F.-. (2020). What is Global Navigation? https://www.interaction-design.org/literature/topics/global-navigation
+Jacob, R. J., & Karn, K. S. (2003). Eye tracking in human-computer interaction and usability research: Ready to deliver 
+the promises. In The Mind's Eye (pp. 573-605). Elsevier. 
+Jul, S. (2004). From brains to branch points: Cognitive constraints in navigational design. University of Michigan. 
+Jul, S., & Furnas, G. W. (1997). Navigation in electronic worlds: a CHI 97 workshop. ACM SIGCHI Bulletin, 29(4), 44-
+49. 
+Just, M. A., & Carpenter, P. A. (1976). Eye fixations and cognitive processes. Cognitive Psychology, 8(4), 441-480. 
+Juvina, I. (2006). Development of cognitive model for navigating on the web. Utrecht University. 
+Kalbach, J. (2007). Designing Web navigation: Optimizing the user experience. " O'Reilly Media, Inc.". 
+Khadka, N. (2021). An usability and universal design investigation into hamburger menus OsloMet-storbyuniversitetet]. 
+Kiger, J. I. (1984). The depth/breadth trade-off in the design of menu-driven user interfaces. International journal of man-
+machine studies, 20(2), 201-213. 
+Kim, K.-S. (2001). Information-seeking on the Web: Effects of user and task variables. Library & information science 
+research, 23(3), 233-255. 
+Klein, C., & Ettinger, U. (2019). Eye movement research: An introduction to its scientific foundations and applications. 
+Springer Nature. 
+Kreigh, R. J., Pesot, J. F., & Halcomb, C. G. (1990). An evaluation of look-ahead help fields on various types of menu 
+hierarchies. International journal of man-machine studies, 32(6), 649-661. 
+Krug, S. (2000). Don't make me think!: a common sense approach to Web usability. Pearson Education India. 
+Kurosu, M., & Kashimura, K. (1995). Apparent usability vs. inherent usability: experimental analysis on the determinants 
+of the apparent usability. Conference companion on Human factors in computing systems, 
+Landauer, T. K. (1987). Relations between cognitive psychology and computer system design. Interfacing thought: 
+cognitive aspects of human-computer interaction, 1-25. 
+Laubheimer, P. (2018). Breadcrumbs: 11 Design Guidelines for Desktop and Mobile. 
+https://www.nngroup.com/articles/breadcrumbs/
+Lavie, T., & Tractinsky, N. (2004). Assessing dimensions of perceived visual aesthetics of web sites. International Journal 
+of Human-Computer Studies, 60(3), 269-298. 
+Lazar, J., Bessiere, K., Ceaparu, I., Robinson, J., & Shneiderman, B. (2003). Help! I'm Lost: User Frustration in Web 
+Navigation. IT and Society, 1. 
+Lee, S., & Koubek, R. J. (2010). Understanding user preferences based on usability and aesthetics before and after actual 
+use. Interacting with computers, 22(6), 530-543. 
+Leuthold, S., Schmutz, P., Bargas-Avila, J. A., Tuch, A. N., & Opwis, K. (2011). Vertical versus dynamic menus on the 
+world wide web: Eye tracking study measuring the influence of menu design and task complexity on user 
+performance and subjective preference. Computers in Human Behavior, 27(1), 459-472. 
+https://doi.org/https://doi.org/10.1016/j.chb.2010.09.009 
+Levene, M. (2011). An introduction to search engines and web navigation. John Wiley & Sons. 
+Loranger, H. (2014). Accordions Are Not Always the Answer for Complex Content on Desktops. Nielsen Norman Group. 
+https://www.nngroup.com/articles/accordions-complex-content/
+Lynch, P. J., Horton, S., & Horton, S. (1999). Web style guide: Basic design principles for creating web sites. Universities 
+Press. 
+Marchionini, G. (1989). Information‐seeking strategies of novices using a full‐text electronic encyclopedia. Journal of the 
+American Society for Information Science, 40(1), 54-66. 
+Miller, D. P. (1981). The depth/breadth tradeoff in hierarchical computer menus. Proceedings of the Human Factors Society 
+Annual Meeting, 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+26
+Min-jun, W. (2021). Online sales continue to grow, helping the retail industry mitigate the impact of the pandemic. Taipei: 
+Ministry of Economic Affairs, R.O.C. Retrieved from 
+https://www.moea.gov.tw/MNS/populace/news/News.aspx?kind=1&menu_id=40&news_id=96105
+Moran, K. (2020). The Lawn Mower Eyetracking Pattern for Scanning Comparison Tables. 
+Nah, F. F.-H., & Davis, S. (2002). HCI research issues in e-commerce. JOURNAL OF ELECTRONIC COMMERCE 
+RESEARCH, 3(3), 98-113. 
+Nakano, Y. I., Conati, C., & Bader, T. (2013). Eye gaze in intelligent user interfaces: gaze-based analyses, models and 
+applications. Springer. 
+Namoun, A. (2018). Three column website layout vs. grid website layout: An eye tracking study. Design, User Experience, 
+and Usability: Designing Interactions: 7th International Conference, DUXU 2018, Held as Part of HCI 
+International 2018, Las Vegas, NV, USA, July 15-20, 2018, Proceedings, Part II 7, 
+Naylor, S. (2016). Breadth and depth: A comparison of search performance in hierarchical and mega menus. 1-64. 
+Nielsen, J. (1994a, 1994). Enhancing the explanatory power of usability heuristics. 
+Nielsen, J. (1994b). Usability engineering. Morgan Kaufmann. 
+Nielsen, J. (1999). Designing web usability: The practice of simplicity. New riders publishing. 
+Nielsen, J. (2006). F-Shaped Pattern For Reading Web Content (original study). 
+Nielsen, J. (2007). Breadcrumb Navigation Increasingly Useful. https://www.nngroup.com/articles/breadcrumb-
+navigation-useful/
+Nielsen, J. (2012). Usability 101: Introduction to Usability. U.S. Retrieved from 
+https://www.nngroup.com/articles/usability-101-introduction-to-usability/
+Nielsen, J., & Levy, J. (1994). Measuring usability. Communications of the ACM, 37(4), 66-75. 
+https://doi.org/10.1145/175276.175282 
+Nielsen, J., & Li, A. (2017). Mega Menus Work Well for Site Navigation. https://www.nngroup.com/articles/mega-menus-
+work-well/
+Nielsen, J., & Pernice, K. (2010). Eyetracking web usability. New Riders. 
+Nielsen Norman Group. (2009). How to Conduct Eyetracking Studies. U.S.: Nielsen Norman Group
+Norman, D., & Nielsen, J. (2016). The Definition of User Experience (UX). U.S.: Nielsen Norman Group Retrieved from 
+https://www.nngroup.com/articles/definition-user-experience/
+Ouyang, X., & Zhou, J. (2018). Smart TV for Older Adults: A Comparative Study of the Mega Menu and Tiled Menu. In 
+(pp. 362-376). Springer International Publishing. https://doi.org/10.1007/978-3-319-92037-5_27 
+Palmer, J. W. (2002). Web Site Usability, Design, and Performance Metrics. Information Systems Research, 13(2), 151-
+167. https://doi.org/10.1287/isre.13.2.151.88 
+Pan, B., Hembrooke, H. A., Gay, G. K., Granka, L. A., Feusner, M. K., & Newman, J. K. (2004). The determinants of web 
+page viewing behavior: an eye-tracking study. Proceedings of the 2004 symposium on Eye tracking research & 
+applications, 
+Parkinson, S. R., Hill, M. D., Sisson, N., & Viera, C. (1988). Effects of breadth, depth and number of responses on computer 
+menu search performance. International journal of man-machine studies, 28(6), 683-692. 
+Peter Morville, & Rosenfeld, L. (2006). Information Architecture for the World Wide Web: Designing Large-Scale Web 
+Sites. O'Reilly Media, Inc. 
+Ping, Z., Small, R. V., Von Dran, G. M., & Barcellos, S. (1999). Websites that satisfy users: a theoretical framework for 
+Web user interface design and evaluation. 
+Pook, S., Lecolinet, E., Vaysseix, G., & Barillot, E. (2000). Control menus: excecution and control in a single interactor. 
+CHI'00 extended abstracts on Human factors in computing systems, 
+Powell, T. A., Jones, D. L., & Cutts, D. C. (1998). Web site engineering: beyond Web page design. Prentice-Hall, Inc. 
+Proctor, R. W., Vu, K.-P. L., Najjar, L. J., Vaughan, M. W., & Salvendy, G. (2003). Content preparation and management 
+for e-commerce Web sites. Communications of the ACM, 46(12), 289-299. 
+https://doi.org/10.1145/953460.953513 
+Qiu, L. (1993). Analytical searching vs. browsing in hypertext information retrieval systems. Canadian Journal of 
+Information and Library Science, 18(4), 1-13. 
+Quinn, J. M., & Tran, T. Q. (2010). Attractive phones don't have to work better: independent effects of attractiveness, 
+effectiveness, and efficiency on perceived usability. Proceedings of the SIGCHI conference on human factors in 
+computing systems, 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+27
+Rennie, A., & Protheroe, J. (2020). How people decide what to buy lies in the ‘messy middle’ of the purchase journey. 
+https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/navigating-purchase-behavior-and-
+decision-making/
+Rivers, H. (2020). Interaction Design for Trees. https://medium.com/@hagan.rivers/interaction-design-for-trees-
+5e915b408ed2
+Rosenfeld, Louis/ Morville, Peter/ Arango, & Jorge. (2015). Information Architecture: For the Web and Beyond. O’Reilly 
+Media. 
+Rosenfeld, L., & Morville, P. (2002). Information architecture for the world wide web. " O'Reilly Media, Inc.". 
+Rotondi, A. J., Grady, J., Hanusa, B. H., Haas, G. L., Spring, M. R., Abebe, K. Z., Luther, J., & Gurklis, J. (2021). Key 
+variables for effective eHealth designs for individuals with and without mental health disorders: 2^ 12-4 
+fractional factorial experiment. Journal of Medical Internet Research, 23(3), e23137. 
+Ruzza, M., Tiozzo, B., Mantovani, C., D’Este, F., & Ravarotto, L. (2017). Designing the information architecture of a 
+complex website: A strategy based on news content and faceted classification. International Journal of 
+Information Management, 37(3), 166-176. https://doi.org/https://doi.org/10.1016/j.ijinfomgt.2017.02.001 
+Schmitt, G. (1999). Information Architecture: Basics and Future of CAAD. Springer Science & Business Media. 
+Shneiderman, B., & Plaisant, C. (2010). Designing the user interface: strategies for effective human-computer interaction. 
+Pearson Education India. 
+Shrestha, S., & Owens, J. W. (2009). Eye movement analysis of text-based web page layouts. Usability News, 11(1). 
+Snowberry, K., Parkinson, S. R., & Sisson, N. (1983). Computer display menus. Ergonomics, 26(7), 699-712. 
+Tang, G.-M., Hu, H.-Y., Chen, S.-Y., & Jeng, W. (2020). A Cross-cultural Study on Information Architecture: Culture 
+Differences on Attention Allocation to Web Components. In (pp. 391-408). Springer International Publishing. 
+https://doi.org/10.1007/978-3-030-43687-2_31 
+Tankala, S. (2023). Information Architecture vs. Sitemaps: What’s the Difference? 
+https://www.nngroup.com/articles/information-architecture-sitemaps/
+Tedesco, D., Schade, A., Pernice, K., & Nielsen, J. (2008). Site map usability: 47 design guidelines based on usability 
+studies with people using site maps. Nielsen Norman Group. 
+Thoma, V., & Dodd, J. (2019). Web usability and eyetracking. Eye Movement Research: An Introduction to its Scientific 
+Foundations and Applications, 883-927. 
+Tobii. (2023). Eye tracking — a window to cognitive processes. https://www.tobii.com/resource-center/reports-and-
+papers/eye-tracking-a-window-to-cognitive-processes
+Toms, E. G. (2002). Information interaction: Providing a framework for information architecture. Journal of the American 
+Society for Information Science and Technology, 53(10), 855-862. https://doi.org/10.1002/asi.10094 
+Tractinsky, N., Katz, A. S., & Ikar, D. (2000). What is beautiful is usable. Interacting with computers, 13(2), 127-145. 
+Tuch, A. N., Roth, S. P., Hornbæk, K., Opwis, K., & Bargas-Avila, J. A. (2012). Is beautiful really usable? Toward 
+understanding the relation between usability, aesthetics, and affect in HCI. Computers in Human Behavior, 28(5), 
+1596-1607. https://doi.org/https://doi.org/10.1016/j.chb.2012.03.024 
+U.S. General Services Administration. Information Architecture Basics.  Retrieved from https://www.usability.gov/what-
+and-why/information-architecture.html
+Van Gompel, R. P. (2007). Eye movements: A window on mind and brain. Elsevier. 
+Van Schaik, P., & Ling, J. (2009). The role of context in perceptions of the aesthetics of web pages over time. International 
+Journal of Human-Computer Studies, 67(1), 79-89. 
+Wan Mohd Isa, W. A. R., Md Noor, N. L., & Mehad, S. (2007). Incorporating the Cultural Dimensions into the Theoretical 
+Framework of Website Information Architecture. In (pp. 212-221). Springer Berlin Heidelberg. 
+https://doi.org/10.1007/978-3-540-73287-7_27 
+Webster, & Ahuja. (2006). Enhancing the Design of Web Navigation Systems: The Influence of User Disorientation on 
+Engagement and Performance. MIS Quarterly, 30(3), 661. https://doi.org/10.2307/25148744 
+Wildemuth, B. M., & O'Neill, A. L. (1995). The" Known" in Known-Item Searches: Empirical Support for User-Centered 
+Design (Research Note). College & Research Libraries, 56(3), 265-281. 
+Wodtke, C. (2011). Information architecture: Blueprints for the Web. Pearson Education India. 
+Wurman, & Richard Saul. (1996). Information Architects. Graphis Inc; First Edition 
+Wurman, & Saul, R. (1996). Information Architect. Information Architects. 
+Yang, Y.-C., & Chiu, T.-P. (2022). Where is Your Product Hiding Inside Navigation? the Study of Differences E-
+commence Website Navigation and Product Category Layer Between U.S., France, Japan, and Taiwan. In (pp. 
+405-416). Springer International Publishing. https://doi.org/10.1007/978-3-031-06038-0_30 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed
+28
+Zaphiris, P., Shneiderman, B., & Norman, K. L. (2002). Expandable indexes vs. sequential menus for searching hierarchies 
+on the World Wide Web. Behaviour & Information Technology, 21(3), 201-207. 
+Zaphiris, P. G. (2000). Depth vs breath in the arrangement of web links. Proceedings of the Human Factors and Ergonomics 
+Society Annual Meeting, 
+Zhang, H., & Salvendy, G. (2001). The implications of visualization ability and structure preview design for web 
+information search tasks. International Journal of Human-Computer Interaction, 13(1), 75-95. 
+Zheng, G. (2015). Web Navigation Systems for Information Seeking. In Encyclopedia of Information Science and 
+Technology, Third Edition (pp. 7693-7701). IGI Global. https://doi.org/10.4018/978-1-4666-5888-2.ch758 
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=4920862
+Preprint not peer reviewed

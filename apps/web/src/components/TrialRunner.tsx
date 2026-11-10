@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EVENT_TYPES, type EventType, type StateLabel } from "@meridian/scoring";
 import { NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
+import { SESSION_TIMING } from "../content";
 import type { EventLogger } from "../logger";
 import { MENU_NAMES, ProductDetail } from "../components/MenuChrome";
 import type { GazeTrialHandle } from "../gaze/GazeController";
@@ -55,6 +56,7 @@ export function TrialRunner({
   const stuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stepRef = useRef<Step>("instruction");
   stepRef.current = step;
+  const trialLimitSeconds = spec.practice ? SESSION_TIMING.practiceTrialSeconds : SESSION_TIMING.scoredTrialSeconds;
   const Menu = MENUS[spec.menuId];
   const targetLabel = useMemo(() => NODE_BY_ID.get(spec.targetId)?.label ?? spec.targetId, [spec.targetId]);
 
@@ -186,10 +188,10 @@ export function TrialRunner({
       state_label: spec.stateLabel,
       condition: "static"
     });
-    log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex } });
+    log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex, limit_ms: trialLimitSeconds * 1000, protocol_version: SESSION_TIMING.protocolVersion } });
     setStep("menu");
     setStarting(false);
-    const timeoutMs = fastMode ? 30_000 : 120_000;
+    const timeoutMs = trialLimitSeconds * 1000;
     timeoutRef.current = setTimeout(() => {
       if (finishedRef.current) return;
       log("timeout", { meta: { practice: spec.practice, limit_ms: timeoutMs } });
@@ -255,7 +257,7 @@ export function TrialRunner({
           <div className="intro-meta">
             <span>{MENU_NAMES[spec.menuId]}</span>
             <span>{spec.practice ? "Not scored" : "Scored"}</span>
-            <span>Up to 120 seconds</span>
+            <span>Up to {trialLimitSeconds} seconds</span>
           </div>
           <p className="instruction-note">
             Start when you are ready. The task stays hidden while you search. If you cannot find the product, use the
@@ -357,7 +359,7 @@ export function TrialRunner({
         <div className="product-overlay" role="dialog" aria-label="Trial timed out">
           <div className="result-card">
             <div className="eyebrow">Time limit</div>
-            <h2>The 120-second limit was reached.</h2>
+            <h2>The {trialLimitSeconds}-second limit was reached.</h2>
             <p>
               The target was <strong>{targetLabel}</strong>. The trial is recorded as a timeout. Take a breath and
               continue when ready.
