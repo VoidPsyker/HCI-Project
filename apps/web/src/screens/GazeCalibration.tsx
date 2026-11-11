@@ -146,9 +146,8 @@ export function GazeCalibrationScreen({
         <div className="eyebrow">Calibration and validation</div>
         <h1>Nine points, then a held-out check</h1>
         <p className="lede">
-          You will see nine dots in turn. Keep your head still and look at each dot; do not follow the mouse. The
-          tracker trains on all nine points first, then its accuracy is checked on a held-out validation pass without
-          retraining. This is not a test of you.
+          Keep your head still and look at the centre of each ring as it appears. Leave the mouse still. The rings
+          advance automatically through nine training points and then nine accuracy checks.
         </p>
         <div className="warning-box soft">
           The pre-registered gate is a maximum held-out error of 1.5°. If the measured error is above the gate, or
@@ -179,9 +178,7 @@ export function GazeCalibrationScreen({
           Point {index + 1} of {targets.length}
         </h1>
         <p className="lede">
-          {isTraining
-            ? "Look at the ring. Training point with explicit clicks."
-            : "Look at the ring. Validating held-out predictions on final model."}
+          Look at the centre of the ring. Keep the mouse still and wait for the next ring.
         </p>
         <div className="small-note">
           {isTraining
