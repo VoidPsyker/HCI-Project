@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   stop: vi.fn(),
   loadSession: vi.fn(),
   patchSessionState: vi.fn(),
+  recordConsent: vi.fn(),
   stopSession: vi.fn(),
   log: vi.fn(),
   flush: vi.fn(),
@@ -19,7 +20,7 @@ vi.mock("../../src/api", () => ({
   loadSession: mocks.loadSession,
   loadSessionStatus: vi.fn(async () => ({ status: "in_progress", phase: "calibration", abort_reason: null })),
   patchSessionState: mocks.patchSessionState,
-  recordConsent: vi.fn(async () => ({ session: {} })),
+  recordConsent: mocks.recordConsent,
   stopSession: mocks.stopSession,
   submitDemographics: mocks.submitDemographics,
   submitQuestionnaires: vi.fn(async () => ({ ok: true, accepted: 0 })),
@@ -90,6 +91,33 @@ const session = (): SessionInfo => ({
 const design = { blocks: [], practiceTrials: [], trials: [] } as unknown as StudyDesign;
 
 describe("ExperimentRunner calibration reload", () => {
+  it.each([false, true])("opens eye-tracking consent after a previous stop (already opened: %s)", async (alreadyOpened) => {
+    const previous = { ...session(), session_id: "S-previous", status: "aborted", abort_reason: "researcher_stop" };
+    useRunnerStore.setState({
+      sessionId: alreadyOpened ? session().session_id : previous.session_id,
+      session: previous,
+      phase: alreadyOpened ? "consent" : "aborted",
+      abortReason: "researcher_stop",
+      startedLogged: true
+    });
+    const fresh = { ...session(), status: "created", phase: "consent" };
+    mocks.recordConsent.mockResolvedValue({ session: { ...fresh, status: "consented" } });
+    mocks.loadSession.mockResolvedValue({
+      session: fresh,
+      participant: { label: "Participant", consent_version: null, consented_at: null },
+      design: null
+    });
+
+    render(<ExperimentRunner sessionId={fresh.session_id} />);
+    await screen.findByTestId("consent-screen");
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByTestId("consent-continue"));
+
+    expect(await screen.findByTestId("gaze-consent-screen")).toBeVisible();
+    expect(useRunnerStore.getState().abortReason).toBeNull();
+    expect(mocks.log).toHaveBeenCalledWith(expect.objectContaining({ event_type: "session_start" }));
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.patchSessionState.mockResolvedValue({ session: {} });

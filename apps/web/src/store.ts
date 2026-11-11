@@ -103,12 +103,15 @@ export const useRunnerStore = create<RunnerState>()(
       ...initial,
       setBootstrap: ({ session, participant, design, fastMode }) => {
         const previous = get();
-        const same = previous.sessionId === session.session_id;
+        // Older builds could persist a previous run's stop reason on an active page.
+        const staleStop = previous.abortReason !== null && previous.phase !== "aborted" && previous.phase !== "complete";
+        const same = previous.sessionId === session.session_id && !staleStop;
+        const restore = (patch: Partial<RunnerState>) => set(same ? patch : { ...initial, ...patch });
         const gazeConsent = same ? previous.gazeConsent : null;
         const gazeViewport = same ? previous.gazeViewport : null;
         const gazeGeometry = same ? previous.gazeGeometry : null;
         if (session.status === "completed") {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -122,7 +125,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         if (session.status === "aborted" || session.status === "withdrawn") {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -137,7 +140,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         if (!participant?.consented_at) {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -151,7 +154,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         if (!gazeConsent) {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -165,7 +168,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         if (!gazeGeometry) {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -179,7 +182,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         if (!design) {
-          set({
+          restore({
             sessionId: session.session_id,
             session,
             participant,
@@ -210,7 +213,7 @@ export const useRunnerStore = create<RunnerState>()(
           (phase === "checkin" && previous.checkinPhase !== "baseline") ||
           (phase === "block_end" && blockIndex + 1 < design.blocks.length);
         if (needsCalibration) phase = "calibration";
-        set({
+        restore({
           sessionId: session.session_id,
           session,
           participant,
