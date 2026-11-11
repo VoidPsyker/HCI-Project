@@ -110,7 +110,7 @@ export function Home() {
             <li>Every raw event appended to <code>data/raw/&lt;session_id&gt;.jsonl</code>.</li>
             <li>Trials are recomputed from events, so a browser crash does not lose the path.</li>
             <li>Reduced-motion support, visible Stop control, and a distress threshold that stops the induction.</li>
-            <li>Gaze is stored separately with restricted access; raw video is never recorded, and a failed calibration blocks scored trials.</li>
+            <li>Eye tracking is optional. The study can continue after failed calibration. Gaze data are stored separately with restricted access.</li>
             <li>No external requests: all fonts, icons, illustrations, WebGazer assets, and data are local.</li>
           </ul>
         </section>

@@ -45,6 +45,30 @@ it("rolls back events when trial scoring fails, allowing a complete retry", () =
   expect(repo.allEvents()).toHaveLength(1);
 });
 
+it.each(["consent_declined", "calibration_failed", "camera_unavailable", "viewport_changed"])(
+  "records core completion with the explicit gaze outcome %s",
+  (reason) => {
+    const unavailable: EventInput = { ...event, event_type: "gaze_unavailable", meta: { reason } };
+    const end: EventInput = { ...event, event_id: "end-1", event_type: "session_end" };
+    expect(repo.insertEvents([unavailable, end]).accepted).toBe(2);
+    expect(repo.getSession(event.session_id)?.status).toBe("completed");
+    expect(repo.getGazeSession(event.session_id)).toBeNull();
+  }
+);
+
+it("requires finalized gaze or an allowed outcome recorded for the same session", () => {
+  const other = repo.createSession().session;
+  repo.insertEvents([
+    { ...event, event_type: "gaze_unavailable", meta: { reason: "unrecognized_reason" } },
+    { ...event, event_id: "other", session_id: other.session_id, participant_id: other.participant_id,
+      event_type: "gaze_unavailable", meta: { reason: "consent_declined" } }
+  ]);
+  const end: EventInput = { ...event, event_id: "end-1", event_type: "session_end" };
+  expect(() => repo.insertEvents([end])).toThrow("gaze_session_not_finalized");
+  expect(() => repo.completeSession(event.session_id)).toThrow("gaze_session_not_finalized");
+  expect(repo.completeSession(other.session_id).status).toBe("completed");
+});
+
 it("records a time-limited session as aborted rather than completed", () => {
   event.event_type = "session_end";
   event.meta = { completed: false, abort_reason: "session_time_limit" };

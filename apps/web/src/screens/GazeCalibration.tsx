@@ -30,13 +30,15 @@ export function GazeCalibrationScreen({
   starting,
   startError,
   onRetry,
-  onCalibrated
+  onCalibrated,
+  onSkip
 }: {
   controller: GazeController | null;
   starting: boolean;
   startError: string | null;
   onRetry: () => void;
   onCalibrated: (report: CalibrationReport) => void;
+  onSkip: (reason: "calibration_failed" | "camera_unavailable") => void;
 }) {
   const [step, setStep] = useState<"intro" | "running" | "done">("intro");
   const [phase, setPhase] = useState<"train" | "validate">("train");
@@ -117,14 +119,19 @@ export function GazeCalibrationScreen({
         </p>
         <p>
           {terminal
-            ? "Use Stop to reach the debrief. The researcher will review the interrupted session before starting another one."
-            : "The scored trials need eye tracking. Check that the camera is connected and that browser camera permission is allowed, then retry. If it still fails, end the session and tell the researcher."}
+            ? "You can continue the study without eye tracking."
+            : "Check the camera connection and browser permission, then retry. You can also continue without eye tracking."}
         </p>
-        {!terminal ? <div className="panel-actions">
-          <button type="button" className="button primary" onClick={onRetry} data-testid="gaze-calibration-retry">
-            Retry camera setup
+        <div className="panel-actions">
+          {!terminal ? (
+            <button type="button" className="button secondary" onClick={onRetry} data-testid="gaze-calibration-retry">
+              Retry camera setup
+            </button>
+          ) : null}
+          <button type="button" className="button primary" onClick={() => onSkip("camera_unavailable")}>
+            Continue without eye tracking
           </button>
-        </div> : null}
+        </div>
       </section>
     );
   }
@@ -151,7 +158,7 @@ export function GazeCalibrationScreen({
         </p>
         <div className="warning-box soft">
           The pre-registered gate is a maximum held-out error of 1.5°. If the measured error is above the gate, or
-          cannot be evaluated, the scored trials cannot continue.
+          cannot be evaluated, you can finish the study without eye tracking.
         </div>
         {error ? (
           <div className="warning-box" role="alert">
@@ -230,8 +237,7 @@ export function GazeCalibrationScreen({
           </div>
           {!passed ? (
             <div className="warning-box" role="alert">
-              The scored trials need a passed calibration. This session will end with a debrief; the researcher will
-              record the exclusion. No click or questionnaire data are discarded by this gate.
+              You can finish the searches and questionnaires. This run will be marked as unavailable for eye-tracking analysis.
             </div>
           ) : null}
         </>
@@ -239,12 +245,12 @@ export function GazeCalibrationScreen({
       <div className="panel-actions">
         <button
           type="button"
-          className={passed ? "button primary big" : "button danger"}
-          onClick={() => report && onCalibrated(report)}
+          className="button primary big"
+          onClick={() => report && (passed ? onCalibrated(report) : onSkip("calibration_failed"))}
           disabled={!report}
-          data-testid={passed ? "gaze-calibration-continue" : "gaze-calibration-end"}
+          data-testid={passed ? "gaze-calibration-continue" : "gaze-calibration-skip"}
         >
-          {passed ? "Continue to scored trials" : "End session and debrief"}
+          {passed ? "Continue to scored trials" : "Continue without eye tracking"}
         </button>
       </div>
     </section>

@@ -4,7 +4,7 @@
 
 Pilot instrument for the fictional watch store Meridian Timepieces: six experiment menus over
 one 72-product taxonomy, four mild emotion inductions with check-ins, scored finding tasks,
-mandatory eye tracking, server-side randomisation, a researcher console and versioned exports.
+optional eye tracking, server-side randomisation, a researcher console and versioned exports.
 No checkout or accounts.
 
 ## Run it
@@ -57,12 +57,11 @@ save verification. Older PDFs describe the earlier protocol.
 
 ## Eye tracking
 
-Eye tracking requires separate consent, measured screen dimensions and viewing distance, nine
-training points followed by held-out validation, and the fixed 1.5° calibration gate. Refusal
-or failed validation blocks scored trials. Raw video is not retained. Synthetic gaze is never
-analysis-ready. Pilot analysis scripts exclude seeded/synthetic sessions by default. Resizing
-after capture starts excludes the session. Camera startup can retry within the page; reloading
-after gaze consent requires a new researcher link.
+Eye tracking requires separate consent, measured screen dimensions and viewing distance,
+and nine training points followed by held-out validation. The 1.5° gate applies to gaze.
+Participants can finish the study if they decline eye tracking or calibration fails.
+Resizing after capture starts invalidates gaze. Camera startup can retry in the same page.
+Raw video is never retained. Synthetic gaze is never eligible for analysis.
 
 ## Status
 

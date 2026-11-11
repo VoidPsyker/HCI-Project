@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { GazeUnavailableReason } from "@meridian/scoring";
 import type { GazeConsent, ScreenGeometry, Viewport } from "@meridian/analysis";
 import type { StudyDesign, SessionInfo, ParticipantInfo } from "./types";
 
@@ -44,6 +45,7 @@ interface RunnerState {
   completionCode: string | null;
   abortReason: string | null;
   gazeConsent: GazeConsent | null;
+  gazeUnavailable: GazeUnavailableReason | null;
   gazeViewport: Viewport | null;
   gazeGeometry: ScreenGeometry | null;
   setBootstrap: (bundle: {
@@ -60,6 +62,7 @@ interface RunnerState {
   setCheckinPhase: (phase: "baseline" | "post_induction" | "post_trials") => void;
   setGazeConsent: (consent: GazeConsent) => void;
   setGazeSetup: (setup: { viewport: Viewport; geometry: ScreenGeometry }) => void;
+  setGazeUnavailable: (reason: GazeUnavailableReason) => void;
   clearGaze: () => void;
   startPractice: () => void;
   nextPractice: () => void;
@@ -86,14 +89,15 @@ const initial = {
   completionCode: null,
   abortReason: null,
   gazeConsent: null,
+  gazeUnavailable: null,
   gazeViewport: null,
   gazeGeometry: null
 };
 
-function resumePhase(phase: RunnerPhase): RunnerPhase {
+function resumePhase(phase: RunnerPhase, hasGaze: boolean): RunnerPhase {
   if (phase === "practice_trial" || phase === "practice_result") return "practice_intro";
-  if (phase === "trial" || phase === "product" || phase === "trial_intro") return "calibration";
-  if (phase === "calibration" || phase === "gaze_failed") return "calibration";
+  if (phase === "trial" || phase === "product" || phase === "trial_intro") return hasGaze ? "calibration" : "trial_intro";
+  if (phase === "calibration" || phase === "gaze_failed") return hasGaze ? "calibration" : "block_intro";
   return phase;
 }
 
@@ -108,6 +112,7 @@ export const useRunnerStore = create<RunnerState>()(
         const same = previous.sessionId === session.session_id && !staleStop;
         const restore = (patch: Partial<RunnerState>) => set(same ? patch : { ...initial, ...patch });
         const gazeConsent = same ? previous.gazeConsent : null;
+        const gazeUnavailable = same ? previous.gazeUnavailable : null;
         const gazeViewport = same ? previous.gazeViewport : null;
         const gazeGeometry = same ? previous.gazeGeometry : null;
         if (session.status === "completed") {
@@ -153,7 +158,7 @@ export const useRunnerStore = create<RunnerState>()(
           });
           return;
         }
-        if (!gazeConsent) {
+        if (!gazeConsent && !gazeUnavailable) {
           restore({
             sessionId: session.session_id,
             session,
@@ -167,7 +172,7 @@ export const useRunnerStore = create<RunnerState>()(
           });
           return;
         }
-        if (!gazeGeometry) {
+        if (!gazeGeometry && !gazeUnavailable) {
           restore({
             sessionId: session.session_id,
             session,
@@ -196,7 +201,7 @@ export const useRunnerStore = create<RunnerState>()(
           return;
         }
         const blockIndex = same ? previous.blockIndex : 0;
-        let phase: RunnerPhase = same ? resumePhase(previous.phase) : "baseline";
+        let phase: RunnerPhase = same ? resumePhase(previous.phase, !gazeUnavailable) : "baseline";
         if (
           phase === "loading" ||
           phase === "error" ||
@@ -212,7 +217,7 @@ export const useRunnerStore = create<RunnerState>()(
           phase === "induction" ||
           (phase === "checkin" && previous.checkinPhase !== "baseline") ||
           (phase === "block_end" && blockIndex + 1 < design.blocks.length);
-        if (needsCalibration) phase = "calibration";
+        if (needsCalibration && !gazeUnavailable) phase = "calibration";
         restore({
           sessionId: session.session_id,
           session,
@@ -239,6 +244,7 @@ export const useRunnerStore = create<RunnerState>()(
       setGazeConsent: (gazeConsent) => set({ gazeConsent }),
       setGazeSetup: ({ viewport, geometry }) =>
         set({ gazeViewport: viewport, gazeGeometry: geometry }),
+      setGazeUnavailable: (gazeUnavailable) => set({ gazeUnavailable }),
       clearGaze: () => set({ gazeConsent: null, gazeViewport: null, gazeGeometry: null }),
       startPractice: () => set({ phase: "practice_intro", practiceIndex: 0 }),
       nextPractice: () => {
@@ -295,6 +301,7 @@ export const useRunnerStore = create<RunnerState>()(
         completionCode: state.completionCode,
         abortReason: state.abortReason,
         gazeConsent: state.gazeConsent,
+        gazeUnavailable: state.gazeUnavailable,
         gazeViewport: state.gazeViewport,
         gazeGeometry: state.gazeGeometry
       })

@@ -40,15 +40,14 @@ export function GazeConsentScreen({
           data-testid="gaze-consent-checkbox"
         />
         <span>
-          I agree to webcam eye tracking for this session. I understand that refusing means the scored search trials
-          cannot run.
+          I agree to webcam eye tracking for this session.
         </span>
       </label>
       <div className="panel-actions">
         <span className="small-note">Gaze consent version: {GAZE_CONSENT_VERSION}.</span>
         <div className="debrief-secondary">
           <button type="button" className="button danger-ghost" disabled={busy} onClick={() => void onRefuse()} data-testid="gaze-consent-refuse">
-            Refuse and end session
+            Continue without eye tracking
           </button>
           <button
             type="button"

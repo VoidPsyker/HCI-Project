@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import { manipulationCheckPassed, reportedState, type StateLabel } from "@meridian/scoring";
+import { manipulationCheckPassed, reportedState, type GazeUnavailableReason, type StateLabel } from "@meridian/scoring";
 import type { CalibrationReport, ScreenGeometry } from "@meridian/analysis";
 import { loadSession, loadSessionStatus, patchSessionState, recordConsent, stopSession, submitDemographics, submitQuestionnaires, withdrawSession } from "./api";
 import { EventLogger } from "./logger";
@@ -194,12 +194,14 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       criterionDeg: 1.5,
       onError: (message) => {
         if (message === "gaze_viewport_changed") {
-          logger?.interruptTrial(message);
-          gazeCalibratedRef.current = false;
-          setGazeReady(false);
-          setGazeReport(controller.report);
-          setBanner("The screen size changed after measurement. Eye tracking stopped; ask the researcher to start a new session.");
-          state.setPhase("gaze_failed");
+          if (useRunnerStore.getState().phase === "calibration") {
+            setGazeReady(false);
+            setGazeReport(controller.report);
+            state.setPhase("gaze_failed");
+          } else {
+            markGazeUnavailable("viewport_changed");
+            setBanner("The window size changed. You can finish the study without eye tracking.");
+          }
           return;
         }
         if (message) setBanner(`Eye-tracking upload: ${message}`);
@@ -286,21 +288,22 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     }
   };
 
-  const endForGaze = async (reason: string) => {
-    setBusy(true);
-    try {
-      await gazeRef.current?.stop();
-      gazeRef.current = null;
-      setGazeReady(false);
-      await stopSession(sessionId, reason).catch(() => undefined);
-      state.abort(reason);
-    } finally {
-      setBusy(false);
-    }
-  };
+  function markGazeUnavailable(reason: GazeUnavailableReason) {
+    const current = useRunnerStore.getState();
+    if (current.sessionId !== sessionId || current.abortReason || current.gazeUnavailable) return false;
+    loggerRef.current?.log({ event_type: "gaze_unavailable", state_label: "mixed", meta: { reason } });
+    current.setGazeUnavailable(reason);
+    gazeCalibratedRef.current = false;
+    setGazeReady(false);
+    return true;
+  }
 
-  const handleGazeRefuse = async () => {
-    await endForGaze("gaze_consent_refused");
+  const continueWithoutGaze = async (reason: GazeUnavailableReason) => {
+    if (!markGazeUnavailable(reason)) return;
+    setGazeStartError(null);
+    setBanner(null);
+    state.setPhase(reason === "consent_declined" ? "demographics" : "block_intro");
+    void gazeRef.current?.stop().catch(() => undefined);
   };
 
   const handleGazeSetup = (geometry: ScreenGeometry) => {
@@ -320,10 +323,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       return;
     }
     state.setPhase("gaze_failed");
-  };
-
-  const handleGazeFailureEnd = async () => {
-    await endForGaze("gaze_quality_gate_failed");
   };
 
   const handleDemographics = async (data: Record<string, unknown>) => {
@@ -410,7 +409,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       return;
     }
     if (payload.phase === "post_induction") {
-      state.setPhase(gazeCalibratedRef.current ? "trial_intro" : "calibration");
+      state.setPhase(gazeCalibratedRef.current || state.gazeUnavailable ? "trial_intro" : "calibration");
       return;
     }
     state.setPhase("block_end");
@@ -453,7 +452,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const finishPractice = () => {
     const lastPractice = state.practiceIndex + 1 >= (state.design?.practiceTrials.length ?? 0);
     state.nextPractice();
-    if (lastPractice) state.setPhase("calibration");
+    if (lastPractice && !state.gazeUnavailable) state.setPhase("calibration");
   };
 
   const finishMainTrial = () => {
@@ -500,13 +499,13 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       state.complete("STOPPED");
       return;
     }
-    if (state.gazeConsent && !gazeFinalizedRef.current && !gazeRef.current) {
+    if (state.gazeConsent && !state.gazeUnavailable && !gazeFinalizedRef.current && !gazeRef.current) {
       setBanner(
         "Eye-tracking data could not be finalized because this page lost the gaze session. Do not mark the session complete; ask the researcher for a fresh session link."
       );
       return;
     }
-    if (gazeRef.current) {
+    if (gazeRef.current && !state.gazeUnavailable) {
       setBusy(true);
       setBanner(null);
       try {
@@ -611,7 +610,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     content = (
       <GazeConsentScreen
         onGrant={handleGazeConsent}
-        onRefuse={handleGazeRefuse}
+        onRefuse={() => continueWithoutGaze("consent_declined")}
         busy={busy}
         error={banner}
       />
@@ -629,10 +628,11 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
           setGazeAttempt((attempt) => attempt + 1);
         }}
         onCalibrated={handleCalibrated}
+        onSkip={(reason) => void continueWithoutGaze(reason)}
       />
     );
   } else if (state.phase === "gaze_failed") {
-    content = <GazeFailureScreen report={gazeReport} onEnd={handleGazeFailureEnd} busy={busy} />;
+    content = <GazeFailureScreen report={gazeReport} onContinue={() => void continueWithoutGaze("viewport_changed")} />;
   } else if (state.phase === "demographics") {
     content = <DemographicsScreen onSubmit={handleDemographics} busy={busy} />;
   } else if (state.phase === "baseline") {
@@ -681,7 +681,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         colourMapping={design?.colourMapping ?? { sport: "teal", dress: "amber", everyday: "olive", smart: "indigo" }}
         logger={logger!}
         fastMode={fastMode}
-        gaze={gazeRef.current ?? undefined}
+        gaze={state.gazeUnavailable ? undefined : gazeRef.current ?? undefined}
         onComplete={finishMainTrial}
       />
     );

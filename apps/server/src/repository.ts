@@ -3,7 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import Database from "better-sqlite3";
 import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
-import { scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
+import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { toCsv } from "./exports";
 import { SCHEMA_SQL } from "./schema";
 import { generateDesign, designSummary, stratumSequenceIndex, type StudyDesign, type StateLabel } from "./design";
@@ -417,7 +417,7 @@ export class Repository {
     const status = patch.status ?? session.status;
     const phase = patch.phase ?? session.phase;
     if (status === "completed" && session.status !== "completed") {
-      this.assertGazeFinalizedForCompletion(sessionId);
+      this.assertGazeOutcomeForCompletion(sessionId);
     }
     const endedAt = status === "completed" || status === "aborted" || status === "withdrawn" ? nowIso() : session.ended_at;
     this.db
@@ -426,14 +426,13 @@ export class Repository {
     return this.getSession(sessionId)!;
   }
 
-  /**
-   * Biometric completion is mandatory: a participant session may complete only
-   * after its persisted gaze bundle is finalized. Seeded rehearsal data uses
-   * the same synthetic gaze row/provenance rather than a completion exception.
-   */
-  private assertGazeFinalizedForCompletion(sessionId: string): void {
-    const gaze = this.getGazeSession(sessionId);
-    if (!gaze || gaze.status !== "completed") throw new Error("gaze_session_not_finalized");
+  private assertGazeOutcomeForCompletion(sessionId: string): void {
+    if (this.getGazeSession(sessionId)?.status === "completed") return;
+    const markers = this.db.prepare(
+      "SELECT meta_json FROM events WHERE session_id = ? AND event_type = 'gaze_unavailable'"
+    ).all(sessionId) as Array<Pick<EventRow, "meta_json">>;
+    if (markers.some((marker) => isGazeUnavailableReason(parseMeta(marker.meta_json).reason))) return;
+    throw new Error("gaze_session_not_finalized");
   }
 
   completeSession(sessionId: string): SessionRow {
@@ -479,7 +478,7 @@ export class Repository {
         sessionCache.set(input.session_id, session);
         if (session.participant_id !== input.participant_id) throw new Error("participant/session mismatch");
         if (input.event_type === "session_end" && input.meta?.completed !== false && session.status !== "completed") {
-          this.assertGazeFinalizedForCompletion(input.session_id);
+          this.assertGazeOutcomeForCompletion(input.session_id);
         }
         if (input.event_type === "trial_end" && input.trial_id) {
           const existing = this.db

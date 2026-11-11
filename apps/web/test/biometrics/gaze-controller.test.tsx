@@ -570,14 +570,14 @@ describe("GazeController regression tests", () => {
   describe("GazeCalibrationScreen UI component", () => {
     it("does not offer a retry loop when gaze authorization was lost", () => {
       render(<GazeCalibrationScreen controller={null} starting={false} startError="gaze_unauthorized"
-        onRetry={vi.fn()} onCalibrated={vi.fn()} />);
+        onRetry={vi.fn()} onSkip={vi.fn()} onCalibrated={vi.fn()} />);
       expect(screen.getByRole("heading", { name: "Ask for a new session link" })).toBeInTheDocument();
       expect(screen.queryByTestId("gaze-calibration-retry")).not.toBeInTheDocument();
     });
 
     it("does not offer a retry loop after a viewport change", () => {
       render(<GazeCalibrationScreen controller={null} starting={false} startError="gaze_viewport_changed"
-        onRetry={vi.fn()} onCalibrated={vi.fn()} />);
+        onRetry={vi.fn()} onSkip={vi.fn()} onCalibrated={vi.fn()} />);
       expect(screen.getByRole("heading", { name: "Ask for a new session link" })).toBeInTheDocument();
       expect(screen.getByText(/screen size changed while the camera was starting/i)).toBeInTheDocument();
       expect(screen.queryByTestId("gaze-calibration-retry")).not.toBeInTheDocument();
@@ -599,7 +599,7 @@ describe("GazeController regression tests", () => {
           starting={false}
           startError={null}
           onRetry={vi.fn()}
-          onCalibrated={onCalibrated}
+          onSkip={vi.fn()} onCalibrated={onCalibrated}
         />
       );
 

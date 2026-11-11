@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { tasks } from "@meridian/taxonomy";
-import { manipulationCheckPassed, reportedState, type AffectRatings } from "@meridian/scoring";
+import { isGazeUnavailableReason, manipulationCheckPassed, reportedState, type AffectRatings, type GazeUnavailableReason } from "@meridian/scoring";
 import type { Repository } from "./repository";
 
 export interface ExportFile {
@@ -83,12 +83,23 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "input_type",
     "meta"
   ];
+  const gazeReasonBySession = new Map<string, GazeUnavailableReason>();
+  const gazeReasonAtTrialStart = new Map<string, GazeUnavailableReason | null>();
+  for (const event of events) {
+    if (event.event_type === "gaze_unavailable") {
+      const reason = (event.meta as Record<string, unknown> | null)?.reason;
+      if (isGazeUnavailableReason(reason)) gazeReasonBySession.set(event.session_id, reason);
+    } else if (event.event_type === "trial_start" && event.trial_id && !gazeReasonAtTrialStart.has(event.trial_id)) {
+      gazeReasonAtTrialStart.set(event.trial_id, gazeReasonBySession.get(event.session_id) ?? null);
+    }
+  }
   const trials = repo.allTrials().map((t) => {
     const checkin = inductionCheckins.get(`${t.session_id}:${t.block_id}`);
     const ratings = checkin?.meta as AffectRatings | undefined;
     return {
       ...t,
       synthetic: synthetic(t.session_id),
+      gaze_unavailable_reason: gazeReasonAtTrialStart.get(t.trial_id) ?? null,
       reported_state: ratings ? reportedState(ratings) : null,
       manipulation_check_passed: ratings ? manipulationCheckPassed(t.state_label ?? "mixed", ratings) : null,
       path: t.path_json,
@@ -98,6 +109,7 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
   const trialColumns = [
     "trial_id",
     "synthetic",
+    "gaze_unavailable_reason",
     "session_id",
     "participant_id",
     "block_id",

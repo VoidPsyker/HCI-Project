@@ -58,3 +58,22 @@ it("links a qualifying post-induction report to its session and block", () => {
   expect(trialRow([{ ...checkin, meta: { ...checkin.meta, frustrated: 2 } }]))
     .toMatchObject({ state_label: "happy", reported_state: "happy", manipulation_check_passed: "1" });
 });
+
+it("exports gaze unavailability only for trials that started after the marker", () => {
+  const repo = {
+    allEvents: () => [
+      { session_id: "s1", trial_id: "before", event_type: "trial_start", meta_json: "{}" },
+      { session_id: "s1", event_type: "gaze_unavailable", meta_json: '{"reason":"viewport_changed"}' },
+      { session_id: "s2", trial_id: "other", event_type: "trial_start", meta_json: "{}" },
+      { session_id: "s1", trial_id: "after", event_type: "trial_start", meta_json: "{}" }
+    ],
+    allCheckins: () => [],
+    allTrials: () => ["before", "other", "after"].map((trial_id) => ({
+      trial_id, session_id: trial_id === "other" ? "s2" : "s1", path_json: "[]", first_click_ok: null
+    })),
+    allQuestionnaires: () => [], allAssignments: () => [], allDemographics: () => []
+  } as unknown as Repository;
+  const output = buildExportBundle(repo).find((file) => file.name === "trials.jsonl")!;
+  const rows = output.content.trim().split("\n").map((row) => JSON.parse(row));
+  expect(rows.map((row) => row.gaze_unavailable_reason)).toEqual([null, null, "viewport_changed"]);
+});

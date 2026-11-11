@@ -11,9 +11,10 @@ import { navigateToLeaf, nodeLocator, resetMenu } from "./support/menu-actions";
  * real nine-point calibration, held-out validation and 1.5° gate run unchanged. It never touches a
  * camera, so this proves the flow and data pipeline, not human gaze accuracy.
  */
-const SCRIPTED_GAZE = `
+const scriptedGaze = (failCalibration: boolean) => `
 let listener = null; let timer = null; let paused = false; const t0 = performance.now();
 function lookAt() {
+  if (${failCalibration}) return { x: innerWidth / 2, y: innerHeight / 2 };
   const el = document.querySelector('[data-testid="gaze-calibration-target"]');
   if (!el) return { x: innerWidth / 2, y: innerHeight / 2 };
   const r = el.getBoundingClientRect();
@@ -88,14 +89,14 @@ test.afterEach(async ({ request }) => {
   sessionId = null;
 });
 
-test("@session a scripted participant completes the whole pilot session", async ({ page, request, net }) => {
+for (const failCalibration of [false, true]) test("@session completes the pilot with " + (failCalibration ? "failed calibration" : "valid gaze"), async ({ page, request, net }) => {
   test.setTimeout(600_000);
   page.setDefaultTimeout(20_000);
   const created = await request.post("/api/admin/sessions", { headers: ADMIN, data: { label: "SYNTHETIC scripted participant" } });
   expect(created.ok()).toBe(true);
   sessionId = (await created.json()).session.session_id as string;
   await page.route("**/node_modules/.vite/deps/webgazer.js*", (route) =>
-    route.fulfill({ contentType: "text/javascript", body: SCRIPTED_GAZE })
+    route.fulfill({ contentType: "text/javascript", body: scriptedGaze(failCalibration) })
   );
 
   await page.goto(`/run/${sessionId}?fast=1`);
@@ -133,7 +134,11 @@ test("@session a scripted participant completes the whole pilot session", async 
   }
 
   await page.getByTestId("gaze-calibration-start").click();
-  await page.getByTestId("gaze-calibration-continue").click({ timeout: 60_000 });
+  await page.getByTestId(failCalibration ? "gaze-calibration-skip" : "gaze-calibration-continue").click({ timeout: 60_000 });
+  if (failCalibration) {
+    await page.reload();
+    await expect(page.getByTestId("start-induction")).toBeVisible();
+  }
 
   let mainIndex = 0;
   for (const block of design.blocks) {
@@ -230,6 +235,17 @@ test("@session a scripted participant completes the whole pilot session", async 
 
   const gazeCsvPath = "/api/admin/gaze/sessions/" + sessionId + "/export/gaze_samples.csv";
   expect((await request.get(gazeCsvPath)).status()).toBe(401);
+  if (failCalibration) {
+    expect(trialEvents.some((row) => row.event_type === "trial_start")).toBe(true);
+    const recordedEvents = (await events.text()).trim().split("\n").map((line) => JSON.parse(line));
+    expect(recordedEvents).toContainEqual(expect.objectContaining({
+      session_id: sessionId,
+      event_type: "gaze_unavailable",
+      meta: { reason: "calibration_failed" }
+    }));
+    expect((await request.get(gazeCsvPath, { headers: ADMIN })).status()).toBe(404);
+    return;
+  }
   const gazeCsv = await request.get(gazeCsvPath, { headers: ADMIN });
   expect(gazeCsv.ok()).toBe(true);
   expect(gazeCsv.headers()["content-type"]).toContain("text/csv");

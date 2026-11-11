@@ -1,20 +1,14 @@
 # Eye-tracking acquisition and analysis
 
-Status: core implemented and unit-tested, **not integrated into the experiment
-runner, menus, server, or storage**. There is no evidence of lab eye-tracking
-hardware or ethics approval. Do not claim either. The only confirmed camera is
-an integrated webcam observed at 1920×1080, 59 Hz, which is not a
-research-grade tracker.
+The current pilot treats gaze as optional, as described in §11.4 of the longer research
+plan. Participants can finish the behavioural study if they decline gaze consent, the camera
+cannot start, or the tracker fails validation. Scored gaze capture requires separate consent
+and a held-out calibration error of at most 1.5°. Use the gaze quality report when determining
+whether samples qualify for gaze analysis. The trial and event exports record when gaze
+became unavailable. See the [researcher guide](researcher-guide.md) for the current flow.
 
-Mandatory eye tracking comes from the current direct user instruction, which
-overrides the earlier pilot scope. The study plan (`08-measures-analysis` §11.4)
-described eye tracking as optional and supplies the measured procedure and
-thresholds used here: a separate consent step, a 9-point calibration, a 1.5°
-held-out calibration gate, a 20% missing-data gate, I-VT fixations at 30°/s with
-a 100 ms minimum, AOI attribution, clock synchronization, restricted
-storage/export, and no raw video retention. That scope deviation is intentional
-and recorded here. This document describes what exists, what is still missing,
-and the exact boundary between the core and the coordinator-owned integration.
+The development notes below include earlier implementation stages and the former mandatory
+gaze policy. Those descriptions are historical where they differ from the current pilot.
 
 ## Files and ownership
 

@@ -224,7 +224,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
   for (const event of events) {
     if (event.event_type === "session_start") {
       const meta = JSON.parse(event.meta_json);
-      if (meta.protocol_version === timing.protocolVersion || meta.protocol_version === "short-pilot-v2") {
+      if ([timing.protocolVersion, "short-pilot-v2", "short-pilot-v3"].includes(meta.protocol_version)) {
         shortPilotStarts.set(event.session_id, meta);
       }
     } else if (event.event_type === "session_end") {
@@ -276,7 +276,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
   let answeredItems = 0;
   for (const session of completed) {
     const protocol = shortPilotStarts.get(session.session_id)?.protocol_version;
-    const expected = protocol === timing.protocolVersion
+    const expected = protocol === timing.protocolVersion || protocol === "short-pilot-v3"
       ? questionnaireItems + 1
       : protocol === "short-pilot-v2" ? questionnaireItems : questionnaireItems + 5 * questionnaires.sus.length;
     expectedAnswers += expected;

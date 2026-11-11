@@ -40,7 +40,8 @@ The participant works through: consent → eye-tracking consent and screen measu
 demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
 blocks (scenario → check-in → three trials → check-in with fatigue → 15-s neutral reset) →
 questionnaires → debrief. Eye-tracking calibration runs before the first induction;
-failing the 1.5° gate ends the session before any scored trial.
+failing the 1.5° gate excludes gaze from analysis. Participants can continue the full
+study without gaze. The event export records the reason as a gaze_unavailable event.
 
 On the admin dashboard, the session row shows the phase, latest menu and trial, and flags:
 
