@@ -117,7 +117,7 @@ export function AdminDashboard() {
             </div>
           </div>
           <h1>Admin sign-in</h1>
-          <p className="lede">Enter the researcher password from the server environment. The default local value is pilot-admin.</p>
+          <p className="lede">Enter the researcher password configured for this study.</p>
           <form
             className="login-form"
             onSubmit={(event) => {

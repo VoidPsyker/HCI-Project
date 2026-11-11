@@ -1,29 +1,18 @@
-# Deploying to Vercel
+# Hosted participant collection
 
-Vercel builds `Dockerfile.vercel` at the repo root and runs it as a container function.
-URL: `https://emotion-nav.vercel.app` (`hci-project.vercel.app` is taken, so step 6 adds this
-name).
+Vercel serves the study URL and forwards requests to a single study server with persistent disk. The study server owns the SQLite database, raw event files, and gaze data. Set up the study server first, then deploy the Vercel project.
 
-## Steps
+## Study server
 
-1. Sign in at <https://vercel.com> with the GitHub account that can see
-   `VoidPsyker/HCI-Project`.
-2. **Add New → Project**, pick `HCI-Project`, press **Import**.
-3. Leave the framework preset and build settings as detected. Under **Environment
-   Variables** add `ADMIN_PASSWORD` with a strong value. Without it, `/admin` accepts the
-   public default `pilot-admin`.
-4. Press **Deploy**. The first build takes a few minutes.
-5. Open `/api/health` on the new URL to check the server, then `/` for the app and `/admin`
-   for the researcher console.
-6. In the project, open **Settings → Domains**, type `emotion-nav.vercel.app`, press **Add**
-   and assign it to Production. It goes live within seconds.
+1. Deploy this repository as one service on a container host that supports persistent volumes. Build from `Dockerfile.vercel`. On Railway, set `RAILWAY_DOCKERFILE_PATH=Dockerfile.vercel`.
+2. Attach a persistent volume at `/app/data`. This covers the default database, raw event, and gaze paths. Run one replica so all requests use the same SQLite database.
+3. Set `MERIDIAN_VERCEL_PROXY=false`, `PORT=8787`, and a unique `ADMIN_PASSWORD` in the host's secret settings. Use the same password when signing in through Vercel.
+4. Enable a public HTTPS domain for the service, forwarding to port 8787. Use `/api/health` for the service health check.
 
-Every push to `main` redeploys automatically.
+## Vercel
 
-## Limits
+Set `STUDY_BACKEND_ORIGIN` in the existing Vercel project's Production environment to the study server's HTTPS origin, with no path. Redeploy the project from the same revision as the study server. The Vercel container requires this setting at startup.
 
-Vercel containers are stateless and scale to zero after 5 minutes without traffic. The SQLite
-database and gaze files live inside the container, so all sessions are lost when it scales
-down or redeploys, and two instances do not share data. Use this deployment to demo the app,
-never to collect participant data. Real collection needs the Docker setup in the README, or a
-hosted database behind `Repository`.
+## Verify before collection
+
+On the Vercel URL, sign in to `/admin`, create a rehearsal session, and complete one trial. Confirm the session row and download `events.csv` and `trials.csv`. Restart the study server and redeploy Vercel, then check that the same session and export rows are still present. Keep the disk attached on subsequent deployments and configure volume backups.

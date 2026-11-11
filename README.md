@@ -28,7 +28,7 @@ docker compose up -d --build
 App: http://127.0.0.1:8787. SQLite and restricted gaze files persist under `data/`; exports go
 to `exports/`.
 
-Demo deployment on Vercel (no persistent data): see [docs/deploy-vercel.md](docs/deploy-vercel.md).
+Hosted participant collection on Vercel with persistent storage: see [docs/deploy-vercel.md](docs/deploy-vercel.md).
 
 | Command | What it does |
 | --- | --- |

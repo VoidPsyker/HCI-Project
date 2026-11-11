@@ -8,7 +8,8 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 8787
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-pilot-admin}
+      MERIDIAN_VERCEL_PROXY: "false"
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
       STUDY_SEED: ${STUDY_SEED:-meridian-pilot-2026}
       DATABASE_PATH: /app/data/meridian.sqlite
       RAW_DATA_DIR: /app/data/raw
