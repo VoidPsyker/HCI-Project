@@ -78,8 +78,9 @@ All other participant wording (consent, scripts, items, debrief) is in `apps/web
 - Pilot analysis scripts and their limits: `packages/analysis/docs/pilot-analysis.md`.
   Pilot data are excluded from confirmatory analysis.
 
-See [short pilot protocol](short-pilot.md) for the 15-minute activity target and revised
-pilot acceptance checks. The historical dashboard criteria still reference the original plan.
+See [short pilot protocol](short-pilot.md) for the 15-minute timing estimate and revised
+pilot acceptance checks. The dashboard reports the average from completed short pilot sessions
+with regular timing, from consent to the end of debrief.
 
 ## 7. Go/no-go
 

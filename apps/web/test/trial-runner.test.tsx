@@ -68,7 +68,7 @@ function renderTrial(targetId: string) {
 }
 
 describe("TrialRunner", () => {
-  it.each([{ practice: false, seconds: 20 }, { practice: true, seconds: 15 }])(
+  it.each([{ practice: false, seconds: 60 }, { practice: true, seconds: 45 }])(
     "records a real timeout at the $seconds-second limit (practice=$practice)",
     ({ practice, seconds }) => {
       vi.useFakeTimers();

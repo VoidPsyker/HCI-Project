@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
-import { MENU_IDS, type MenuId } from "@meridian/taxonomy";
+import { useState } from "react";
+import type { MenuId } from "@meridian/taxonomy";
 import type { EventLogger } from "../logger";
 import { CREDIBILITY_ITEMS, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITEMS } from "../content";
 
-const MENU_TABS = MENU_IDS.map((menu) => ({ id: `sus-${menu}`, label: `SUS ${menu}`, kind: "sus" as const, menu }));
 const TABS = [
-  ...MENU_TABS,
+  { id: "sus", label: "Menu usability", kind: "sus" as const },
   { id: "nasa", label: "NASA-TLX", kind: "nasa" as const, menu: null },
   { id: "open", label: "Open questions", kind: "open" as const, menu: null },
   { id: "credibility", label: "Credibility", kind: "credibility" as const, menu: null }
@@ -32,39 +31,33 @@ function Likert5({ value, onChange, label }: { value: number | undefined; onChan
 
 export function QuestionnairesScreen({
   sessionId,
+  usabilityMenu,
   logger,
   fastMode,
   busy,
   onSubmit
 }: {
   sessionId: string;
+  usabilityMenu: MenuId;
   logger: EventLogger;
   fastMode: boolean;
   busy: boolean;
   onSubmit: (responses: Array<Record<string, unknown>>) => Promise<void>;
 }) {
   const [tab, setTab] = useState(0);
-  const [sus, setSus] = useState<Record<string, number>>({});
+  const [sus, setSus] = useState<Record<number, number>>({});
   const [nasa, setNasa] = useState<Record<string, number>>(() =>
     Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50]))
   );
   const [open, setOpen] = useState<Record<string, string>>({});
   const [credibility, setCredibility] = useState<Record<string, number>>({});
   const current = TABS[tab]!;
-  const answeredCurrent = useMemo(() => {
-    if (current.kind === "sus") {
-      return SUS_ITEMS.every((_, index) => typeof sus[`${current.menu}:${index}`] === "number");
-    }
-    if (current.kind === "credibility") {
-      return CREDIBILITY_ITEMS.every((item) => typeof credibility[item.id] === "number");
-    }
-    return true;
-  }, [credibility, current, sus]);
+  const answeredSus = SUS_ITEMS.every((_, index) => typeof sus[index] === "number");
+  const answeredCredibility = CREDIBILITY_ITEMS.every((item) => typeof credibility[item.id] === "number");
+  const answeredCurrent = current.kind !== "sus" || answeredSus;
 
   const fillNeutral = () => {
-    const nextSus: Record<string, number> = {};
-    for (const menu of MENU_IDS) for (let index = 0; index < SUS_ITEMS.length; index++) nextSus[`${menu}:${index}`] = 3;
-    setSus(nextSus);
+    setSus(Object.fromEntries(SUS_ITEMS.map((_, index) => [index, 3])));
     setNasa(Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50])));
     setOpen(Object.fromEntries(OPEN_QUESTIONS.map((item) => [item.id, "Test-mode answer."])));
     setCredibility(Object.fromEntries(CREDIBILITY_ITEMS.map((item) => [item.id, 4])));
@@ -74,19 +67,17 @@ export function QuestionnairesScreen({
   const buildResponses = () => {
     const now = new Date().toISOString();
     const responses: Array<Record<string, unknown>> = [];
-    for (const menu of MENU_IDS) {
-      for (let index = 0; index < SUS_ITEMS.length; index++) {
-        responses.push({
-          response_id: crypto.randomUUID(),
-          session_id: sessionId,
-          menu_id: menu,
-          instrument: "SUS",
-          item_id: `Q${index + 1}`,
-          value: sus[`${menu}:${index}`] ?? 3,
-          text_value: null,
-          answered_at: now
-        });
-      }
+    for (let index = 0; index < SUS_ITEMS.length; index++) {
+      responses.push({
+        response_id: crypto.randomUUID(),
+        session_id: sessionId,
+        menu_id: usabilityMenu,
+        instrument: "SUS",
+        item_id: `Q${index + 1}`,
+        value: sus[index],
+        text_value: null,
+        answered_at: now
+      });
     }
     for (const item of NASA_ITEMS) {
       responses.push({
@@ -116,7 +107,7 @@ export function QuestionnairesScreen({
         session_id: sessionId,
         instrument: "CREDIBILITY",
         item_id: item.id,
-        value: credibility[item.id] ?? 4,
+        value: credibility[item.id],
         text_value: null,
         answered_at: now
       });
@@ -125,6 +116,7 @@ export function QuestionnairesScreen({
   };
 
   const submit = () => {
+    if (!answeredSus || !answeredCredibility) return;
     const responses = buildResponses();
     for (const instrument of ["SUS", "NASA_TLX", "OPEN", "CREDIBILITY"] as const) {
       logger.log({
@@ -142,8 +134,7 @@ export function QuestionnairesScreen({
           <div className="eyebrow">Final questionnaires</div>
           <h1>Tell us about the menus</h1>
           <p>
-            Six short usability scales, one workload scale, three open questions, and four credibility items. There are
-            no right answers. Your first impression is the useful one.
+            Rate the menu you used in the final search, then answer questions about the session.
           </p>
         </div>
         {fastMode ? (
@@ -160,21 +151,14 @@ export function QuestionnairesScreen({
             className={index === tab ? "q-tab active" : "q-tab"}
             onClick={() => setTab(index)}
           >
-            {index < 6 ? (
-              <>
-                <span className={`q-menu-dot q-menu-${MENU_IDS[index]}`} aria-hidden="true" />
-                {item.label}
-              </>
-            ) : (
-              item.label
-            )}
+            {item.label}
           </button>
         ))}
       </nav>
       <div className="q-body">
         {current.kind === "sus" ? (
-          <div className="sus-page" data-testid={`sus-${current.menu}`}>
-            <h2>Menu {current.menu} · System Usability Scale</h2>
+          <div className="sus-page" data-testid={`sus-${usabilityMenu}`}>
+            <h2>Menu {usabilityMenu} · System Usability Scale</h2>
             <p className="small-note">1 = strongly disagree, 5 = strongly agree.</p>
             {SUS_ITEMS.map((item, index) => (
               <div key={index} className="sus-row">
@@ -182,8 +166,8 @@ export function QuestionnairesScreen({
                 <span className="sus-text">{item}</span>
                 <Likert5
                   label={item}
-                  value={sus[`${current.menu}:${index}`]}
-                  onChange={(value) => setSus((currentSus) => ({ ...currentSus, [`${current.menu}:${index}`]: value }))}
+                  value={sus[index]}
+                  onChange={(value) => setSus((currentSus) => ({ ...currentSus, [index]: value }))}
                 />
               </div>
             ))}
@@ -275,7 +259,7 @@ export function QuestionnairesScreen({
             Next section →
           </button>
         ) : (
-          <button type="button" className="button primary" onClick={submit} disabled={busy || !answeredCurrent} data-testid="submit-questionnaires">
+          <button type="button" className="button primary" onClick={submit} disabled={busy || !answeredSus || !answeredCredibility} data-testid="submit-questionnaires">
             {busy ? "Submitting…" : "Submit questionnaires"}
           </button>
         )}

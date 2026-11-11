@@ -1,5 +1,7 @@
 import { validateTaxonomy } from "@meridian/taxonomy";
 import { manipulationCheckPassed, type AffectRatings } from "@meridian/scoring";
+import questionnaires from "../../web/content/questionnaires.json";
+import timing from "../../web/content/session-timing.json";
 import type { Repository } from "./repository";
 
 export type CheckStatus = "pass" | "fail" | "na";
@@ -217,18 +219,35 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     );
   }
 
-  const durationsMs = completed
-    .filter((s) => s.started_at && s.ended_at)
-    .map((s) => (new Date(s.ended_at ?? 0).getTime() - new Date(s.started_at ?? 0).getTime()) / 1000);
-  if (durationsMs.length === 0) {
-    criteria.push(na("session_duration", "Session duration", "no completed sessions", "<= 100 min"));
+  const shortPilotStarts = new Map<string, { wall_time_ms?: number; fast_mode?: boolean }>();
+  const sessionEnds = new Map<string, number>();
+  for (const event of events) {
+    if (event.event_type === "session_start") {
+      const meta = JSON.parse(event.meta_json);
+      if (meta.protocol_version === timing.protocolVersion) shortPilotStarts.set(event.session_id, meta);
+    } else if (event.event_type === "session_end") {
+      const meta = JSON.parse(event.meta_json);
+      if (meta.completed === true && typeof meta.wall_time_ms === "number") {
+        sessionEnds.set(event.session_id, meta.wall_time_ms);
+      }
+    }
+  }
+  const durationsSeconds = completed.flatMap((session) => {
+    const start = shortPilotStarts.get(session.session_id);
+    const end = sessionEnds.get(session.session_id);
+    if (start?.fast_mode || typeof start?.wall_time_ms !== "number" || end === undefined || end < start.wall_time_ms) return [];
+    return [(end - start.wall_time_ms) / 1000];
+  });
+  const durationLabel = "Average short pilot duration";
+  const durationTarget = "≤ " + timing.targetSeconds / 60 + " min target";
+  if (durationsSeconds.length === 0) {
+    criteria.push(na("session_duration", durationLabel, "no completed short pilot sessions", durationTarget));
   } else {
-    const max = Math.max(...durationsMs);
-    criteria.push(
-      max <= 6000
-        ? pass("session_duration", "Session duration", `${(max / 60).toFixed(1)} min max`, "<= 100 min")
-        : fail("session_duration", "Session duration", `${(max / 60).toFixed(1)} min max`, "<= 100 min")
-    );
+    const average = durationsSeconds.reduce((sum, duration) => sum + duration, 0) / durationsSeconds.length;
+    const value = (average / 60).toFixed(1) + " min (" + durationsSeconds.length + (durationsSeconds.length === 1 ? " session)" : " sessions)");
+    criteria.push(average <= timing.targetSeconds
+      ? pass("session_duration", durationLabel, value, durationTarget)
+      : fail("session_duration", durationLabel, value, durationTarget));
   }
 
   const completionTimes = main.filter((t) => t.success && t.completion_time_ms !== null).map((t) => t.completion_time_ms ?? 0);
@@ -243,8 +262,24 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     );
   }
 
-  const expectedAnswers = completed.length * 73;
-  const completeness = expectedAnswers ? (answers.length / expectedAnswers) * 100 : null;
+  const questionnaireItems = questionnaires.sus.length + questionnaires.nasa_tlx.length
+    + questionnaires.open.length + questionnaires.credibility.length;
+  const answersBySession = new Map<string, Set<string>>();
+  for (const answer of answers) {
+    const itemKeys = answersBySession.get(String(answer.session_id)) ?? new Set<string>();
+    itemKeys.add(JSON.stringify([answer.instrument, answer.menu_id, answer.item_id]));
+    answersBySession.set(String(answer.session_id), itemKeys);
+  }
+  let expectedAnswers = 0;
+  let answeredItems = 0;
+  for (const session of completed) {
+    const expected = shortPilotStarts.has(session.session_id)
+      ? questionnaireItems
+      : questionnaireItems + 5 * questionnaires.sus.length;
+    expectedAnswers += expected;
+    answeredItems += Math.min(expected, answersBySession.get(session.session_id)?.size ?? 0);
+  }
+  const completeness = expectedAnswers ? (answeredItems / expectedAnswers) * 100 : null;
   if (completeness === null) {
     criteria.push(na("questionnaire_completeness", "Questionnaire completeness", "no completed sessions", ">= 95%"));
   } else {

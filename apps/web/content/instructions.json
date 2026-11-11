@@ -9,7 +9,7 @@
     },
     {
       "title": "Search naturally",
-      "text": "Use the menu as you would in a real shop. Practice searches last up to 15 seconds; scored searches last up to 20 seconds. A timeout is recorded honestly; you do not need to guess."
+      "text": "Use the menu as you would in a real shop. Practice searches allow up to 45 seconds and scored searches allow up to 60 seconds. You can move on as soon as you find the watch, or choose to give up."
     },
     {
       "title": "Check in honestly",
@@ -28,6 +28,6 @@
     "Questionnaires",
     "Debrief"
   ],
-  "estimate": "The activities are designed for approximately 15 minutes. Complete each activity at your own pace; the session does not stop automatically after 15 minutes.",
+  "estimate": "The study is designed to take about 15 minutes. You can continue through all activities if you need longer.",
   "start": "Start the six practice trials"
 }

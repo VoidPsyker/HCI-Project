@@ -82,3 +82,23 @@ describe("task calibration table", () => {
     expect(table.by_menu.find((m) => m.key === "A")).toEqual({ key: "A", n: 2, success_pct: 50, median_success_s: 10 });
   });
 });
+
+it("measures the short pilot from consent to completion across reloads and excludes fast mode", () => {
+  const sessions = ["regular", "fast"].map((session_id) => ({ session_id, status: "completed" }));
+  const events = sessions.flatMap(({ session_id }) => [
+    {
+      session_id, event_type: "session_start", t_client: 10_000,
+      meta_json: JSON.stringify({ protocol_version: "short-pilot-v2", wall_time_ms: 1_000_000, fast_mode: session_id === "fast" })
+    },
+    {
+      session_id, event_type: "session_end", t_client: 5,
+      meta_json: JSON.stringify({ completed: true, wall_time_ms: session_id === "fast" ? 1_020_000 : 1_960_000 })
+    }
+  ]);
+  const repo = {
+    listAdminSessions: () => sessions, allTrials: () => [], allCheckins: () => [],
+    allEvents: () => events, allQuestionnaires: () => []
+  } as unknown as Repository;
+  const duration = buildGoNoGo(repo).find((item) => item.id === "session_duration");
+  expect(duration).toMatchObject({ status: "fail", value: "16.0 min (1 session)" });
+});

@@ -4,25 +4,31 @@ This revision supersedes timing in the supplied planning PDFs for the executable
 It is a feasibility pilot, not the full 6 menus x 4 states mapping study. Twelve scored trials
 sample three menus per state and each menu twice; they do not cover all 24 cells per person.
 
-## Budget
+## Timing estimate
 
-| Activity | Maximum timed duration |
+| Activity | Planning allowance |
 | --- | ---: |
-| Six practice trials at 15 seconds | 90 seconds |
-| Happy, frustrated, confused inductions at 45 seconds | 135 seconds |
-| Bored induction | 60 seconds |
-| Twelve scored trials at 20 seconds | 240 seconds |
-| Four neutral resets at 15 seconds | 60 seconds |
-| Total timed activities | 585 seconds (9:45) |
-| Setup, calibration, reading, check-ins, questionnaires, transitions | 315 seconds (5:15) |
+| Consent, setup, calibration and debrief | 2:00 |
+| Six practice searches, averaging 10 seconds | 1:00 |
+| Four mood activities | 3:15 |
+| Twelve scored searches, averaging 25 seconds | 5:00 |
+| Four neutral resets | 1:00 |
+| Check-ins, instructions and transitions | 1:30 |
+| End questionnaires | 1:15 |
+| Total | 15:00 |
 
-There is no automatic session cutoff. The 15-minute target describes the activity workload,
-not a deadline that aborts the participant. Allow camera setup, calibration and consent
-additional time. Participants can finish all tasks and questionnaires even if they take longer.
-Individual search timeouts remain 15 seconds for practice and 20 seconds for scored trials;
-these end only that search and let the participant proceed to the next activity.
-Human rehearsal must establish the actual activity duration, especially the six full SUS
-questionnaires. Do not hurry answers or claim a guaranteed duration before measuring it.
+The estimates assume the researcher has screen measurements ready and that the participant
+finishes most searches well before the individual limit. The longer plan expects a typical
+scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes 17 minutes.
+Measure the full session in a rehearsal and allow people enough time to read consent, calibrate,
+and answer. A 45-second practice or 60-second scored timeout ends that search only. The app
+records it separately from voluntary give-up and successful completion.
+
+Each participant answers all ten SUS items for the final trial menu. The assigned menu order
+rotates which menu is last. This reduces repeated SUS items from 60 to 10 while preserving
+the scale and its menu ID. SUS is now a between-participant comparison, with fewer ratings
+per layout. Keep NASA-TLX, credibility ratings and optional comments. The primary menu
+comparison still uses search performance in each emotional context.
 
 ## Preserve the emotional study
 
@@ -36,10 +42,9 @@ longer because repetition is its mechanism; this is a design choice, not proof i
 The happy media slot is currently empty: the sunrise placeholder cannot establish a successful
 positive induction. Supply and rehearse an approved local clip before collecting real data.
 
-Twenty-second deadlines can themselves induce frustration and alter success rates and menu
-rankings. Compare only runs using this timing protocol; do not pool with the 120-second protocol.
-Review practice success and timeouts before recruitment. If most people cannot finish, reduce
-scope or split visits rather than inventing ratings, skipping calibration or labelling failures success.
+The scored timeout changed from 20 seconds in the first short pilot and 120 seconds in
+the longer plan. Report timeout rates by menu, state and difficulty. Compare runs with
+the same protocol version, which is recorded in session-start and trial-start events.
 
 ## Feasibility checks
 
@@ -57,7 +62,7 @@ persistent data and must not collect research sessions. Keep the data directory 
 volume; back up the database and restricted gaze store together. Never retain webcam video.
 
 After a rehearsal, export CSV/JSONL with the checksum manifest. Verify six practice results,
-twelve main trials, four induction pairs, nine check-ins (baseline plus two per block), all
+twelve main trials, four induction pairs, nine check-ins (baseline plus two per block), one complete 10-item SUS and the other
 questionnaire answers, assignment metadata and gaze quality records for a completed run.
 For a participant-stopped run, verify its stop reason and only the records actually collected; do not fill
 missing observations. Reopen the server and export again to check persistence across restart.
@@ -80,6 +85,8 @@ The Shopify PDF was excluded. Original PDFs remain unchanged as reference docume
 
 Gaze upload recovery: unsent gaze samples remain in memory. A failed stop now reports the upload error and allows retry before closing the debrief. Reloading or closing while offline can still lose these unsent samples. Keep the page open until saving succeeds; persistent gaze recovery across browser crashes is not implemented.
 
-## Verification (10 November 2026)
+## Verification
 
-The previous revision passed 238 automated tests across taxonomy, scoring, analysis, server and web. Web production build and server TypeScript build passed. The full scripted participant browser test passed, including 18 trial records and server-side completion checks. It uses accelerated timers and scripted gaze: it verifies flow and storage, not human completion time, calibration accuracy or emotional induction effectiveness.
+The scripted browser session completed all 18 searches and exported ten SUS answers for
+the final menu. It uses accelerated scenario timers and scripted gaze. Measure actual
+duration, mood induction and calibration with people before drawing conclusions.

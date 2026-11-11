@@ -166,6 +166,9 @@ test("@session a scripted participant completes the whole pilot session", async 
     await page.getByTestId("reset-continue").click();
   }
 
+  const finalMenu = design.trials.at(-1)!.menuId;
+  await expect(page.getByTestId("sus-" + finalMenu)).toBeVisible();
+  await expect(page.getByTestId("sus-" + finalMenu).getByRole("radiogroup")).toHaveCount(10);
   await page.getByTestId("fill-neutral").click();
   await page.getByTestId("submit-questionnaires").click();
   await page.getByTestId("finish-session").click();
@@ -189,6 +192,15 @@ test("@session a scripted participant completes the whole pilot session", async 
   expect(main.filter((row) => row.gave_up)).toHaveLength(1);
   expect(main.some((row) => Number(row.wrong_department) > 0 && row.success)).toBe(true);
   expect(main.every((row) => row.condition === "static")).toBe(true);
+
+  const questionnaires = await request.get("/api/admin/export/questionnaires.jsonl", { headers: ADMIN });
+  expect(questionnaires.ok()).toBe(true);
+  const responses = (await questionnaires.text()).trim().split("\n")
+    .map((line) => JSON.parse(line))
+    .filter((row) => row.session_id === sessionId);
+  const usability = responses.filter((row) => row.instrument === "SUS");
+  expect(usability).toHaveLength(10);
+  expect(usability.every((row) => row.menu_id === finalMenu)).toBe(true);
 
   const qa = await (await request.get("/api/admin/qa", { headers: ADMIN })).json();
   expect(qa.data_quality.missing_trial_starts).toBe(0);

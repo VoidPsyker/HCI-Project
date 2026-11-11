@@ -47,11 +47,10 @@ and data pipeline, not human gaze accuracy.
 
 ## Short pilot timing
 
-The pilot activities target approximately 15 minutes, with no automatic session cutoff.
-It keeps four states, six practices and twelve scored trials. Timed activities occupy at most
-9 minutes 45 seconds; allow approximately 5 minutes 15 seconds for reading, check-ins,
-questionnaires and transitions. Participants can finish every activity if they need longer.
-Camera setup, calibration and consent should be allowed additional time.
+The short pilot targets about 15 minutes including setup, with time to finish if needed.
+It keeps four emotion blocks, six practice searches and twelve scored searches. Practice
+allows 45 seconds per search and scored trials allow 60 seconds. The final questionnaire
+includes the full usability scale for the last menu used, plus workload and credibility ratings.
 
 See [short pilot protocol](docs/short-pilot.md) for the timing budget, research limitations and
 save verification. Older PDFs describe the earlier protocol.

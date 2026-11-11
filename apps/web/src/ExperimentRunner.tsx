@@ -138,7 +138,8 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         taxonomy_hash: state.design?.taxonomyHash ?? null,
         study: "pilot",
         protocol_version: SESSION_TIMING.protocolVersion,
-        session_target_seconds: SESSION_TIMING.targetSeconds
+        session_target_seconds: SESSION_TIMING.targetSeconds,
+        wall_time_ms: Date.parse(state.participant.consented_at)
       }
     });
     state.setStartedLogged(true);
@@ -525,7 +526,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     const code = completionLoggedRef.current ?? makeCode();
     if (!completionLoggedRef.current) {
       logger?.setContext({ state_label: "mixed", block_id: null, trial_id: null, task_id: null, target_id: null, menu_id: null });
-      logger?.log({ event_type: "session_end", state_label: "mixed", meta: { completed: true, completion_code: code } });
+      logger?.log({ event_type: "session_end", state_label: "mixed", meta: { completed: true, completion_code: code, wall_time_ms: Date.now() } });
       completionLoggedRef.current = code;
     }
     if (!(await logger?.flush())) {
@@ -550,6 +551,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const design = state.design;
+  const finalTrial = design?.trials.at(-1);
   const session = state.session;
   const block = design?.blocks[state.blockIndex];
   const practice = design?.practiceTrials[state.practiceIndex];
@@ -685,9 +687,16 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     );
   } else if (state.phase === "block_end" && block) {
     content = <NeutralResetScreen fastMode={fastMode} state={block.stateLabel as Exclude<StateLabel, "mixed">} onContinue={finishBlock} />;
-  } else if (state.phase === "questionnaires") {
+  } else if (state.phase === "questionnaires" && finalTrial) {
     content = (
-      <QuestionnairesScreen sessionId={sessionId} logger={logger!} fastMode={fastMode} busy={busy} onSubmit={submitAllQuestionnaires} />
+      <QuestionnairesScreen
+        sessionId={sessionId}
+        usabilityMenu={finalTrial.menuId}
+        logger={logger!}
+        fastMode={fastMode}
+        busy={busy}
+        onSubmit={submitAllQuestionnaires}
+      />
     );
   } else if (state.phase === "debrief" || state.phase === "aborted") {
     content = (
