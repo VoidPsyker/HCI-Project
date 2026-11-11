@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { EVENT_TYPES, type EventType, type StateLabel } from "@meridian/scoring";
 import { NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
 import { SESSION_TIMING } from "../content";
@@ -12,6 +12,7 @@ import { MenuD } from "../menus/MenuD";
 import { MenuE } from "../menus/MenuE";
 import { MenuF } from "../menus/MenuF";
 
+const POINTER_SAMPLE_INTERVAL_MS = 100;
 const MENUS = { A: MenuA, B: MenuB, C: MenuC, D: MenuD, E: MenuE, F: MenuF };
 
 export interface TrialInstruction {
@@ -52,6 +53,7 @@ export function TrialRunner({
   const stageRef = useRef<HTMLElement | null>(null);
   const gazeStartedRef = useRef(false);
   const finishedRef = useRef(false);
+  const lastPointerSample = useRef(-Infinity);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stepRef = useRef<Step>("instruction");
@@ -111,6 +113,22 @@ export function TrialRunner({
       state_label: spec.stateLabel,
       ...payload
     });
+  };
+
+  const capturePointerMove = (event: PointerEvent<HTMLElement>) => {
+    if (finishedRef.current || event.pointerType !== "mouse") return;
+    if (step !== "menu" && step !== "wrong_product") return;
+    const now = performance.now();
+    if (now - lastPointerSample.current < POINTER_SAMPLE_INTERVAL_MS) return;
+    lastPointerSample.current = now;
+    log("pointer_move", { x: event.clientX, y: event.clientY, input_type: "mouse" });
+  };
+
+  const capturePointerClick = (event: MouseEvent<HTMLElement>) => {
+    if (finishedRef.current || event.detail === 0) return;
+    if (step !== "menu" && step !== "wrong_product") return;
+    const pointerType = (event.nativeEvent as globalThis.PointerEvent).pointerType;
+    log("pointer_click", { x: event.clientX, y: event.clientY, input_type: pointerType === "touch" ? "touch" : "mouse" });
   };
 
   useEffect(() => {
@@ -188,7 +206,7 @@ export function TrialRunner({
       state_label: spec.stateLabel,
       condition: "static"
     });
-    log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex, limit_ms: trialLimitSeconds * 1000, protocol_version: SESSION_TIMING.protocolVersion } });
+    log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex, limit_ms: trialLimitSeconds * 1000, protocol_version: SESSION_TIMING.protocolVersion, viewport_width: window.innerWidth, viewport_height: window.innerHeight } });
     setStep("menu");
     setStarting(false);
     const timeoutMs = trialLimitSeconds * 1000;
@@ -278,7 +296,14 @@ export function TrialRunner({
   }
 
   return (
-    <section className="trial-stage" data-testid="trial-stage" data-trial-id={spec.trialId} ref={stageRef}>
+    <section
+      className="trial-stage"
+      data-testid="trial-stage"
+      data-trial-id={spec.trialId}
+      ref={stageRef}
+      onPointerMoveCapture={capturePointerMove}
+      onClickCapture={capturePointerClick}
+    >
       {gazeError ? (
         <div className="warning-box" role="alert">
           Eye-tracking warning: {gazeError}

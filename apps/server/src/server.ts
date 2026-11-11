@@ -390,8 +390,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const { sessionId, name } = request.params as { sessionId: string; name: string };
     const file = repo.readGazeExportFile(sessionId, name);
     if (!file) return reply.code(404).send({ error: "gaze_export_not_found" });
-    const type = name.endsWith(".jsonl")
-      ? "application/x-ndjson; charset=utf-8"
+    const type = name.endsWith(".csv") ? "text/csv; charset=utf-8"
+      : name.endsWith(".jsonl") ? "application/x-ndjson; charset=utf-8"
       : "application/json; charset=utf-8";
     return reply
       .header("content-type", type)

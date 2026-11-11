@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { EVENT_TYPES } from "@meridian/scoring";
+import { MENU_IDS } from "@meridian/taxonomy";
+import questionnaires from "../../web/content/questionnaires.json";
 
 export const eventSchema = z.object({
   event_id: z.string().uuid(),
@@ -48,12 +50,15 @@ export const questionnaireSchema = z.object({
   session_id: z.string().min(1).max(100),
   block_id: z.string().max(100).nullable().optional().default(null),
   menu_id: z.enum(["A", "B", "C", "D", "E", "F"]).nullable().optional().default(null),
-  instrument: z.enum(["SUS", "NASA_TLX", "OPEN", "CREDIBILITY"]),
+  instrument: z.enum(["SUS", "NASA_TLX", "OPEN", "CREDIBILITY", "PREFERENCE"]),
   item_id: z.string().min(1).max(80),
   value: z.number().finite().nullable().optional().default(null),
   text_value: z.string().max(4000).nullable().optional().default(null),
   answered_at: z.string().datetime()
-});
+}).refine((response) => response.instrument !== "PREFERENCE" ||
+  (response.item_id === questionnaires.menu_preference.id && response.text_value !== null &&
+    [...MENU_IDS, "none"].includes(response.text_value) &&
+    response.menu_id === null && response.value === null), "Invalid menu preference");
 
 export const questionnaireBatchSchema = z.object({
   responses: z.array(questionnaireSchema).min(1).max(500)

@@ -114,8 +114,23 @@ export function getGoNoGo(password: string) {
   return adminRequest<{ generated_at: string; criteria: import("./types").QaCriterion[] }>("/api/admin/gonogo", password);
 }
 
-export async function downloadExport(password: string, kind: string): Promise<{ blob: Blob; checksum: string; rows: string }> {
-  const response = await fetch(`${API_BASE}/api/admin/export/${encodeURIComponent(kind)}`, {
+export function getGazeSummary(password: string, sessionId: string) {
+  return adminRequest<{ gaze: { status: string; sample_count: number; analysis_ready: boolean; export_files: string[] } }>(
+    "/api/admin/gaze/sessions/" + encodeURIComponent(sessionId), password
+  );
+}
+
+export function downloadGazeExport(password: string, sessionId: string, filename: string) {
+  return downloadAdminFile(password,
+    "/api/admin/gaze/sessions/" + encodeURIComponent(sessionId) + "/export/" + encodeURIComponent(filename));
+}
+
+export function downloadExport(password: string, kind: string) {
+  return downloadAdminFile(password, "/api/admin/export/" + encodeURIComponent(kind));
+}
+
+async function downloadAdminFile(password: string, path: string) {
+  const response = await fetch(API_BASE + path, {
     headers: { "x-admin-password": password }
   });
   if (!response.ok) throw new Error(`Export failed: HTTP ${response.status}`);

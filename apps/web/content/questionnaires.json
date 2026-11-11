@@ -24,6 +24,12 @@
     { "id": "fast", "label": "What felt fast or easy?" },
     { "id": "frustrating", "label": "What, if anything, felt frustrating?" }
   ],
+  "menu_preference": {
+    "id": "preferred_menu",
+    "label": "Which menu would you choose for another search?",
+    "placeholder": "Choose a menu",
+    "no_preference": "No preference"
+  },
   "credibility": [
     { "id": "credible_happy", "label": "The comedy clip and great-deal scenario felt believable." },
     { "id": "credible_frustrated", "label": "The unreliable search felt like a genuine site problem." },

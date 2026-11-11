@@ -170,6 +170,9 @@ test("@session a scripted participant completes the whole pilot session", async 
   await expect(page.getByTestId("sus-" + finalMenu)).toBeVisible();
   await expect(page.getByTestId("sus-" + finalMenu).getByRole("radiogroup")).toHaveCount(10);
   await page.getByTestId("fill-neutral").click();
+  await page.getByRole("button", { name: "Menu usability", exact: true }).click();
+  await page.getByTestId("preferred-menu").selectOption("B");
+  await page.getByRole("button", { name: "Credibility", exact: true }).click();
   await page.getByTestId("submit-questionnaires").click();
   await page.getByTestId("finish-session").click();
   await expect(page.getByTestId("complete-screen")).toBeVisible();
@@ -193,6 +196,15 @@ test("@session a scripted participant completes the whole pilot session", async 
   expect(main.some((row) => Number(row.wrong_department) > 0 && row.success)).toBe(true);
   expect(main.every((row) => row.condition === "static")).toBe(true);
 
+  const events = await request.get("/api/admin/export/events.jsonl", { headers: ADMIN });
+  expect(events.ok()).toBe(true);
+  const trialEvents = (await events.text()).trim().split("\n")
+    .map((line) => JSON.parse(line))
+    .filter((row) => row.session_id === sessionId && row.trial_id === design.trials[0]!.trialId);
+  for (const type of ["pointer_move", "pointer_click"]) {
+    expect(trialEvents.some((row) => row.event_type === type && Number.isFinite(row.x) && Number.isFinite(row.y))).toBe(true);
+  }
+
   const questionnaires = await request.get("/api/admin/export/questionnaires.jsonl", { headers: ADMIN });
   expect(questionnaires.ok()).toBe(true);
   const responses = (await questionnaires.text()).trim().split("\n")
@@ -201,10 +213,48 @@ test("@session a scripted participant completes the whole pilot session", async 
   const usability = responses.filter((row) => row.instrument === "SUS");
   expect(usability).toHaveLength(10);
   expect(usability.every((row) => row.menu_id === finalMenu)).toBe(true);
+  expect(responses.filter((row) => row.instrument === "PREFERENCE")).toEqual([
+    expect.objectContaining({ item_id: "preferred_menu", text_value: "B" })
+  ]);
+
+  const demographics = await request.get("/api/admin/export/demographics.jsonl", { headers: ADMIN });
+  expect(demographics.ok()).toBe(true);
+  const demographicRows = (await demographics.text()).trim().split("\n").map((line) => JSON.parse(line));
+  expect(demographicRows.find((row) => row.session_id === sessionId)).toMatchObject({
+    age_band: "25-34",
+    education: "undergraduate",
+    shopping_freq: "monthly",
+    colour_vision: "typical",
+    prior_menu_experience: ["horizontal"]
+  });
+
+  const gazeCsvPath = "/api/admin/gaze/sessions/" + sessionId + "/export/gaze_samples.csv";
+  expect((await request.get(gazeCsvPath)).status()).toBe(401);
+  const gazeCsv = await request.get(gazeCsvPath, { headers: ADMIN });
+  expect(gazeCsv.ok()).toBe(true);
+  expect(gazeCsv.headers()["content-type"]).toContain("text/csv");
+  expect(await gazeCsv.text()).toContain("session_id,participant_id,trial_id,seq,t_ms");
+
+  const gaze = await request.get("/api/admin/gaze/sessions/" + sessionId + "/export/gaze_samples.jsonl", { headers: ADMIN });
+  expect(gaze.ok()).toBe(true);
+  const gazeRows = (await gaze.text()).trim().split("\n").map((line) => JSON.parse(line));
+  const scoredIds = new Set(design.trials.map((trial) => trial.trialId));
+  expect(gazeRows.some((row) => row.valid && scoredIds.has(row.trial_id) && Number.isFinite(row.x_px) && Number.isFinite(row.y_px))).toBe(true);
 
   const qa = await (await request.get("/api/admin/qa", { headers: ADMIN })).json();
   expect(qa.data_quality.missing_trial_starts).toBe(0);
   expect(qa.data_quality.duplicate_trial_ends).toBe(0);
   expect(qa.criteria.find((c: { id: string }) => c.id === "practice_reconstructable").status).toBe("pass");
+
+  await page.goto("/admin");
+  await page.getByLabel("Admin password").fill(ADMIN["x-admin-password"]);
+  await page.getByRole("button", { name: "Open dashboard" }).click();
+  await expect(page.getByRole("button", { name: "demographics.csv", exact: false })).toBeVisible();
+  await page.getByText("SYNTHETIC scripted participant", { exact: true }).click();
+  const gazeExports = page.getByTestId("gaze-exports");
+  await expect(gazeExports.getByRole("button", { name: "gaze_quality.json" })).toBeVisible();
+  const download = page.waitForEvent("download");
+  await gazeExports.getByRole("button", { name: "gaze_samples.csv" }).click();
+  expect((await download).suggestedFilename()).toBe(sessionId + "-gaze_samples.csv");
   expect(qa.criteria.find((c: { id: string }) => c.id === "reconstructable").status).toBe("pass");
 });

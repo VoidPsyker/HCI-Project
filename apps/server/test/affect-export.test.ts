@@ -7,7 +7,7 @@ function trialRow(checkins: Array<{ session_id: string; block_id: string; meta: 
   const repo = {
     allEvents: () => events, allCheckins: () => checkins,
     allTrials: () => [{ session_id: "session-1", block_id: "block-1", state_label: "happy", path_json: "[]", first_click_ok: null }],
-    allQuestionnaires: () => [], allAssignments: () => []
+    allQuestionnaires: () => [], allAssignments: () => [], allDemographics: () => []
   } as unknown as Repository;
   const csv = buildExportBundle(repo).find((file) => file.name === "trials.csv")!.content;
   const [header, row] = csv.trim().split("\r\n");
@@ -40,7 +40,7 @@ it("exports trials, check-ins and questionnaires as JSONL with the CSV columns",
   const repo = {
     allEvents: () => [], allCheckins: () => [checkin],
     allTrials: () => [{ trial_id: "t1", session_id: "session-1", block_id: "block-1", state_label: "happy", path_json: "[]", first_click_ok: null, task_description: "a, b" }],
-    allQuestionnaires: () => [], allAssignments: () => []
+    allQuestionnaires: () => [], allAssignments: () => [], allDemographics: () => []
   } as unknown as Repository;
   const bundle = buildExportBundle(repo);
   const csvHeader = (name: string) => bundle.find((f) => f.name === name)!.content.split("\r\n")[0]!.split(",");

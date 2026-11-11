@@ -1,5 +1,5 @@
 {
-  "protocolVersion": "short-pilot-v2",
+  "protocolVersion": "short-pilot-v3",
   "targetSeconds": 900,
   "scoredTrialSeconds": 60,
   "practiceTrialSeconds": 45,

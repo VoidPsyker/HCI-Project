@@ -18,6 +18,8 @@ export const EVENT_TYPES = [
   "menu_close",
   "node_hover",
   "node_click",
+  "pointer_move",
+  "pointer_click",
   "leaf_select",
   "product_view",
   "back",

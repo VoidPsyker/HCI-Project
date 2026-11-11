@@ -219,12 +219,14 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     );
   }
 
-  const shortPilotStarts = new Map<string, { wall_time_ms?: number; fast_mode?: boolean }>();
+  const shortPilotStarts = new Map<string, { wall_time_ms?: number; fast_mode?: boolean; protocol_version: string }>();
   const sessionEnds = new Map<string, number>();
   for (const event of events) {
     if (event.event_type === "session_start") {
       const meta = JSON.parse(event.meta_json);
-      if (meta.protocol_version === timing.protocolVersion) shortPilotStarts.set(event.session_id, meta);
+      if (meta.protocol_version === timing.protocolVersion || meta.protocol_version === "short-pilot-v2") {
+        shortPilotStarts.set(event.session_id, meta);
+      }
     } else if (event.event_type === "session_end") {
       const meta = JSON.parse(event.meta_json);
       if (meta.completed === true && typeof meta.wall_time_ms === "number") {
@@ -273,9 +275,10 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
   let expectedAnswers = 0;
   let answeredItems = 0;
   for (const session of completed) {
-    const expected = shortPilotStarts.has(session.session_id)
-      ? questionnaireItems
-      : questionnaireItems + 5 * questionnaires.sus.length;
+    const protocol = shortPilotStarts.get(session.session_id)?.protocol_version;
+    const expected = protocol === timing.protocolVersion
+      ? questionnaireItems + 1
+      : protocol === "short-pilot-v2" ? questionnaireItems : questionnaireItems + 5 * questionnaires.sus.length;
     expectedAnswers += expected;
     answeredItems += Math.min(expected, answersBySession.get(session.session_id)?.size ?? 0);
   }

@@ -292,6 +292,16 @@ describe("Biometric Gaze Server Integration", () => {
       expect(storedSamples[0]!.seq).toBe(1);
       expect(storedSamples[0]!.x_px).toBe(500);
 
+      const partialExport = await app.inject({
+        method: "GET",
+        url: "/api/admin/gaze/sessions/" + sessionId + "/export/gaze_samples.csv",
+        headers: { "x-admin-password": ADMIN_PW }
+      });
+      expect(partialExport.statusCode).toBe(200);
+      const [header, firstSample] = partialExport.body.trim().split("\r\n");
+      const fields = Object.fromEntries(header!.split(",").map((key, index) => [key, firstSample!.split(",")[index]]));
+      expect(fields).toMatchObject({ session_id: sessionId, trial_id: "trial-1", x_px: "500", y_px: "400", finalized: "0" });
+
       const events = repo.getSessionEvents(sessionId);
       expect(events).toHaveLength(0); // Click event store preserved untouched!
 

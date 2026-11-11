@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import Database from "better-sqlite3";
 import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
+import { toCsv } from "./exports";
 import { SCHEMA_SQL } from "./schema";
 import { generateDesign, designSummary, stratumSequenceIndex, type StudyDesign, type StateLabel } from "./design";
 
@@ -815,6 +816,22 @@ export class Repository {
     });
   }
 
+  allDemographics(): Array<Record<string, unknown>> {
+    const rows = this.db.prepare(
+      "SELECT s.session_id, p.participant_id, p.age_band, p.gender, p.education, p.shopping_freq, " +
+      "CAST(p.watch_expertise AS INTEGER) AS watch_expertise, CAST(p.tech_savvy AS INTEGER) AS tech_savvy, p.colour_vision, " +
+      "(SELECT e.meta_json FROM events e WHERE e.session_id = s.session_id AND e.event_type = 'demographics' " +
+      " ORDER BY e.rowid DESC LIMIT 1) AS demographics_event " +
+      "FROM sessions s JOIN participants p ON p.participant_id = s.participant_id " +
+      "WHERE s.design_json IS NOT NULL AND s.status != 'withdrawn' ORDER BY s.session_id"
+    ).all() as Array<Record<string, unknown> & { demographics_event: string | null; gender: string | null }>;
+    return rows.map(({ demographics_event, gender, ...row }) => ({
+      ...row,
+      gender: gender?.split(":")[0] ?? null,
+      prior_menu_experience: demographics_event ? parseMeta(demographics_event).prior_menu_experience ?? null : null
+    }));
+  }
+
   allQuestionnaires(): Array<Record<string, unknown>> {
     return this.db.prepare("SELECT * FROM questionnaires ORDER BY session_id, instrument, item_id").all() as Array<
       Record<string, unknown>
@@ -1207,11 +1224,29 @@ export class Repository {
       created_at: row.created_at,
       updated_at: row.updated_at,
       completed_at: row.completed_at,
-      export_files: this.listGazeExportFiles(sessionId)
+      export_files: [
+        ...(row.sample_count > 0 ? ["gaze_samples.csv"] : []),
+        ...this.listGazeExportFiles(sessionId)
+      ]
     };
   }
 
   readGazeExportFile(sessionId: string, name: string): { content: string; sha256: string } | null {
+    if (name === "gaze_samples.csv") {
+      const session = this.getGazeSession(sessionId);
+      if (!session || session.status === "withdrawn" || session.sample_count === 0) return null;
+      const samples = this.getGazeSamples(sessionId).map((sample) => ({
+        ...sample,
+        participant_id: session.participant_id,
+        synthetic: session.synthetic === 1,
+        finalized: session.status === "completed"
+      }));
+      const content = toCsv(samples, [
+        "session_id", "participant_id", "trial_id", "seq", "t_ms", "t_source_ms",
+        "x_px", "y_px", "valid", "invalid_reason", "pupil_left_mm", "pupil_right_mm", "synthetic", "finalized"
+      ]);
+      return { content, sha256: crypto.createHash("sha256").update(content, "utf8").digest("hex") };
+    }
     const allowed = new Set(["manifest.json", "gaze_samples.jsonl", "aoi_metrics.jsonl", "gaze_quality.json"]);
     if (!allowed.has(name)) return null;
     const directory = this.gazeExportDirectory(sessionId);

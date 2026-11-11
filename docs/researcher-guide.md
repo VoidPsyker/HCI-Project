@@ -70,10 +70,27 @@ All other participant wording (consent, scripts, items, debrief) is in `apps/web
 
 ## 6. Export and analyse
 
-- Admin console **Exports**: download any file; each response carries its SHA-256 checksum.
-- Command line: `npm run export` writes a timestamped folder under `exports/` with
-  `events`, `trials`, `checkins` and `questionnaires` as both CSV and JSONL, plus
-  `assignments.csv`, `tasks.csv` and a `manifest.json` of row counts and checksums.
+- **Exports** in the admin console provides events, trials, mood check-ins, demographics,
+  questionnaires, and assignment files. Downloads carry SHA-256 checksums.
+- In the events export, use `pointer_move` and `pointer_click` for cursor position in
+  browser viewport pixels. Movement is sampled at most ten times per second during active
+  searches, including practice. The trial-start event records viewport width and height.
+  Mouse and trackpad motion both arrive as mouse-pointer input in the browser. Keyboard
+  activations do not have cursor coordinates.
+- The demographics export includes the saved age band, gender category, education,
+  shopping frequency, watch expertise, technical confidence, colour vision and prior menu
+  experience. Free-text gender self-descriptions are omitted from this export.
+  Join to trials by `session_id`.
+- The questionnaire export contains `SUS` for usability ratings for the final menu. The
+  `PREFERENCE` row records a menu ID (A–F) or `none` in `text_value`. These rows appear
+  after the participant submits the final questionnaire.
+- Select the session in the admin console for its eye-tracking downloads. Gaze starts
+  after calibration and is collected during scored trials. The CSV includes samples already
+  saved for incomplete runs and marks them as unfinalized. Use the session and trial IDs
+  to join gaze samples and area-of-interest metrics to trial results. Keep gaze exports
+  with the restricted study data.
+- `npm run export` writes the general exports to a timestamped folder with row counts
+  and checksums. Gaze files are downloaded separately per session.
 - `npm run audit:balance` prints the chi-square randomisation balance report.
 - Pilot analysis scripts and their limits: `packages/analysis/docs/pilot-analysis.md`.
   Pilot data are excluded from confirmatory analysis.

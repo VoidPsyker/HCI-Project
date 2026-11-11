@@ -51,6 +51,7 @@ export const STATE_ITEMS = checkin.state_items as Array<{ id: InductionState; la
 export const SUS_ITEMS = questionnaires.sus;
 export const NASA_ITEMS = questionnaires.nasa_tlx;
 export const OPEN_QUESTIONS = questionnaires.open;
+export const MENU_PREFERENCE = questionnaires.menu_preference;
 export const CREDIBILITY_ITEMS = questionnaires.credibility;
 
 export const DEBRIEF_PARAGRAPHS = debrief.paragraphs;

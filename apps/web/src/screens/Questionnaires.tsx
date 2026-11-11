@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { MenuId } from "@meridian/taxonomy";
+import { MENU_IDS, type MenuId } from "@meridian/taxonomy";
+import { MENU_NAMES } from "../components/MenuChrome";
 import type { EventLogger } from "../logger";
-import { CREDIBILITY_ITEMS, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITEMS } from "../content";
+import { CREDIBILITY_ITEMS, MENU_PREFERENCE, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITEMS } from "../content";
 
 const TABS = [
   { id: "sus", label: "Menu usability", kind: "sus" as const },
@@ -45,6 +46,7 @@ export function QuestionnairesScreen({
   onSubmit: (responses: Array<Record<string, unknown>>) => Promise<void>;
 }) {
   const [tab, setTab] = useState(0);
+  const [preferredMenu, setPreferredMenu] = useState("");
   const [sus, setSus] = useState<Record<number, number>>({});
   const [nasa, setNasa] = useState<Record<string, number>>(() =>
     Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50]))
@@ -54,9 +56,10 @@ export function QuestionnairesScreen({
   const current = TABS[tab]!;
   const answeredSus = SUS_ITEMS.every((_, index) => typeof sus[index] === "number");
   const answeredCredibility = CREDIBILITY_ITEMS.every((item) => typeof credibility[item.id] === "number");
-  const answeredCurrent = current.kind !== "sus" || answeredSus;
+  const answeredCurrent = current.kind !== "sus" || (answeredSus && preferredMenu !== "");
 
   const fillNeutral = () => {
+    setPreferredMenu("none");
     setSus(Object.fromEntries(SUS_ITEMS.map((_, index) => [index, 3])));
     setNasa(Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50])));
     setOpen(Object.fromEntries(OPEN_QUESTIONS.map((item) => [item.id, "Test-mode answer."])));
@@ -66,7 +69,14 @@ export function QuestionnairesScreen({
 
   const buildResponses = () => {
     const now = new Date().toISOString();
-    const responses: Array<Record<string, unknown>> = [];
+    const responses: Array<Record<string, unknown>> = [{
+      response_id: crypto.randomUUID(),
+      session_id: sessionId,
+      instrument: "PREFERENCE",
+      item_id: MENU_PREFERENCE.id,
+      text_value: preferredMenu,
+      answered_at: now
+    }];
     for (let index = 0; index < SUS_ITEMS.length; index++) {
       responses.push({
         response_id: crypto.randomUUID(),
@@ -116,9 +126,9 @@ export function QuestionnairesScreen({
   };
 
   const submit = () => {
-    if (!answeredSus || !answeredCredibility) return;
+    if (!answeredSus || !answeredCredibility || preferredMenu === "") return;
     const responses = buildResponses();
-    for (const instrument of ["SUS", "NASA_TLX", "OPEN", "CREDIBILITY"] as const) {
+    for (const instrument of ["PREFERENCE", "SUS", "NASA_TLX", "OPEN", "CREDIBILITY"] as const) {
       logger.log({
         event_type: "questionnaire",
         meta: { instrument, count: responses.filter((r) => r.instrument === instrument).length }
@@ -159,7 +169,15 @@ export function QuestionnairesScreen({
         {current.kind === "sus" ? (
           <div className="sus-page" data-testid={`sus-${usabilityMenu}`}>
             <h2>Menu {usabilityMenu} · System Usability Scale</h2>
-            <p className="small-note">1 = strongly disagree, 5 = strongly agree.</p>
+            <label className="field">
+              <span>{MENU_PREFERENCE.label}</span>
+              <select value={preferredMenu} onChange={(event) => setPreferredMenu(event.target.value)} data-testid="preferred-menu">
+                <option value="" disabled>{MENU_PREFERENCE.placeholder}</option>
+                {MENU_IDS.map((menu) => <option key={menu} value={menu}>{MENU_NAMES[menu]}</option>)}
+                <option value="none">{MENU_PREFERENCE.no_preference}</option>
+              </select>
+            </label>
+            <p className="small-note">Rate Menu {usabilityMenu} below. 1 = strongly disagree, 5 = strongly agree.</p>
             {SUS_ITEMS.map((item, index) => (
               <div key={index} className="sus-row">
                 <span className="sus-number">{index + 1}</span>
@@ -259,7 +277,7 @@ export function QuestionnairesScreen({
             Next section →
           </button>
         ) : (
-          <button type="button" className="button primary" onClick={submit} disabled={busy || !answeredSus || !answeredCredibility} data-testid="submit-questionnaires">
+          <button type="button" className="button primary" onClick={submit} disabled={busy || !answeredSus || !answeredCredibility || preferredMenu === ""} data-testid="submit-questionnaires">
             {busy ? "Submitting…" : "Submit questionnaires"}
           </button>
         )}

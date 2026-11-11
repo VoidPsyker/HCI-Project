@@ -6,13 +6,15 @@ import {
   createAdminSession,
   deleteAdminSession,
   downloadExport,
+  downloadGazeExport,
+  getGazeSummary,
   getAdminSessions,
   getGoNoGo,
   getQa
 } from "../api";
 
 const STORAGE_KEY = "meridian.admin.password";
-const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"];
+const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "demographics.jsonl", "demographics.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"];
 
 const STATUS_LABEL: Record<string, string> = {
   created: "Created",
@@ -39,6 +41,69 @@ function download(blob: Blob, name: string) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+function GazeExports({ sessionId, password }: { sessionId: string; password: string }) {
+  const [summary, setSummary] = useState<Awaited<ReturnType<typeof getGazeSummary>>["gaze"]>();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      try {
+        const { gaze } = await getGazeSummary(password, sessionId);
+        if (cancelled) return;
+        setSummary(gaze);
+        setError(null);
+      } catch (failure) {
+        if (cancelled) return;
+        setSummary(undefined);
+        if ((failure as Error).message !== "gaze_session_not_found") setError((failure as Error).message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void refresh();
+    const timer = setInterval(() => void refresh(), 10_000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [password, sessionId]);
+
+  const save = async (filename: string) => {
+    setDownloading(filename);
+    setError(null);
+    try {
+      const { blob } = await downloadGazeExport(password, sessionId, filename);
+      download(blob, sessionId + "-" + filename);
+    } catch (failure) {
+      setError((failure as Error).message);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  return (
+    <section data-testid="gaze-exports">
+      <h3>Eye tracking</h3>
+      {loading ? <p>Loading gaze data…</p> : summary ? (
+        <p>{summary.sample_count} samples saved. {summary.status === "completed"
+          ? (summary.analysis_ready ? "Quality checks passed." : "See the quality report before analysis.")
+          : summary.sample_count > 0 ? "The CSV contains samples received so far." : "Capture begins in scored trials after calibration."}</p>
+      ) : !error ? <p>No eye-tracking data yet. Capture begins in scored trials after calibration.</p> : null}
+      {error ? <p role="alert">{error}</p> : null}
+      <div className="export-grid">
+        {summary?.export_files.map((filename) => (
+          <button key={filename} type="button" className="export-card" onClick={() => void save(filename)} disabled={downloading !== null}>
+            {filename}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function AdminDashboard() {
@@ -561,6 +626,7 @@ export function AdminDashboard() {
               <strong>{selected.viewport_warning ?? "1920x1080 at 1x"}</strong>
             </div>
           </div>
+          <GazeExports key={selected.session_id} sessionId={selected.session_id} password={password} />
           <label className="field">
             <span>Researcher note</span>
             <textarea

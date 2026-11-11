@@ -180,6 +180,13 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "fatigue",
     "meta"
   ];
+  const demographics = repo.allDemographics().map((row) => ({
+    ...row, synthetic: synthetic(String(row.session_id))
+  }));
+  const demographicColumns = [
+    "session_id", "participant_id", "synthetic", "age_band", "gender", "education", "shopping_freq",
+    "watch_expertise", "tech_savvy", "colour_vision", "prior_menu_experience"
+  ];
   const questionnaires = repo.allQuestionnaires();
   const questionColumns = [
     "response_id",
@@ -231,6 +238,8 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     file("trials.csv", toCsv(trials, trialColumns), trials.length),
     file("checkins.jsonl", toJsonl(checkins, checkinColumns), checkins.length),
     file("checkins.csv", toCsv(checkins, checkinColumns), checkins.length),
+    file("demographics.jsonl", toJsonl(demographics, demographicColumns), demographics.length),
+    file("demographics.csv", toCsv(demographics, demographicColumns), demographics.length),
     file("questionnaires.jsonl", toJsonl(questionnaires, questionColumns), questionnaires.length),
     file("questionnaires.csv", toCsv(questionnaires, questionColumns), questionnaires.length),
     file("assignments.csv", toCsv(assignments, assignmentColumns), assignments.length),
