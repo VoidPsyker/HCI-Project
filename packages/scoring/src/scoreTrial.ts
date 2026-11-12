@@ -42,21 +42,26 @@ function isClick(event: ResearchEvent): boolean {
 export function scoreTrial(events: ResearchEvent[], targetId: string, menuId: MenuId): TrialScore {
   const sorted = [...events].sort((a, b) => a.t_client - b.t_client);
   const startEvent = sorted.find((e) => e.event_type === "trial_start");
-  const correctView = sorted.find(
+  const terminalEvent = sorted.find((e) => ["trial_end", "timeout", "give_up"].includes(e.event_type));
+  const activeEvents = sorted.filter((e) =>
+    (!startEvent || e.t_client >= startEvent.t_client) &&
+    (!terminalEvent || e.t_client <= terminalEvent.t_client)
+  );
+  const correctView = activeEvents.find(
     (e) => isProductView(e) && (e.element_id === targetId || e.meta?.product_id === targetId || e.meta?.correct === true)
   );
   const endEvents = sorted.filter((e) => e.event_type === "trial_end");
   const endEvent = endEvents[0];
-  const cutoff = correctView?.t_client ?? Number.POSITIVE_INFINITY;
+  const cutoff = correctView?.t_client ?? terminalEvent?.t_client ?? Number.POSITIVE_INFINITY;
 
-  const beforeSuccess = sorted.filter((e) => e.t_client <= cutoff);
+  const beforeSuccess = activeEvents.filter((e) => e.t_client <= cutoff);
   const clicks = beforeSuccess.filter(isClick);
   const firstDepartment = clicks.find((e) => e.level === 1);
   const targetDept = targetId.split(".")[0];
   const targetSub = targetId.split(".").slice(0, 2).join(".");
 
   const wrongDepartment = Boolean(
-    firstDepartment?.element_id && firstDepartment.element_id.split(".")[0] !== targetDept
+    clicks.some((e) => e.level === 1 && e.element_id && e.element_id !== targetDept)
   );
 
   const wrongSubcategory = clicks.some((e) => {

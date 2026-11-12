@@ -257,3 +257,23 @@ describe("scoreTrial", () => {
     expect(score.pathEfficiency).toBe(1);
   });
 });
+
+it("flags a later wrong department even when the first choice is correct", () => {
+  const score = scoreTrial([
+    ev({ event_type: "node_click", t_client: 1, level: 1, element_id: "sport" }),
+    ev({ event_type: "node_click", t_client: 2, level: 1, element_id: "dress" })
+  ], "sport.prodiver.steel-blue", "A");
+  expect(score.firstClickCorrect).toBe(true);
+  expect(score.wrongDepartment).toBe(true);
+});
+
+it.each(["trial_end", "timeout", "give_up"] as const)("ignores success and clicks after %s", (event_type) => {
+  const score = scoreTrial([
+    ev({ event_type: "trial_start", t_client: 0 }),
+    ev({ event_type, t_client: 10 }),
+    ev({ event_type: "leaf_select", t_client: 20, element_id: "sport.prodiver.steel-blue" }),
+    ev({ event_type: "product_view", t_client: 30, element_id: "sport.prodiver.steel-blue" })
+  ], "sport.prodiver.steel-blue", "A");
+  expect(score.success).toBe(false);
+  expect(score.clicks).toBe(0);
+});

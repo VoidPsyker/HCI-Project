@@ -1,26 +1,31 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import taxonomy from "../taxonomy.json";
+import type { Difficulty, Product, ProductAttributes, Task, TaskCriteria } from "../src/index";
+
+type Leaf = Extract<(typeof taxonomy.nodes)[number], { parentId: string }>;
+type AttributeName = keyof ProductAttributes;
+type CanonicalSpec = Pick<Task, "id" | "description" | "difficulty"> & { attributes: ProductAttributes };
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
-const taxonomy = JSON.parse(fs.readFileSync(path.join(dir, "..", "taxonomy.json"), "utf8"));
 
-const cases = [38, 40, 42, 44];
-const straps = ["steel", "titanium", "leather", "rubber", "mesh", "fabric"];
-const movements = ["automatic", "quartz", "solar", "hybrid"];
-const waters = [50, 100, 200, 300];
-const dials = ["blue", "black", "green", "white", "grey", "brown", "silver", "champagne", "orange"];
-const bands = ["£180–£240", "£240–£420", "£420–£900", "£900+"];
+const cases = [38, 40, 42, 44] as const;
+const straps = ["steel", "titanium", "leather", "rubber", "mesh", "fabric"] as const;
+const movements = ["automatic", "quartz", "solar", "hybrid"] as const;
+const waters = [50, 100, 200, 300] as const;
+const dials = ["blue", "black", "green", "white", "grey", "brown", "silver", "champagne", "orange"] as const;
+const bands = ["£180–£240", "£240–£420", "£420–£900", "£900+"] as const;
 
-const leaves = taxonomy.nodes.filter((n) => n.level === 3);
+const leaves = taxonomy.nodes.filter((n): n is Leaf => n.level === 3 && n.parentId !== null);
 const departments = taxonomy.nodes.filter((n) => n.level === 1);
 const subs = taxonomy.nodes.filter((n) => n.level === 2);
 const byId = new Map(taxonomy.nodes.map((n) => [n.id, n]));
 const deptIndex = new Map(departments.map((d, i) => [d.id, i]));
 const subIndex = new Map(subs.map((s, i) => [s.id, i % 3]));
-const attrNames = ["caseSize", "strap", "movement", "water", "dial", "priceBand"];
+const attrNames = ["caseSize", "strap", "movement", "water", "dial", "priceBand"] as const;
 
-const canonical = {
+const canonical: Record<string, CanonicalSpec> = {
   "sport.prodiver.steel-blue": {
     id: "T01", description: "Titanium dive watch, 300 m, deep blue dial", difficulty: "Easy",
     attributes: { caseSize: 42, strap: "titanium", movement: "automatic", water: 300, dial: "blue", priceBand: "£420–£900" }
@@ -71,7 +76,7 @@ const canonical = {
   }
 };
 
-const canonicalCriteria = {
+const canonicalCriteria: Record<string, TaskCriteria> = {
   T01: { departmentId: "sport", subcategoryId: "sport.prodiver", strap: "titanium", water: 300, dial: "blue" },
   T02: { departmentId: "sport", subcategoryId: "sport.prodiver", strap: "titanium", water: 300, dial: "black" },
   T03: { departmentId: "sport", subcategoryId: "sport.trail", caseSize: 42, movement: "automatic", dial: "green", strap: "fabric" },
@@ -86,11 +91,11 @@ const canonicalCriteria = {
   T12: { departmentId: "smart", subcategoryId: "smart.connected", strap: "leather", caseSize: 42, dial: "brown" }
 };
 
-function slugWords(label) {
+function slugWords(label: string) {
   return label.toLowerCase().replace(/&/g, " ").replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/);
 }
 
-function hash(text) {
+function hash(text: string) {
   let h = 2166136261;
   for (const ch of text) {
     h ^= ch.charCodeAt(0);
@@ -99,7 +104,7 @@ function hash(text) {
   return h >>> 0;
 }
 
-function preferredDial(label, deptId) {
+function preferredDial(label: string, deptId: string): ProductAttributes["dial"] {
   const l = label.toLowerCase();
   if (/(black|onyx|anthracite|carbon|ink|midnight|night|black tie)/.test(l)) return "black";
   if (/(blue|navy|sapphire|gulf|denim|aurora|starlight)/.test(l)) return "blue";
@@ -112,7 +117,7 @@ function preferredDial(label, deptId) {
   return deptId === "dress" ? "champagne" : "blue";
 }
 
-function preferredStrap(label, deptId) {
+function preferredStrap(label: string, deptId: string): ProductAttributes["strap"] {
   const l = label.toLowerCase();
   if (/titanium/.test(l)) return "titanium";
   if (/steel mesh|mesh/.test(l)) return "mesh";
@@ -123,29 +128,29 @@ function preferredStrap(label, deptId) {
   return deptId === "dress" ? "leather" : deptId === "everyday" ? "fabric" : "steel";
 }
 
-function preferredMovement(deptId, label) {
+function preferredMovement(deptId: string, label: string): ProductAttributes["movement"] {
   if (deptId === "sport") return "automatic";
   if (deptId === "dress") return /month|moon|heritage|classic/.test(label.toLowerCase()) ? "automatic" : "quartz";
   if (deptId === "everyday") return "quartz";
   return "hybrid";
 }
 
-function preferredWater(deptId) {
+function preferredWater(deptId: string): ProductAttributes["water"] {
   if (deptId === "sport") return 300;
   if (deptId === "dress") return 50;
   if (deptId === "everyday") return 100;
   return 50;
 }
 
-function preferredCase(deptId, label) {
+function preferredCase(deptId: string, label: string): ProductAttributes["caseSize"] {
   if (deptId === "sport") return /trail|aqua/.test(label.toLowerCase()) ? 42 : 44;
   if (deptId === "dress") return 38;
   if (deptId === "everyday") return 38;
   return 44;
 }
 
-function preferenceScore(attributes, leaf) {
-  const dept = leaf.parentId.split(".")[0];
+function preferenceScore(attributes: ProductAttributes, leaf: Leaf) {
+  const dept = leaf.parentId.split(".")[0]!;
   const label = leaf.label;
   let score = 0;
   score += attributes.caseSize === preferredCase(dept, label) ? 0 : 2;
@@ -159,17 +164,16 @@ function preferenceScore(attributes, leaf) {
   return score;
 }
 
-function satisfies(product, criteria) {
+function satisfies(product: Pick<Product, "departmentId" | "subcategoryId" | "attributes">, criteria: TaskCriteria) {
   if (criteria.departmentId && product.departmentId !== criteria.departmentId) return false;
   if (criteria.subcategoryId && product.subcategoryId !== criteria.subcategoryId) return false;
-  for (const [k, v] of Object.entries(criteria)) {
-    if (k === "departmentId" || k === "subcategoryId") continue;
-    if (product.attributes[k] !== v) return false;
+  for (const key of attrNames) {
+    if (criteria[key] !== undefined && product.attributes[key] !== criteria[key]) return false;
   }
   return true;
 }
 
-const candidates = [];
+const candidates: ProductAttributes[] = [];
 for (const caseSize of cases)
   for (const strap of straps)
     for (const movement of movements)
@@ -178,21 +182,21 @@ for (const caseSize of cases)
           for (const priceBand of bands)
             candidates.push({ caseSize, strap, movement, water, dial, priceBand });
 
-const products = [];
+const products: Product[] = [];
 const usedVectors = new Set();
 
-function addProduct(leaf, attributes) {
+function addProduct(leaf: Leaf, attributes: ProductAttributes) {
   const key = JSON.stringify(attributes);
   if (usedVectors.has(key)) throw new Error(`duplicate vector for ${leaf.id}`);
   usedVectors.add(key);
   const band = bands.indexOf(attributes.priceBand);
-  const lo = [189, 249, 429, 949][band];
-  const span = [50, 170, 470, 1550][band];
+  const lo = [189, 249, 429, 949][band]!;
+  const span = [50, 170, 470, 1550][band]!;
   const price = lo + (hash(leaf.id + "price") % span);
   products.push({
     id: leaf.id,
     leafId: leaf.id,
-    departmentId: leaf.parentId.split(".")[0],
+    departmentId: leaf.parentId.split(".")[0]!,
     subcategoryId: leaf.parentId,
     attributes,
     price,
@@ -201,12 +205,13 @@ function addProduct(leaf, attributes) {
   });
 }
 
-function resolve(criteria) {
+function resolve(criteria: TaskCriteria) {
   return products.filter((p) => satisfies(p, criteria));
 }
 
 for (const leaf of leaves) {
-  if (canonical[leaf.id]) addProduct(leaf, canonical[leaf.id].attributes);
+  const spec = canonical[leaf.id];
+  if (spec) addProduct(leaf, spec.attributes);
 }
 
 for (const [taskId, criteria] of Object.entries(canonicalCriteria)) {
@@ -215,11 +220,11 @@ for (const [taskId, criteria] of Object.entries(canonicalCriteria)) {
 }
 
 const domains = { caseSize: cases, strap: straps, movement: movements, water: waters, dial: dials, priceBand: bands };
-const keyMap = new Map();
+const keyMap = new Map<string, { names: readonly AttributeName[]; key: Partial<ProductAttributes> }>();
 for (let i = 0; i < attrNames.length; i++) {
   for (let j = i + 1; j < attrNames.length; j++) {
     for (let k = j + 1; k < attrNames.length; k++) {
-      const names = [attrNames[i], attrNames[j], attrNames[k]];
+      const names = [attrNames[i]!, attrNames[j]!, attrNames[k]!] as const;
       for (const a of domains[names[0]])
         for (const b of domains[names[1]])
           for (const c of domains[names[2]]) {
@@ -231,12 +236,12 @@ for (let i = 0; i < attrNames.length; i++) {
 }
 const keyList = [...keyMap.values()];
 
-const assignedKeys = [];
+const assignedKeys: Partial<ProductAttributes>[] = [];
 
 for (const leaf of leaves) {
   if (canonical[leaf.id]) continue;
-  const deptId = leaf.parentId.split(".")[0];
-  const preferred = {
+  const deptId = leaf.parentId.split(".")[0]!;
+  const preferred: ProductAttributes = {
     caseSize: preferredCase(deptId, leaf.label),
     strap: preferredStrap(leaf.label, deptId),
     movement: preferredMovement(deptId, leaf.label),
@@ -250,7 +255,7 @@ for (const leaf of leaves) {
       const plausible = names.reduce((sum, n) => sum + (preferred[n] === key[n] ? 1 : 0), 0);
       return { names, key, plausible };
     })
-    .filter(({ key }) => !products.some((p) => satisfies(p, key)) && !assignedKeys.some((existing) => Object.entries(key).every(([k, v]) => existing[k] === v)))
+    .filter(({ key }) => !products.some((p) => satisfies(p, key)) && !assignedKeys.some((existing) => attrNames.every((name) => key[name] === undefined || existing[name] === key[name])))
     .sort((a, b) => b.plausible - a.plausible || a.names.join(",").localeCompare(b.names.join(",")));
 
   let chosen = null;
@@ -262,7 +267,7 @@ for (const leaf of leaves) {
     for (const { c } of ranked) {
       const vector = JSON.stringify(c);
       if (usedVectors.has(vector)) continue;
-      const probe = { departmentId: leaf.parentId.split(".")[0], subcategoryId: leaf.parentId, attributes: c };
+      const probe = { departmentId: leaf.parentId.split(".")[0]!, subcategoryId: leaf.parentId, attributes: c };
       const breaksCanonical = Object.entries(canonicalCriteria).some(([taskId, criteria]) => {
         const target = products.find((p) => canonical[p.leafId]?.id === taskId);
         return target && target.leafId !== leaf.id && satisfies(probe, criteria);
@@ -284,16 +289,16 @@ for (const [taskId, criteria] of Object.entries(canonicalCriteria)) {
   if (matches.length !== 1) throw new Error(`canonical ${taskId} resolves to ${matches.length}: ${matches.map((p) => p.id).join(", ")}`);
 }
 
-const allTasks = [];
+const allTasks: Task[] = [];
 for (const [leafId, spec] of Object.entries(canonical)) {
   allTasks.push({
     id: spec.id, targetId: leafId, description: spec.description,
-    difficulty: spec.difficulty, canonical: true, criteria: canonicalCriteria[spec.id]
+    difficulty: spec.difficulty, canonical: true, criteria: canonicalCriteria[spec.id]!
   });
 }
 
 // e.g. "Find a 44 mm watch with a black dial, priced £180–£240."
-function phraseFor(criteria) {
+function phraseFor(criteria: TaskCriteria) {
   const adjectives = [criteria.caseSize ? `${criteria.caseSize} mm` : null, criteria.movement ?? null].filter(Boolean);
   const head = adjectives.length ? `${adjectives.join(" ")} watch` : "watch";
   const article = /^[aeiou]/i.test(head) ? "an" : "a";
@@ -306,8 +311,8 @@ function phraseFor(criteria) {
   if (features.length) phrase += ` with ${features.join(" and ")}`;
   if (criteria.priceBand) phrase += `, priced ${criteria.priceBand}`;
   if (criteria.departmentId) {
-    const dept = byId.get(criteria.departmentId).label;
-    if (criteria.subcategoryId) return `In ${dept}, find ${phrase} in the ${byId.get(criteria.subcategoryId).label} range.`;
+    const dept = byId.get(criteria.departmentId)!.label;
+    if (criteria.subcategoryId) return `In ${dept}, find ${phrase} in the ${byId.get(criteria.subcategoryId)!.label} range.`;
     return `In ${dept}, find ${phrase}.`;
   }
   return `Find ${phrase}.`;
@@ -315,10 +320,10 @@ function phraseFor(criteria) {
 
 const nonCanonical = leaves.filter((l) => !canonical[l.id]);
 const scored = nonCanonical.map((leaf) => {
-  const product = products.find((p) => p.leafId === leaf.id);
-  const key = assignedKeys[nonCanonical.indexOf(leaf)];
-  const deptPos = deptIndex.get(product.departmentId) / 3;
-  const subPos = subIndex.get(product.subcategoryId) / 2;
+  const product = products.find((p) => p.leafId === leaf.id)!;
+  const key = assignedKeys[nonCanonical.indexOf(leaf)]!;
+  const deptPos = deptIndex.get(product.departmentId)! / 3;
+  const subPos = subIndex.get(product.subcategoryId)! / 2;
   const labelWords = new Set(slugWords(leaf.label).filter((w) => w.length > 2));
   const taskWords = new Set(slugWords(phraseFor(key)).filter((w) => w.length > 2));
   const overlap = [...labelWords].filter((w) => taskWords.has(w)).length;
@@ -350,7 +355,7 @@ products.sort((a, b) => a.id.localeCompare(b.id));
 fs.writeFileSync(path.join(dir, "..", "products.json"), JSON.stringify({ version: "1.0.0", products }, null, 2));
 fs.writeFileSync(path.join(dir, "..", "tasks.json"), JSON.stringify({ version: "1.0.0", tasks: allTasks }, null, 2));
 
-const counts = allTasks.reduce((acc, t) => ((acc[t.difficulty] = (acc[t.difficulty] || 0) + 1), acc), {});
+const counts = allTasks.reduce<Partial<Record<Difficulty, number>>>((acc, t) => ((acc[t.difficulty] = (acc[t.difficulty] || 0) + 1), acc), {});
 console.log(`products: ${products.length}`);
 console.log(`tasks: ${allTasks.length}`, counts);
 console.log(`unique vectors: ${new Set(products.map((p) => JSON.stringify(p.attributes))).size}`);

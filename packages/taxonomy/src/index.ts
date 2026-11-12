@@ -197,11 +197,16 @@ export interface ValidationReport {
 export function validateTaxonomy(): ValidationReport {
   const errors: string[] = [];
   const nodeIds = new Set<string>();
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
   for (const n of nodes) {
     if (nodeIds.has(n.id)) errors.push(`duplicate node id ${n.id}`);
     nodeIds.add(n.id);
     if (n.level === 1 && n.parentId !== null) errors.push(`L1 ${n.id} has parent`);
-    if (n.level > 1 && (!n.parentId || !nodeIds.has(n.parentId))) errors.push(`orphan ${n.id}`);
+    if (n.level > 1) {
+      const parent = nodeById.get(n.parentId ?? "");
+      if (!parent) errors.push(`orphan ${n.id}`);
+      else if (parent.level !== n.level - 1) errors.push(`invalid parent level for ${n.id}`);
+    }
   }
   if (DEPARTMENTS.length !== 4) errors.push(`expected 4 departments, got ${DEPARTMENTS.length}`);
   for (const dept of DEPARTMENTS) {
@@ -215,10 +220,21 @@ export function validateTaxonomy(): ValidationReport {
   if (SUBCATEGORIES.length !== 12) errors.push(`expected 12 subcategories, got ${SUBCATEGORIES.length}`);
   if (LEAVES.length !== 72) errors.push(`expected 72 leaves, got ${LEAVES.length}`);
 
+  const attributeValues = {
+    caseSize: [38, 40, 42, 44],
+    strap: ["steel", "titanium", "leather", "rubber", "mesh", "fabric"],
+    movement: ["automatic", "quartz", "solar", "hybrid"],
+    water: [50, 100, 200, 300],
+    dial: ["blue", "black", "green", "white", "grey", "brown", "silver", "champagne", "orange"],
+    priceBand: ["£180–£240", "£240–£420", "£420–£900", "£900+"]
+  };
   const leafIds = new Set(LEAVES.map((l) => l.id));
   const productIds = new Set<string>();
   const vectorKeys = new Set<string>();
   for (const p of products) {
+    for (const key of Object.keys(attributeValues) as Array<keyof ProductAttributes>) {
+      if (!(attributeValues[key] as readonly unknown[]).includes(p.attributes[key])) errors.push(`invalid ${key} for ${p.id}`);
+    }
     if (productIds.has(p.id)) errors.push(`duplicate product id ${p.id}`);
     productIds.add(p.id);
     if (!leafIds.has(p.leafId)) errors.push(`product ${p.id} points at missing leaf`);
@@ -233,12 +249,13 @@ export function validateTaxonomy(): ValidationReport {
     const bandIndex = ["£180–£240", "£240–£420", "£420–£900", "£900+"].indexOf(p.attributes.priceBand);
     const ranges = [[180, 240], [240, 420], [420, 900], [900, 100000]];
     const range = ranges[bandIndex];
-    if (!range || p.price < (range[0] ?? 0) || p.price > (range[1] ?? 0)) errors.push(`price ${p.price} outside band for ${p.id}`);
+    if (!Number.isFinite(p.price) || !range || p.price < (range[0] ?? 0) || p.price > (range[1] ?? 0)) errors.push(`price ${p.price} outside band for ${p.id}`);
     if (p.priceBand !== p.attributes.priceBand) errors.push(`priceBand mismatch for ${p.id}`);
   }
   if (products.length !== 72) errors.push(`expected 72 products, got ${products.length}`);
   for (const leaf of LEAVES) {
     if (!leaf.productId) errors.push(`leaf ${leaf.id} has no productId`);
+    else if (leaf.productId !== leaf.id) errors.push(`leaf ${leaf.id} productId mismatch`);
     if (!products.some((p) => p.leafId === leaf.id)) errors.push(`leaf ${leaf.id} has no product record`);
   }
 
