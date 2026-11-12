@@ -29,7 +29,7 @@ export function uniformChiSquare(factor: string, categories: string[], observed:
     chi_square: Math.round(chi * 1000) / 1000,
     df,
     critical_05: critical,
-    balanced: critical === null ? true : chi <= critical,
+    balanced: observed.every((value) => categories.includes(value)) && (critical === null ? true : chi <= critical),
     ...(expected < 5 ? { note: `expected count ${expected.toFixed(2)} < 5; chi-square is approximate` } : {})
   };
 }
@@ -44,7 +44,17 @@ export function designErrors(sessionId: string, design: StudyDesign): string[] {
     const n = flat.filter((m) => m === menu).length;
     if (n !== 2) errors.push(`${sessionId}: menu ${menu} appears ${n} times`);
   }
+  if (new Set(design.trials.map((t) => t.trialId)).size !== design.trials.length) errors.push(`${sessionId}: duplicate trial IDs`);
   for (const block of design.blocks) {
+    const trials = design.trials.filter((t) => t.blockId === block.blockId);
+    if (trials.length !== 3 || block.trialIds.length !== 3 || block.menuIds.length !== 3) errors.push(`${sessionId}: expected 3 trials in ${block.blockId}`);
+    for (const [index, trialId] of block.trialIds.entries()) {
+      const trial = trials.find((t) => t.trialId === trialId);
+      if (!trial || trial.menuId !== block.menuIds[index] || trial.stateLabel !== block.stateLabel ||
+          trial.blockIndex !== block.blockIndex || trial.trialIndex !== index) {
+        errors.push(`${sessionId}: trial/block mismatch for ${trialId}`);
+      }
+    }
     if (new Set(block.menuIds).size !== block.menuIds.length) errors.push(`${sessionId}: repeated menu within ${block.blockId}`);
   }
   if (new Set(design.blocks.map((b) => b.stateLabel)).size !== 4) errors.push(`${sessionId}: states not unique`);

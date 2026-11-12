@@ -85,12 +85,18 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     bodyLimit: 5 * 1024 * 1024
   });
 
+  app.addHook("onSend", async (request, reply, payload) => {
+    reply.header("permissions-policy", "camera=(self), microphone=(), geolocation=()");
+    reply.header("content-security-policy", "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
+    if (request.url.startsWith("/api/")) reply.header("cache-control", "private, no-store");
+    return payload;
+  });
   await app.register(cors, { origin: true });
   app.addContentTypeParser("text/plain", { parseAs: "string" }, (_request, body, done) => {
     try {
       done(null, JSON.parse(body as string));
     } catch (error) {
-      done(error as Error);
+      done(Object.assign(error as Error, { statusCode: 400 }));
     }
   });
 
@@ -166,7 +172,7 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       const design = repo.assignDesign(sessionId, body);
       return { design: publicDesign(design), session: publicSession(repo.getSession(sessionId)) };
     } catch (error) {
-      return reply.code(500).send({ error: "assignment_failed", message: (error as Error).message });
+      return reply.code(500).send({ error: "assignment_failed" });
     }
   });
 
@@ -182,8 +188,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       const session = repo.updateSession(sessionId, body);
       return { session: publicSession(session) };
     } catch (error) {
-      if ((error as Error).message === "gaze_session_not_finalized") {
-        return reply.code(409).send({ error: "gaze_session_not_finalized" });
+      if (["gaze_session_not_finalized", "invalid_session_transition"].includes((error as Error).message)) {
+        return reply.code(409).send({ error: (error as Error).message });
       }
       throw error;
     }
@@ -194,6 +200,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const body = parseBody(z.object({ reason: z.string().max(500).optional() }), request.body ?? {}, reply);
     if (!body) return;
     if (!repo.getSession(sessionId)) return reply.code(404).send({ error: "session_not_found" });
+    const session = repo.getSession(sessionId)!;
+    if (["completed", "aborted"].includes(session.status)) return { session: publicSession(session) };
     return { session: publicSession(repo.abortSession(sessionId, body.reason ?? "participant_stop")) };
   });
 
@@ -233,7 +241,12 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       if (message === "gaze_session_not_finalized") {
         return reply.code(409).send({ error: "gaze_session_not_finalized" });
       }
-      return reply.code(400).send({ error: "event_ingestion_failed", message });
+      const conflicts = ["event_id_conflict", "trial_session_mismatch", "study_session_mismatch"];
+      if (conflicts.includes(message)) return reply.code(409).send({ error: message });
+      if (message.startsWith("session not found:") || message === "participant/session mismatch") {
+        return reply.code(400).send({ error: "event_ingestion_failed" });
+      }
+      return reply.code(500).send({ error: "event_ingestion_failed" });
     }
   });
 
@@ -302,7 +315,7 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       const status =
         message === "gaze_session_not_found"
           ? 404
-          : message === "gaze_seq_conflict" || message === "gaze_session_completed"
+          : message === "gaze_seq_conflict" || message === "gaze_batch_conflict" || message === "gaze_session_completed"
             ? 409
             : 400;
       return reply.code(status).send({ error: message });
@@ -311,7 +324,7 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
 
   app.post("/api/gaze/sessions/:sessionId/complete", async (request, reply) => {
     const { sessionId } = request.params as { sessionId: string };
-    if (!repo.authorizeGaze(sessionId, gazeToken(request))) {
+    if (!repo.authorizeGaze(sessionId, gazeToken(request), true)) {
       return reply.code(401).send({ error: "gaze_token_invalid" });
     }
     if (rejectMedia(request.body, reply)) return;
@@ -405,6 +418,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const body = parseBody(z.object({ reason: z.string().min(1).max(500) }), request.body ?? {}, reply);
     if (!body) return;
     if (!repo.getSession(sessionId)) return reply.code(404).send({ error: "session_not_found" });
+    const session = repo.getSession(sessionId)!;
+    if (["completed", "aborted"].includes(session.status)) return { session: publicSession(session) };
     return { session: publicSession(repo.abortSession(sessionId, body.reason)) };
   });
 
@@ -430,7 +445,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const { sessionId } = request.params as { sessionId: string };
     if (!repo.getSession(sessionId)) return reply.code(404).send({ error: "session_not_found" });
     const query = request.query as { limit?: string };
-    const limit = Math.min(1000, Math.max(1, Number(query.limit ?? 200)));
+    const limit = Number(query.limit ?? 200);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 1000) return reply.code(400).send({ error: "invalid_limit" });
     return { events: repo.getSessionEvents(sessionId, limit) };
   });
 
@@ -467,6 +483,10 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       if (request.raw.url?.startsWith("/api/")) {
         reply.code(404).send({ error: "not_found" });
         return;
+      }
+      const pathname = new URL(request.raw.url ?? "/", "http://localhost").pathname;
+      if (pathname.startsWith("/vendor/") || pathname.startsWith("/assets/") || path.extname(pathname)) {
+        return reply.code(404).send({ error: "not_found" });
       }
       const index = path.join(webDist, "index.html");
       if (fs.existsSync(index)) reply.type("text/html").send(fs.readFileSync(index, "utf8"));

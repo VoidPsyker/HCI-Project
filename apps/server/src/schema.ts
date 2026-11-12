@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS participants (
   gender TEXT,
   education TEXT,
   shopping_freq TEXT,
-  watch_expertise TEXT,
-  tech_savvy TEXT,
+  watch_expertise INTEGER,
+  tech_savvy INTEGER,
   colour_vision TEXT,
   withdrawn_at TEXT
 );

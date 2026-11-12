@@ -1,4 +1,4 @@
-import { validateTaxonomy } from "@meridian/taxonomy";
+import { MENU_IDS, validateTaxonomy } from "@meridian/taxonomy";
 import { manipulationCheckPassed, type AffectRatings } from "@meridian/scoring";
 import questionnaires from "../../web/content/questionnaires.json";
 import timing from "../../web/content/session-timing.json";
@@ -102,8 +102,36 @@ function na(id: string, label: string, value: string, threshold: string, note?: 
 }
 
 /** An empty path is the true record of a trial ended without clicks (e.g. an immediate give-up); only a success needs one. */
-function isReconstructable(t: { event_count: number; trial_end_count: number; path_json: string; success: unknown }): boolean {
-  return t.event_count > 0 && t.trial_end_count === 1 && (!t.success || t.path_json !== "[]");
+function isReconstructable(t: { event_count: number; trial_end_count: number; path_json: string; success: unknown; missing_trial_start?: unknown; missing_trial_end?: unknown }): boolean {
+  return !t.missing_trial_start && !t.missing_trial_end && t.event_count > 0 && t.trial_end_count === 1 && (!t.success || t.path_json !== "[]");
+}
+
+function questionnaireCompleteness(
+  completed: Array<{ session_id: string }>,
+  events: ReturnType<Repository["allEvents"]>,
+  answers: ReturnType<Repository["allQuestionnaires"]>
+): number | null {
+  const protocols = new Map<string, string>();
+  for (const event of events) {
+    if (event.event_type === "session_start") {
+      const meta = JSON.parse(event.meta_json);
+      protocols.set(event.session_id, meta.protocol_version);
+    }
+  }
+  const base = questionnaires.sus.length + questionnaires.nasa_tlx.length
+    + questionnaires.open.length + questionnaires.credibility.length;
+  let expected = 0;
+  let answered = 0;
+  for (const session of completed) {
+    const protocol = protocols.get(session.session_id);
+    const count = protocol === timing.protocolVersion || protocol === "short-pilot-v3"
+      ? base + 1 : protocol === "short-pilot-v2" ? base : base + 5 * questionnaires.sus.length;
+    const unique = new Set(answers.filter((answer) => answer.session_id === session.session_id)
+      .map((answer) => JSON.stringify([answer.instrument, answer.menu_id, answer.item_id])));
+    expected += count;
+    answered += Math.min(count, unique.size);
+  }
+  return expected ? answered / expected * 100 : null;
 }
 
 export function buildGoNoGo(repo: Repository): QaCriterion[] {
@@ -132,7 +160,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     const lowest = rates.reduce((a, b) => (a.rate <= b.rate ? a : b));
     const value = `${lowest.menu}: ${Math.round(lowest.rate * 1000) / 10}%`;
     criteria.push(
-      lowest.rate >= 0.8
+      MENU_IDS.every((menu) => practiceByMenu.has(menu)) && lowest.rate >= 0.8
         ? pass("practice_success", "Practice success per menu", value, ">= 80% for every menu")
         : fail("practice_success", "Practice success per menu", value, ">= 80% for every menu")
     );
@@ -264,25 +292,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
     );
   }
 
-  const questionnaireItems = questionnaires.sus.length + questionnaires.nasa_tlx.length
-    + questionnaires.open.length + questionnaires.credibility.length;
-  const answersBySession = new Map<string, Set<string>>();
-  for (const answer of answers) {
-    const itemKeys = answersBySession.get(String(answer.session_id)) ?? new Set<string>();
-    itemKeys.add(JSON.stringify([answer.instrument, answer.menu_id, answer.item_id]));
-    answersBySession.set(String(answer.session_id), itemKeys);
-  }
-  let expectedAnswers = 0;
-  let answeredItems = 0;
-  for (const session of completed) {
-    const protocol = shortPilotStarts.get(session.session_id)?.protocol_version;
-    const expected = protocol === timing.protocolVersion || protocol === "short-pilot-v3"
-      ? questionnaireItems + 1
-      : protocol === "short-pilot-v2" ? questionnaireItems : questionnaireItems + 5 * questionnaires.sus.length;
-    expectedAnswers += expected;
-    answeredItems += Math.min(expected, answersBySession.get(session.session_id)?.size ?? 0);
-  }
-  const completeness = expectedAnswers ? (answeredItems / expectedAnswers) * 100 : null;
+  const completeness = questionnaireCompleteness(completed, events, answers);
   if (completeness === null) {
     criteria.push(na("questionnaire_completeness", "Questionnaire completeness", "no completed sessions", ">= 95%"));
   } else {
@@ -389,12 +399,14 @@ export function buildQaReport(repo: Repository): QaReport {
     }
   }
 
-  const expectedTrials = completed.length * 18;
-  const missingTrialEnds = Math.max(0, expectedTrials - trials.length) + trials.filter((t) => t.missing_trial_end).length;
+  const missingTrialEnds = completed.reduce((sum, session) => {
+    const observed = trials.filter((trial) => trial.session_id === session.session_id);
+    return sum + Math.max(0, 18 - observed.length);
+  }, 0) + trials.filter((t) => t.missing_trial_end).length;
   const missingStarts = trials.filter((t) => t.missing_trial_start).length;
   const duplicateEnds = trials.filter((t) => t.trial_end_count > 1).length;
   const reconstructablePct = pct(main.filter(isReconstructable).length, main.length) ?? 0;
-  const completeness = completed.length ? pct(answers.length, completed.length * 73) : null;
+  const completeness = questionnaireCompleteness(completed, events, answers);
 
   const fpsSamples: number[] = [];
   for (const e of events) {

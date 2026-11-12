@@ -584,6 +584,7 @@ function seedSession(repo: Repository, index: number, failurePlan: { Easy: numbe
 }
 
 export function seedDatabase(repo: Repository, count = 8): number {
+  if (!Number.isSafeInteger(count) || count < 0) throw new Error("seed count must be a non-negative safe integer");
   const existing = repo.listAdminSessions().filter((s) => s.label.startsWith("SEED-"));
   for (const s of existing) repo.withdrawSession(s.session_id);
   const plans = [

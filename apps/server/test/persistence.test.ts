@@ -129,3 +129,18 @@ it("requires a configured HTTPS backend for Vercel", () => {
   expect(() => studyBackendOrigin("http://localhost:8787")).toThrow("STUDY_BACKEND_ORIGIN");
   expect(studyBackendOrigin("https://study.example").origin).toBe("https://study.example");
 });
+
+it("preserves receive order across a page-relative client clock reset in exports and check-ins", async () => {
+  const { buildExportBundle } = await import("../src/exports");
+  const first = { ...event, event_type: "checkin" as const, t_client: 90_000, meta: { phase: "baseline", happy: 3 } };
+  const afterReload = { ...first, event_id: "after-reload", t_client: 20, meta: { phase: "baseline", happy: 5 } };
+  repo.insertEvents([first, afterReload]);
+  expect(repo.allEvents().map((row) => row.event_id)).toEqual([first.event_id, afterReload.event_id]);
+  expect(repo.allCheckins().map((row) => row.event_id)).toEqual([first.event_id, afterReload.event_id]);
+  const bundle = buildExportBundle(repo);
+  for (const name of ["events.jsonl", "checkins.jsonl"]) {
+    const exported = bundle.find((file) => file.name === name)!;
+    expect(exported.content.trim().split("\n").map((line) => JSON.parse(line).event_id))
+      .toEqual([first.event_id, afterReload.event_id]);
+  }
+});

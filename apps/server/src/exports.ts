@@ -24,7 +24,7 @@ export function toCsv(rows: Array<Record<string, unknown>>, columns: string[]): 
     const text = csvValue(value);
     return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
   };
-  return [columns.join(","), ...rows.map((row) => columns.map((c) => escape(row[c])).join(","))].join("\r\n") + "\r\n";
+  return [columns.map(escape).join(","), ...rows.map((row) => columns.map((c) => escape(row[c])).join(","))].join("\r\n") + "\r\n";
 }
 
 function sha256(content: string): string {
@@ -254,7 +254,9 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     file("demographics.csv", toCsv(demographics, demographicColumns), demographics.length),
     file("questionnaires.jsonl", toJsonl(questionnaires, questionColumns), questionnaires.length),
     file("questionnaires.csv", toCsv(questionnaires, questionColumns), questionnaires.length),
+    file("assignments.jsonl", toJsonl(assignments, assignmentColumns), assignments.length),
     file("assignments.csv", toCsv(assignments, assignmentColumns), assignments.length),
+    file("tasks.jsonl", toJsonl(taskRows, taskColumns), taskRows.length),
     file("tasks.csv", toCsv(taskRows, taskColumns), taskRows.length)
   ];
 }

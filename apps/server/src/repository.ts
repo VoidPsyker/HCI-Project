@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 import Database from "better-sqlite3";
 import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
@@ -307,6 +308,7 @@ export class Repository {
   recordConsent(sessionId: string, version: string): SessionRow {
     const session = this.getSession(sessionId);
     if (!session) throw new Error("session not found");
+    if (["aborted", "completed", "withdrawn"].includes(session.status)) throw new Error("session_not_active");
     if (session.design_json) throw new Error("session already randomised");
     const at = nowIso();
     const tx = this.db.transaction(() => {
@@ -322,6 +324,8 @@ export class Repository {
   assignDesign(sessionId: string, demographics: Record<string, unknown>, sequenceOverride?: number): StudyDesign {
     const session = this.getSession(sessionId);
     if (!session) throw new Error("session not found");
+    if (["aborted", "completed", "withdrawn"].includes(session.status)) throw new Error("session_not_active");
+    if (!this.getParticipant(session.participant_id)?.consented_at) throw new Error("consent_required");
     const existing = this.getDesign(sessionId);
     if (existing) return existing;
 
@@ -331,6 +335,7 @@ export class Repository {
     const genderSelf = String(demographics.gender_self_describe ?? "");
 
     const tx = this.db.transaction(() => {
+      if (this.getDesign(sessionId)) return;
       this.db
         .prepare(
           `UPDATE participants SET age_band=?, gender=?, education=?, shopping_freq=?,
@@ -347,13 +352,11 @@ export class Repository {
           session.participant_id
         );
 
-      const assigned =
-        sequenceOverride ??
-        stratumSequenceIndex(
-          this.seed,
-          stratum,
-          (this.db.prepare("SELECT COUNT(*) AS n FROM assignments_audit WHERE stratum = ?").get(stratum) as { n: number }).n
-        );
+      // Allocation history must survive deletion of participant records.
+      const allocationKey = `stratum_allocation:${crypto.createHash("sha256").update(stratum).digest("hex")}`;
+      const position = Number(this.getMeta(allocationKey) ?? 0);
+      const assigned = sequenceOverride ?? stratumSequenceIndex(this.seed, stratum, position);
+      this.setMeta(allocationKey, String(position + 1));
       const design = generateDesign({
         sessionId,
         participantId: session.participant_id,
@@ -407,7 +410,7 @@ export class Repository {
       this.setMeta("taxonomy_hash", design.taxonomyHash);
       this.setMeta("seed", this.seed);
     });
-    tx();
+    tx.immediate();
     return this.getDesign(sessionId)!;
   }
 
@@ -416,6 +419,16 @@ export class Repository {
     if (!session) throw new Error("session not found");
     const status = patch.status ?? session.status;
     const phase = patch.phase ?? session.phase;
+    const transitions: Record<string, string[]> = {
+      created: ["consented", "aborted", "withdrawn", "completed"],
+      consented: ["in_progress", "aborted", "withdrawn", "completed"],
+      in_progress: ["paused", "completed", "aborted", "withdrawn"],
+      paused: ["in_progress", "completed", "aborted", "withdrawn"]
+    };
+    if (status !== session.status && !transitions[session.status]?.includes(status)) {
+      throw new Error("invalid_session_transition");
+    }
+    if (["completed", "aborted", "withdrawn"].includes(session.status)) return session;
     if (status === "completed" && session.status !== "completed") {
       this.assertGazeOutcomeForCompletion(sessionId);
     }
@@ -476,8 +489,22 @@ export class Repository {
         const session = sessionCache.get(input.session_id) ?? this.getSession(input.session_id);
         if (!session) throw new Error(`session not found: ${input.session_id}`);
         sessionCache.set(input.session_id, session);
+        const existingEvent = this.db.prepare("SELECT * FROM events WHERE event_id = ?").get(input.event_id) as EventRow | undefined;
+        if (existingEvent) {
+          const previous = this.rowToEvent(existingEvent);
+          const { t_server: _oldTime, ...oldPayload } = previous;
+          const { t_server: _newTime, ...newPayload } = { ...previous, ...input };
+          if (!isDeepStrictEqual(oldPayload, newPayload)) throw new Error("event_id_conflict");
+          duplicates++;
+          continue;
+        }
+        if (input.study !== session.study) throw new Error("study_session_mismatch");
+        if (input.trial_id) {
+          const owner = this.db.prepare("SELECT session_id FROM events WHERE trial_id = ? LIMIT 1").get(input.trial_id) as { session_id: string } | undefined;
+          if (owner && owner.session_id !== input.session_id) throw new Error("trial_session_mismatch");
+        }
         if (session.participant_id !== input.participant_id) throw new Error("participant/session mismatch");
-        if (input.event_type === "session_end" && input.meta?.completed !== false && session.status !== "completed") {
+        if (input.event_type === "session_end" && input.meta?.completed !== false && !["completed", "aborted", "withdrawn"].includes(session.status)) {
           this.assertGazeOutcomeForCompletion(input.session_id);
         }
         if (input.event_type === "trial_end" && input.trial_id) {
@@ -533,12 +560,13 @@ export class Repository {
         this.db
           .prepare("UPDATE sessions SET last_event_at=? WHERE session_id=?")
           .run(tServer, input.session_id);
-        if (input.event_type === "session_end") {
+        if (input.event_type === "session_end" && !["completed", "aborted", "withdrawn"].includes(session.status)) {
           const aborted = input.meta?.completed === false;
           this.db
             .prepare("UPDATE sessions SET status=?, phase='debrief', ended_at=?, abort_reason=? WHERE session_id=?")
             .run(aborted ? "aborted" : "completed", tServer,
               aborted ? String(input.meta?.abort_reason ?? "stopped") : null, input.session_id);
+          sessionCache.set(input.session_id, this.getSession(input.session_id)!);
         }
         if (input.event_type === "session_start") {
           this.db
@@ -671,6 +699,8 @@ export class Repository {
       for (const r of responses) {
         const sessionId = String(r.session_id ?? "");
         if (!this.getSession(sessionId)) throw new Error(`session not found: ${sessionId}`);
+        const owner = this.db.prepare("SELECT session_id FROM questionnaires WHERE response_id = ?").get(r.response_id) as { session_id: string } | undefined;
+        if (owner && owner.session_id !== sessionId) throw new Error("response_id_conflict");
         this.db
           .prepare(
             `INSERT OR REPLACE INTO questionnaires
@@ -851,7 +881,7 @@ export class Repository {
     meta: Record<string, unknown>;
   }> {
     const rows = this.db
-      .prepare("SELECT * FROM events WHERE event_type='checkin' ORDER BY session_id, t_client")
+      .prepare("SELECT * FROM events WHERE event_type='checkin' ORDER BY session_id, t_server, rowid")
       .all() as EventRow[];
     return rows.map((row) => ({
       event_id: row.event_id,
@@ -901,7 +931,7 @@ export class Repository {
     if (!session) throw new Error("session_not_found");
     const participant = this.getParticipant(session.participant_id);
     if (!participant?.consented_at) throw new Error("core_consent_required");
-    if (session.status === "aborted" || session.status === "withdrawn") throw new Error("session_not_active");
+    if (["aborted", "withdrawn", "completed"].includes(session.status)) throw new Error("session_not_active");
     const existing = this.getGazeSession(sessionId);
     if (existing?.status === "completed") throw new Error("gaze_session_completed");
     if (existing?.status === "withdrawn") throw new Error("gaze_session_withdrawn");
@@ -963,14 +993,14 @@ export class Repository {
     return { session: this.getGazeSession(sessionId)!, token };
   }
 
-  authorizeGaze(sessionId: string, token: string | undefined): GazeSessionRow | null {
+  authorizeGaze(sessionId: string, token: string | undefined, allowCompleted = false): GazeSessionRow | null {
     if (!token) return null;
     const session = this.getSession(sessionId);
     if (!session || session.status === "aborted" || session.status === "withdrawn") return null;
     const participant = this.getParticipant(session.participant_id);
     if (!participant || participant.withdrawn_at) return null;
     const row = this.getGazeSession(sessionId);
-    if (!row || row.status === "withdrawn" || row.status === "completed") return null;
+    if (!row || row.status === "withdrawn" || (row.status === "completed" && !allowCompleted)) return null;
     return this.tokenMatches(token, row.token_hash) ? row : null;
   }
 
@@ -984,6 +1014,7 @@ export class Repository {
     if (row.status === "completed") throw new Error("gaze_session_completed");
     if (row.status === "withdrawn") throw new Error("gaze_session_withdrawn");
     if (input.samples.length === 0) throw new Error("gaze_batch_empty");
+    const viewport = JSON.parse(row.viewport_json) as { width_px: number; height_px: number };
     let previous = 0;
     const normalized = input.samples.map((sample) => {
       if (!Number.isInteger(sample.seq) || sample.seq <= 0) throw new Error("gaze_sample_seq_invalid");
@@ -997,6 +1028,10 @@ export class Repository {
       if (valid && (!finiteX || !finiteY)) {
         valid = false;
         reason = sample.x_px === null || sample.y_px === null ? "no_prediction" : "non_finite";
+      }
+      if (valid && (sample.x_px! < 0 || sample.y_px! < 0 || sample.x_px! >= viewport.width_px || sample.y_px! >= viewport.height_px)) {
+        valid = false;
+        reason = "out_of_bounds";
       }
       return {
         seq: sample.seq,
@@ -1017,9 +1052,12 @@ export class Repository {
     const at = nowIso();
     const tx = this.db.transaction(() => {
       const existing = this.db
-        .prepare("SELECT last_seq FROM gaze_batches WHERE session_id = ? AND batch_id = ?")
-        .get(sessionId, input.batch_id) as { last_seq: number } | undefined;
-      if (existing) return { accepted: 0, duplicate: true, last_seq: existing.last_seq };
+        .prepare("SELECT last_seq, sha256 FROM gaze_batches WHERE session_id = ? AND batch_id = ?")
+        .get(sessionId, input.batch_id) as { last_seq: number; sha256: string } | undefined;
+      if (existing) {
+        if (existing.sha256 !== digest) throw new Error("gaze_batch_conflict");
+        return { accepted: 0, duplicate: true, last_seq: existing.last_seq };
+      }
       if (firstSeq <= row.last_seq) throw new Error("gaze_seq_conflict");
       const insert = this.db.prepare(
         `INSERT INTO gaze_samples
@@ -1089,7 +1127,7 @@ export class Repository {
     const calibration = input.calibration;
     const maxError = calibration && typeof calibration.max_error_deg === "number" ? calibration.max_error_deg : null;
     const FIXED_STUDY_GATE_DEG = 1.5;
-    const calibrationPassed = calibration?.passes === true && maxError !== null && maxError <= FIXED_STUDY_GATE_DEG;
+    const calibrationPassed = calibration?.passes === true && maxError !== null && maxError >= 0 && maxError <= FIXED_STUDY_GATE_DEG && calibration.angular_available === true && calibration.unknown_observations === 0 && Number(calibration.target_count) >= Number(calibration.expected_target_count);
     const qualityPassed = input.quality.overall === "pass" && input.quality.analysis_ready === true;
     const at = nowIso();
     const samples = this.getGazeSamples(sessionId);
@@ -1126,7 +1164,7 @@ export class Repository {
       clock: input.clock,
       quality_overall: input.quality.overall,
       analysis_ready: analysisReady,
-      angular_metrics_ready: !synthetic && input.quality.angular_metrics_ready === true,
+      angular_metrics_ready: analysisReady && input.quality.angular_metrics_ready === true,
       streams: {
         samples: "gaze_samples.jsonl",
         aoi_metrics: "aoi_metrics.jsonl",

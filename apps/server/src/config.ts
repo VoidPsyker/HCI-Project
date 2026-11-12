@@ -10,10 +10,15 @@ function resolveFromRoot(value: string): string {
   return path.isAbsolute(value) ? value : path.resolve(ROOT, value);
 }
 
+const port = Number(process.env.PORT ?? 8787);
+if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  throw new Error("PORT must be an integer between 1 and 65535.");
+}
+
 export const config = {
   root: ROOT,
   host: process.env.HOST ?? "127.0.0.1",
-  port: Number(process.env.PORT ?? 8787),
+  port,
   adminPassword: process.env.ADMIN_PASSWORD ?? "pilot-admin",
   seed: process.env.STUDY_SEED ?? "meridian-pilot-2026",
   dbPath: resolveFromRoot(process.env.DATABASE_PATH ?? "data/meridian.sqlite"),
