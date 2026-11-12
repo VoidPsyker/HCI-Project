@@ -109,7 +109,7 @@ export function auditGazeQuality(input: {
   const validFirst = validSorted[0];
   const validLast = validSorted[validSorted.length - 1];
   const validSpanMs = validFirst && validLast ? validLast.t_ms - validFirst.t_ms : 0;
-  const effectiveRate = valid >= 2 && validSpanMs > 0 ? ((valid - 1) / validSpanMs) * 1000 : null;
+  let effectiveRate = valid >= 2 && validSpanMs > 0 ? ((valid - 1) / validSpanMs) * 1000 : null;
 
   const hasTrials = Boolean(input.trials && input.trials.length > 0);
   let spanMs = 0;
@@ -120,22 +120,32 @@ export function auditGazeQuality(input: {
 
   if (hasTrials) {
     const declaredTrials = input.trials!;
+    let validIntervals = 0;
+    let validTrialSpanMs = 0;
     for (const trial of declaredTrials) {
       const trialSamples = sorted.filter(
-        (s) => (s.trial_id ? s.trial_id === trial.trial_id : s.t_ms >= trial.start_ms && s.t_ms <= trial.end_ms)
+        (s) => s.t_ms >= trial.start_ms && s.t_ms <= trial.end_ms &&
+          (s.trial_id == null || s.trial_id === trial.trial_id)
       );
+      const usable = trialSamples.filter((sample) => countValid([sample]) === 1);
+      if (usable.length >= 2) {
+        validIntervals += usable.length - 1;
+        validTrialSpanMs += usable[usable.length - 1]!.t_ms - usable[0]!.t_ms;
+      }
       for (let index = 1; index < trialSamples.length; index += 1) {
         const dt = trialSamples[index]!.t_ms - trialSamples[index - 1]!.t_ms;
         if (dt > 0) intervals.push(dt);
       }
     }
+    effectiveRate = validTrialSpanMs > 0 ? validIntervals / validTrialSpanMs * 1000 : null;
     const medianInterval = median(intervals);
     let totalSpan = 0;
     for (const trial of declaredTrials) {
       const trialDuration = Math.max(0, trial.end_ms - trial.start_ms);
       totalSpan += trialDuration;
       const trialSamples = sorted.filter(
-        (s) => (s.trial_id ? s.trial_id === trial.trial_id : s.t_ms >= trial.start_ms && s.t_ms <= trial.end_ms)
+        (s) => s.t_ms >= trial.start_ms && s.t_ms <= trial.end_ms &&
+          (s.trial_id == null || s.trial_id === trial.trial_id)
       );
       if (trialSamples.length === 0) {
         if (trialDuration > 0) {

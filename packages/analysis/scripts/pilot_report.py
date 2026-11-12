@@ -2,6 +2,7 @@
 import argparse
 import csv
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 from statistics import mean, median
@@ -14,6 +15,13 @@ def read_csv(folder, name, required):
         if missing:
             raise ValueError(f"{name}: missing columns {sorted(missing)}; regenerate the export")
         return list(reader)
+
+
+def finite_number(value, field):
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise ValueError(f"{field} must be finite and nonnegative")
+    return number
 
 
 def summarize(checkins, trials, tasks, include_synthetic=False):
@@ -35,23 +43,35 @@ def summarize(checkins, trials, tasks, include_synthetic=False):
     manipulation = {}
     for state in ("happy", "frustrated", "confused", "bored"):
         rows = induction[state]
+        intensities = [finite_number(row["intensity"], "intensity") for row in rows if row["intensity"]]
         manipulation[state] = {
             "n": len(rows),
             "threshold_pass_rate": mean(int(row["manipulation_check_passed"]) for row in rows) if rows else None,
             "reported_intended_rate": mean(row["reported_state"] == state for row in rows) if rows else None,
-            "mean_intensity": mean(float(row["intensity"]) for row in rows) if rows else None,
+            "mean_intensity": mean(intensities) if intensities else None,
         }
     by_task = defaultdict(list)
+    incomplete = 0
     for row in trials:
+        if row["practice"] not in ("0", "1"):
+            raise ValueError("practice must be 0 or 1")
         if row["practice"] == "0":
+            if row["missing_trial_start"] not in ("0", "1") or row["missing_trial_end"] not in ("0", "1"):
+                raise ValueError("missing trial flags must be 0 or 1")
+            end_count = int(row["trial_end_count"])
+            if end_count < 0:
+                raise ValueError("trial_end_count must be nonnegative")
+            if row["missing_trial_start"] == "1" or row["missing_trial_end"] == "1" or end_count != 1:
+                incomplete += 1
+                continue
             if row["success"] not in ("0", "1"):
                 raise ValueError("success must be 0 or 1 for completed trials")
             by_task[row["task_id"]].append(row)
     difficulty = []
     for task in tasks:
         rows = by_task[task["id"]]
-        times = [float(row["completion_time_ms"]) / 1000 for row in rows
-                 if row["success"] == "1" and row["completion_time_ms"]]
+        times = [finite_number(row["completion_time_ms"], "completion_time_ms") / 1000 for row in rows
+                 if row["success"] == "1"]
         difficulty.append({
             "task_id": task["id"], "target_id": task["target_id"], "difficulty": task["difficulty"],
             "n": len(rows), "success_rate": mean(int(row["success"]) for row in rows) if rows else None,
@@ -62,6 +82,7 @@ def summarize(checkins, trials, tasks, include_synthetic=False):
         })
     return {"scope": "synthetic rehearsal enabled; not research results" if include_synthetic else "pilot_only; excluded from confirmatory analysis",
             "include_synthetic": include_synthetic, "synthetic_rows": excluded,
+            "incomplete_main_trials_excluded": incomplete,
             "manipulation": manipulation, "task_difficulty": difficulty}
 
 
@@ -73,7 +94,7 @@ def main():
     args = parser.parse_args()
     report = summarize(
         read_csv(args.export_dir, "checkins.csv", ["synthetic", "meta", "state_label", "reported_state", "manipulation_check_passed", "intensity"]),
-        read_csv(args.export_dir, "trials.csv", ["synthetic", "practice", "success", "task_id", "completion_time_ms"]),
+        read_csv(args.export_dir, "trials.csv", ["synthetic", "practice", "success", "task_id", "completion_time_ms", "missing_trial_start", "missing_trial_end", "trial_end_count", "timed_out", "gave_up"]),
         read_csv(args.export_dir, "tasks.csv", ["id", "target_id", "difficulty"]),
         args.include_synthetic,
     )

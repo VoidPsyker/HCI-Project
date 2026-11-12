@@ -158,16 +158,16 @@ export function computeTrialMetrics(
   }
   const maxMissing = options.maxMissingPct ?? DEFAULT_MAX_MISSING_PCT;
   const inWindow = samples
-    .filter((sample) => sample.t_ms >= trial.start_ms && sample.t_ms <= trial.end_ms)
+    .filter((sample) => sample.t_ms >= trial.start_ms && sample.t_ms <= trial.end_ms &&
+      (sample.trial_id == null || sample.trial_id === trial.trial_id))
     .sort((a, b) => a.t_ms - b.t_ms);
   const valid = inWindow.filter(
     (sample) => sample.valid && sample.x_px !== null && sample.y_px !== null && Number.isFinite(sample.x_px) && Number.isFinite(sample.y_px)
   );
   const missingPct = inWindow.length === 0 ? null : ((inWindow.length - valid.length) / inWindow.length) * 100;
   const aoisById = new Map(aois.map((aoi) => [aoi.id, aoi]));
-  // Keep one attribution per valid sample, including nulls, so the interval
-  // loop cannot skip a sample that left every AOI and over-credit dwell time.
-  const attributions = valid.map((sample) => attributeSample(sample, aois));
+  // Preserve invalid samples and samples outside AOIs as interval boundaries.
+  const attributions = inWindow.map((sample) => attributeSample(sample, aois));
 
   const dwell = new Map<string, { dwellMs: number; sampleCount: number }>();
   for (const attribution of attributions) {
@@ -180,11 +180,12 @@ export function computeTrialMetrics(
   for (let i = 0; i < attributions.length - 1; i += 1) {
     const id = attributions[i]?.primary_aoi_id;
     if (!id) continue;
-    const dt = valid[i + 1]!.t_ms - valid[i]!.t_ms;
+    const dt = inWindow[i + 1]!.t_ms - inWindow[i]!.t_ms;
     if (dt <= 0) continue;
     if (options.maxGapMs !== undefined && dt > options.maxGapMs) continue;
     const currentDwell = dwell.get(id);
-    if (currentDwell) currentDwell.dwellMs += dt;
+    const activeTo = aoisById.get(id)?.active_to_ms ?? trial.end_ms;
+    if (currentDwell) currentDwell.dwellMs += Math.max(0, Math.min(dt, activeTo - inWindow[i]!.t_ms));
   }
 
   const duration = trial.end_ms - trial.start_ms;
@@ -202,7 +203,7 @@ export function computeTrialMetrics(
     })
     .sort((a, b) => b.dwell_ms - a.dwell_ms || a.aoi_id.localeCompare(b.aoi_id));
 
-  const ivt = classifyFixations(valid, geometry);
+  const ivt = classifyFixations(inWindow, geometry, { max_gap_ms: options.maxGapMs });
   const fixations = ivt.status === "ok" ? ivt.fixations : null;
   const scanpath = fixations ? scanpathLength(fixations, geometry) : null;
   const fixationPrimaries = fixations

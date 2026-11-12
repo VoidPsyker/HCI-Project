@@ -259,3 +259,27 @@ describe("synthetic replay", () => {
     expect(bundle.manifest.quality_overall).toBe("not_evaluable");
   });
 });
+
+it("treats stop as terminal and ignores callbacks during shutdown", async () => {
+  const source = new ManualSource();
+  const gaze = session(source, consent());
+  await gaze.start();
+  gaze.startTrial({ trial_id: "t1", menu_id: "A", start_ms: 0 });
+  const stopping = gaze.stop();
+  source.emit([sample(1, 10, 500, 500)]);
+  await stopping;
+  expect(gaze.getSamples()).toHaveLength(0);
+  await expect(gaze.start()).rejects.toThrow("gaze_session_stopped");
+  expect(() => gaze.startTrial({ trial_id: "t2", menu_id: "A", start_ms: 20 })).toThrow("gaze_session_stopped");
+});
+
+it("rejects timestamps that move backwards even when sequence numbers increase", async () => {
+  const source = new ManualSource();
+  const gaze = session(source, consent());
+  await gaze.start();
+  gaze.startTrial({ trial_id: "t1", menu_id: "A", start_ms: 0 });
+  source.emit([sample(1, 20, 500, 500), sample(2, 10, 500, 500)]);
+  expect(gaze.getSamples()).toHaveLength(1);
+  expect(gaze.getRejectedSampleCount()).toBe(1);
+  await gaze.stop();
+});

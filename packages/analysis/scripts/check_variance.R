@@ -10,6 +10,9 @@ d$completion_time_ms <- exp(8 + rnorm(12, 0, 0.3)[as.integer(d$participant_id)] 
   rnorm(nrow(d), 0, 0.15)) - 1
 d$practice <- 0
 d$success <- 1
+d$missing_trial_start <- 0
+d$missing_trial_end <- 0
+d$trial_end_count <- 1
 d$synthetic <- 1
 write.csv(d, file.path(root, "trials.csv"), row.names = FALSE)
 run <- function(output, include = TRUE) system2(file.path(R.home("bin"), "Rscript"),
@@ -37,3 +40,18 @@ stopifnot(run("singular") != 0,
           startsWith(readLines(file.path(root, "singular", "variance-status.txt")), "not_estimable:"),
           !file.exists(file.path(root, "singular", "variance-components.csv")))
 cat("PASS: synthetic variance components, insufficient-data and singular-fit rejection\n")
+
+# A retained partial session may contribute closed trials, never an unfinished trial.
+d <- valid_d
+d$missing_trial_end <- 1
+d$trial_end_count <- 0
+write.csv(d, file.path(root, "trials.csv"), row.names = FALSE)
+stopifnot(run("incomplete") != 0,
+          grepl("no_eligible_trials", readLines(file.path(root, "incomplete", "variance-status.txt"))),
+          !file.exists(file.path(root, "incomplete", "variance-components.csv")))
+d <- valid_d[FALSE, ]
+write.csv(d, file.path(root, "trials.csv"), row.names = FALSE)
+stopifnot(run("empty") != 0,
+          grepl("no_eligible_trials", readLines(file.path(root, "empty", "variance-status.txt"))),
+          !file.exists(file.path(root, "empty", "variance-components.csv")))
+cat("PASS: incomplete and empty exports produce no variance estimates\n")

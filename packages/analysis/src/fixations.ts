@@ -45,12 +45,13 @@ function isUsable(sample: GazeSample): sample is GazeSample & PointPx {
 export function classifyFixations(
   samples: readonly GazeSample[],
   geometry: ScreenGeometry | null,
-  options: { velocity_threshold_deg_s?: number; min_fixation_ms?: number } = {}
+  options: { velocity_threshold_deg_s?: number; min_fixation_ms?: number; max_gap_ms?: number } = {}
 ): IvtResult {
   const threshold = options.velocity_threshold_deg_s ?? DEFAULT_IVT_VELOCITY_DEG_S;
   const minDuration = options.min_fixation_ms ?? DEFAULT_MIN_FIXATION_MS;
   if (!Number.isFinite(threshold) || threshold <= 0) throw new Error("ivt_threshold_invalid");
   if (!Number.isFinite(minDuration) || minDuration <= 0) throw new Error("ivt_min_fixation_invalid");
+  if (options.max_gap_ms !== undefined && (!Number.isFinite(options.max_gap_ms) || options.max_gap_ms <= 0)) throw new Error("ivt_max_gap_invalid");
   if (!geometry) return { status: "not_evaluable", reason: "screen_geometry_required", threshold_deg_s: threshold, min_fixation_ms: minDuration };
   if (samples.length < 2) {
     return { status: "not_evaluable", reason: "insufficient_samples", threshold_deg_s: threshold, min_fixation_ms: minDuration };
@@ -63,13 +64,12 @@ export function classifyFixations(
     const current = sorted[i]!;
     const next = sorted[i + 1]!;
     const dt = next.t_ms - current.t_ms;
-    if (!isUsable(current) || !isUsable(next) || dt <= 0) {
+    if (!isUsable(current) || !isUsable(next) || dt <= 0 || (options.max_gap_ms !== undefined && dt > options.max_gap_ms)) {
       invalidSegments += 1;
       continue;
     }
     const velocity = angularVelocityDegS(current, next, dt, geometry);
     velocities[i] = velocity;
-    if (i === sorted.length - 2) velocities[i + 1] = velocity;
   }
 
   const fixations: Fixation[] = [];
@@ -88,7 +88,7 @@ export function classifyFixations(
     if (usable.length < 2) return;
     const meanX = usable.reduce((sum, sample) => sum + sample.x_px, 0) / usable.length;
     const meanY = usable.reduce((sum, sample) => sum + sample.y_px, 0) / usable.length;
-    const runVelocities = run
+    const runVelocities = run.slice(0, -1)
       .map((_sample, index) => velocities[startIndex + index] ?? null)
       .filter((velocity): velocity is number => velocity !== null);
     const meanVelocity =
@@ -104,11 +104,14 @@ export function classifyFixations(
     });
   };
 
-  for (let i = 0; i < sorted.length; i += 1) {
+  // Velocities describe intervals: both endpoints belong to a low-velocity run.
+  for (let i = 0; i < sorted.length - 1; i += 1) {
     const velocity = velocities[i] ?? null;
-    const below = isUsable(sorted[i]!) && velocity !== null && velocity < threshold;
-    if (below && runStart < 0) runStart = i;
-    if (!below) flush(i);
+    if (velocity !== null && velocity < threshold) {
+      if (runStart < 0) runStart = i;
+    } else {
+      flush(i + 1);
+    }
   }
   flush(sorted.length);
 

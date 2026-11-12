@@ -44,6 +44,7 @@ export class GazeSession {
   private readonly onRetainedSample: ((sample: GazeSample) => void) | undefined;
   private readonly samples: GazeSample[] = [];
   private lastSampleSeq = 0;
+  private lastSampleTime: number | null = null;
   private rejectedSamples = 0;
   private droppedSamples = 0;
   private aois: AoiDefinition[] = [];
@@ -77,6 +78,7 @@ export class GazeSession {
 
   async start(): Promise<void> {
     if (this.withdrawn) throw new Error("gaze_session_withdrawn");
+    if (this.stopped) throw new Error("gaze_session_stopped");
     if (this.started || this.starting) throw new Error("gaze_session_already_started");
     if (!this.source.info.synthetic) {
       assertConsentMatches(this.consent, this.participant_id, this.session_id);
@@ -103,11 +105,14 @@ export class GazeSession {
   }
 
   private onSample(sample: GazeSample): void {
-    if (!Number.isInteger(sample.seq) || sample.seq <= 0 || sample.seq <= this.lastSampleSeq || !Number.isFinite(sample.t_ms)) {
+    if (this.stopped || this.withdrawn) return;
+    if (!Number.isInteger(sample.seq) || sample.seq <= 0 || sample.seq <= this.lastSampleSeq || !Number.isFinite(sample.t_ms) ||
+        (this.lastSampleTime !== null && sample.t_ms < this.lastSampleTime)) {
       this.rejectedSamples += 1;
       return;
     }
     this.lastSampleSeq = sample.seq;
+    this.lastSampleTime = sample.t_ms;
     if (!this.retainIdleSamples && !this.activeTrial) return;
 
     let x = sample.x_px;
@@ -164,6 +169,7 @@ export class GazeSession {
     } finally {
       this.samples.length = 0;
       this.lastSampleSeq = 0;
+      this.lastSampleTime = null;
       this.rejectedSamples = 0;
       this.droppedSamples = 0;
       this.aois = [];
@@ -190,6 +196,7 @@ export class GazeSession {
 
   startTrial(input: { trial_id: string; menu_id: string; target_aoi_id?: string | null; start_ms?: number }): TrialWindow {
     if (this.withdrawn) throw new Error("gaze_session_withdrawn");
+    if (this.stopped) throw new Error("gaze_session_stopped");
     if (this.activeTrial) throw new Error("gaze_trial_already_active");
     if (this.trials.some((trial) => trial.trial_id === input.trial_id)) throw new Error("gaze_trial_id_duplicate");
     const startMs = input.start_ms ?? this.now();

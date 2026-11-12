@@ -10,10 +10,16 @@ if (file.exists(components_path)) unlink(components_path)
 result <- tryCatch({
   if (!requireNamespace("lme4", quietly = TRUE)) stop("Install the R package lme4 first")
   trials <- read.csv(file.path(args[1], "trials.csv"), stringsAsFactors = FALSE)
-  required <- c("synthetic", "participant_id", "target_id", "menu_id", "state_label", "practice", "success", "completion_time_ms")
+  required <- c("synthetic", "participant_id", "target_id", "menu_id", "state_label", "practice", "success", "completion_time_ms",
+                "missing_trial_start", "missing_trial_end", "trial_end_count")
   if (!all(required %in% names(trials))) stop("Missing required trial export columns")
   if (any(!trials$synthetic %in% c(0, 1))) stop("Missing or invalid synthetic provenance")
-  d <- subset(trials, practice == 0 & success == 1 & is.finite(completion_time_ms) & completion_time_ms >= 0 &
+  if (any(!trials$practice %in% c(0, 1)) || any(!trials$missing_trial_start %in% c(0, 1)) ||
+      any(!trials$missing_trial_end %in% c(0, 1)) || anyNA(trials$trial_end_count) ||
+      any(trials$trial_end_count < 0 | trials$trial_end_count != floor(trials$trial_end_count)))
+    stop("Invalid trial completeness flags")
+  d <- subset(trials, missing_trial_start == 0 & missing_trial_end == 0 & trial_end_count == 1 &
+              practice == 0 & success == 1 & is.finite(completion_time_ms) & completion_time_ms >= 0 &
               state_label %in% c("happy", "frustrated", "confused", "bored") & (include_synthetic | synthetic == 0))
   if (nrow(d) == 0) stop("no_eligible_trials_after_practice_success_provenance_filters")
   if (anyNA(d[required])) stop("Missing model identifiers or outcomes")

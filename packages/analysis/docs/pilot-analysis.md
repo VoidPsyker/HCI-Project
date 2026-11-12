@@ -11,7 +11,10 @@ python -m unittest discover -s packages/analysis/test-python
 
 Python uses only the standard library. It reads checkins.csv, trials.csv and
 tasks.csv, reports post-induction manipulation checks and observed task difficulty,
-and excludes practice trials. Missing cells remain null. Manipulation results use
+and excludes practice trials and trials lacking a start or exactly one end.
+It reports the count of excluded incomplete main trials; successful times must
+be finite, nonnegative and present. Blank intensity values remain missing.
+Missing cells remain null. Manipulation results use
 the exported shared scoring rule; the script does not duplicate its thresholds.
 Assigned state_label and observed reported_state remain distinct. Do not mix
 synthetic seed sessions with human pilot exports.
@@ -48,3 +51,12 @@ running scripts/pilot_variance.R in the same image. No host R install is require
 
 Gaze quality/provenance exports stay separate. Synthetic gaze is never analysis-ready.
 Webcam accuracy and dedicated tracker hardware still require human lab validation.
+
+Both scripts analyze observed completed trials, not a complete-session cohort.
+A stopped or unfinished session can contribute its already completed trials;
+its unfinished trial never enters the failure denominator or successful-time fit.
+Sessions ended for `gaze_quality_gate_failed` follow the same rule: failing the
+gaze gate does not invalidate already observed behavioral outcomes. These reports
+do not analyze gaze outcomes. Withdrawn sessions are deleted by the server before
+export; regenerate exports after withdrawal rather than using an older snapshot.
+Neither script can infer withdrawal from a historical trials CSV.
