@@ -22,15 +22,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run test:deploy
       # `build` runs validateTaxonomy first, so an invalid taxonomy or task bank fails CI here.
       - run: npm run build
       - run: npm test
       - run: npm run test:coverage
       - run: npx playwright install --with-deps chromium
+      # Keep Vite for scripted module interception; also test the actual built server below.
       - name: Start API server and web app
         run: |
           DATABASE_PATH="$RUNNER_TEMP/ci.sqlite" RAW_DATA_DIR="$RUNNER_TEMP/raw" GAZE_DATA_DIR="$RUNNER_TEMP/gaze" \
-            npm run start -w @meridian/server > "$RUNNER_TEMP/server.log" 2>&1 &
+            NODE_ENV=production MERIDIAN_VERCEL_PROXY=false npm run start -w @meridian/server > "$RUNNER_TEMP/server.log" 2>&1 &
           npm run dev:web > "$RUNNER_TEMP/web.log" 2>&1 &
           for i in $(seq 1 60); do
             curl -sf http://127.0.0.1:8787/api/health > /dev/null && curl -sf http://127.0.0.1:5173/ > /dev/null && exit 0
@@ -38,6 +40,10 @@ jobs:
           done
           cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/web.log"
           exit 1
+      - name: Built deployment assets and security headers
+        env:
+          PW_BASE_URL: http://127.0.0.1:8787
+        run: npx playwright test deployment-assets.spec.ts
       - name: Acceptance suite (24-path smoke, parity, geometry, keyboard, axe, network, events, scripted session)
         if: github.event_name != 'schedule'
         run: >
@@ -45,7 +51,7 @@ jobs:
           axe.spec.ts network.spec.ts trial-events.spec.ts biometrics-offline.spec.ts full-session.spec.ts
       - name: Nightly full suite (432 paths and transition timing)
         if: github.event_name == 'schedule'
-        run: npx playwright test
+        run: npx playwright test --grep-invert @deployment
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -8,5 +8,8 @@ test-results
 playwright-report
 tests/artifacts
 .git
-.env
+.env*
+**/.env*
+!.env.example
+.vercel
 *.log

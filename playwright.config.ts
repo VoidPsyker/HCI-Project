@@ -5,6 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * The app under test is expected to be running already: the Docker stack on
  * http://127.0.0.1:8787 by default. Set PW_BASE_URL to test another host.
+ * CI uses Vite for scripted module interception and the built server for
+ * deployment-assets.spec.ts; run that contract only against a built service.
  */
 const baseURL = process.env.PW_BASE_URL ?? "http://127.0.0.1:8787";
 const isCI = Boolean(process.env.CI);

@@ -17,6 +17,7 @@
     "seed": "npm run seed -w @meridian/server",
     "test": "npm run test -w @meridian/taxonomy && npm run test -w @meridian/scoring && npm run test -w @meridian/analysis && npm run test -w @meridian/server && npm run test -w @meridian/web",
     "test:coverage": "npm run test:coverage -w @meridian/scoring",
+    "test:deploy": "node --test tests/deploy/*.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:full": "playwright test --grep @full",
     "export": "npm run export -w @meridian/server",
