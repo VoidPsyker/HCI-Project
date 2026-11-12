@@ -1,10 +1,18 @@
-import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { forwardRef, useState, type ComponentProps } from "react";
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
 import { DEPARTMENTS, PALETTE, childrenOf, departmentColour, departmentOf, type TaxonomyNode } from "@meridian/taxonomy";
 import type { MenuProps } from "../types";
 import { NodeIcon } from "../components/Icon";
 import { MenuHeading, createMenuLog, inputTypeFor, useInert, useMenuOpened } from "../components/MenuChrome";
 import { useBrowserBack, type BackSource } from "./browserBack";
+
+const Choice = forwardRef<HTMLButtonElement, ComponentProps<typeof motion.button>>((props, ref) => {
+  const present = useIsPresent();
+  return <motion.button {...props} ref={ref} disabled={props.disabled || !present}
+    aria-hidden={!present || undefined} tabIndex={present ? props.tabIndex : -1}
+    data-node-id={present ? (props as Record<string, unknown>)["data-node-id"] : undefined}
+    onClick={present ? props.onClick : undefined} />;
+});
 
 export function MenuE({ menuId, colourMapping, onLeafSelect, onEvent, disabled = false }: MenuProps) {
   const [path, setPath] = useState<TaxonomyNode[]>([]);
@@ -89,7 +97,7 @@ export function MenuE({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
         <div className="e-grid" data-testid="e-grid">
           <AnimatePresence mode="popLayout" initial={false}>
             {path.length ? (
-              <motion.button
+              <Choice
                 key="back"
                 type="button"
                 className="e-card e-back"
@@ -102,14 +110,14 @@ export function MenuE({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
               >
                 <span className="e-back-arrow">{"\u2190"}</span>
                 <span>Back</span>
-              </motion.button>
+              </Choice>
             ) : null}
             {items.map((node) => {
               const nodeDept = departmentOf(node.id);
               const palette = PALETTE[departmentColour(nodeDept?.id ?? node.id, colourMapping)];
               const leaf = node.level === 3;
               return (
-                <motion.button
+                <Choice
                   key={`${levelKey}:${node.id}`}
                   type="button"
                   className={leaf ? "e-card e-card-leaf" : "e-card"}
@@ -135,7 +143,7 @@ export function MenuE({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
                   <span className="e-meta" style={{ color: leaf ? "#475569" : "#ffffff" }}>
                     {node.level === 1 ? "Department" : node.level === 2 ? "6 watches" : "View product"}
                   </span>
-                </motion.button>
+                </Choice>
               );
             })}
           </AnimatePresence>

@@ -44,6 +44,8 @@ interface RunnerState {
   fastMode: boolean;
   completionCode: string | null;
   abortReason: string | null;
+  stopSource: "participant" | "system" | null;
+  calibrationResumePhase: RunnerPhase | null;
   gazeConsent: GazeConsent | null;
   gazeUnavailable: GazeUnavailableReason | null;
   gazeViewport: Viewport | null;
@@ -70,7 +72,7 @@ interface RunnerState {
   nextTrial: () => void;
   finishBlock: () => void;
   complete: (code: string) => void;
-  abort: (reason: string) => void;
+  abort: (reason: string, source?: "participant" | "system") => void;
   reset: () => void;
 }
 
@@ -88,6 +90,8 @@ const initial = {
   fastMode: false,
   completionCode: null,
   abortReason: null,
+  stopSource: null,
+  calibrationResumePhase: null,
   gazeConsent: null,
   gazeUnavailable: null,
   gazeViewport: null,
@@ -137,7 +141,8 @@ export const useRunnerStore = create<RunnerState>()(
             design,
             phase: "aborted",
             fastMode,
-            abortReason: session.abort_reason,
+            abortReason: session.abort_reason ?? "stopped_by_server",
+            stopSource: same && previous.stopSource ? previous.stopSource : session.abort_reason === "participant_stop" || session.abort_reason?.startsWith("distress_") ? "participant" : "system",
             gazeConsent,
             gazeViewport,
             gazeGeometry
@@ -217,6 +222,11 @@ export const useRunnerStore = create<RunnerState>()(
           phase === "induction" ||
           (phase === "checkin" && previous.checkinPhase !== "baseline") ||
           (phase === "block_end" && blockIndex + 1 < design.blocks.length);
+        const calibrationResumePhase = same && previous.phase === "calibration"
+          ? previous.calibrationResumePhase
+          : previous.phase === "trial" || previous.phase === "product" || previous.phase === "trial_intro"
+            ? "trial_intro"
+            : previous.phase === "induction" ? "block_intro" : previous.phase;
         if (needsCalibration && !gazeUnavailable) phase = "calibration";
         restore({
           sessionId: session.session_id,
@@ -224,6 +234,7 @@ export const useRunnerStore = create<RunnerState>()(
           participant,
           design,
           phase,
+          calibrationResumePhase: phase === "calibration" ? calibrationResumePhase : null,
           fastMode,
           practiceIndex: same ? previous.practiceIndex : 0,
           blockIndex,
@@ -235,7 +246,10 @@ export const useRunnerStore = create<RunnerState>()(
           gazeGeometry
         });
       },
-      setPhase: (phase) => set({ phase }),
+      setPhase: (phase) => {
+        if (get().abortReason || get().phase === "complete") return;
+        set({ phase });
+      },
       setSession: (session) => set({ session }),
       setDesign: (design) => set({ design }),
       setParticipant: (participant) => set({ participant }),
@@ -246,14 +260,19 @@ export const useRunnerStore = create<RunnerState>()(
         set({ gazeViewport: viewport, gazeGeometry: geometry }),
       setGazeUnavailable: (gazeUnavailable) => set({ gazeUnavailable }),
       clearGaze: () => set({ gazeConsent: null, gazeViewport: null, gazeGeometry: null }),
-      startPractice: () => set({ phase: "practice_intro", practiceIndex: 0 }),
+      startPractice: () => {
+        if (get().abortReason || get().phase === "complete") return;
+        set({ phase: "practice_intro", practiceIndex: 0 });
+      },
       nextPractice: () => {
+        if (get().abortReason || get().phase === "complete") return;
         const { practiceIndex, design } = get();
         if (!design) return;
         if (practiceIndex + 1 >= design.practiceTrials.length) set({ phase: "block_intro", blockIndex: 0 });
         else set({ practiceIndex: practiceIndex + 1, phase: "practice_intro" });
       },
       startBlock: (index) => {
+        if (get().abortReason || get().phase === "complete") return;
         const { design } = get();
         if (!design) return;
         const block = design.blocks[index];
@@ -264,6 +283,7 @@ export const useRunnerStore = create<RunnerState>()(
         set({ blockIndex: index, trialIndex: 0, phase: "block_intro" });
       },
       nextTrial: () => {
+        if (get().abortReason || get().phase === "complete") return;
         const { trialIndex, blockIndex, design } = get();
         if (!design) return;
         const block = design.blocks[blockIndex];
@@ -275,13 +295,14 @@ export const useRunnerStore = create<RunnerState>()(
         }
       },
       finishBlock: () => {
+        if (get().abortReason || get().phase === "complete") return;
         const { blockIndex, design } = get();
         if (!design) return;
         if (blockIndex + 1 >= design.blocks.length) set({ phase: "questionnaires" });
         else set({ blockIndex: blockIndex + 1, trialIndex: 0, phase: "block_intro" });
       },
       complete: (code) => set({ completionCode: code, phase: "complete" }),
-      abort: (reason) => set({ abortReason: reason, phase: "aborted" }),
+      abort: (reason, source = "participant") => set({ abortReason: reason, stopSource: source, phase: "aborted" }),
       reset: () => set({ ...initial })
     }),
     {
@@ -300,6 +321,8 @@ export const useRunnerStore = create<RunnerState>()(
         fastMode: state.fastMode,
         completionCode: state.completionCode,
         abortReason: state.abortReason,
+        stopSource: state.stopSource,
+        calibrationResumePhase: state.calibrationResumePhase,
         gazeConsent: state.gazeConsent,
         gazeUnavailable: state.gazeUnavailable,
         gazeViewport: state.gazeViewport,

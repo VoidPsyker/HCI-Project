@@ -2,6 +2,14 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
+// Node's native storage globals can shadow jsdom's browser storage.
+for (const name of ["localStorage", "sessionStorage"] as const) {
+  Object.defineProperty(globalThis, name, {
+    configurable: true,
+    get: () => jsdom.window[name]
+  });
+}
+
 afterEach(() => {
   cleanup();
 });

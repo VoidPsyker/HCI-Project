@@ -114,6 +114,27 @@ describe("EventLogger", () => {
     logger.discard();
   });
 
+  it("keeps client event order across a reload while elapsed time stays page-relative", async () => {
+    const origin = vi.spyOn(performance, "timeOrigin", "get").mockReturnValue(1_000_000);
+    const first = new EventLogger("P-reload", "S-reload");
+    now = 90_000;
+    first.log({ event_type: "checkin" });
+    await first.flush();
+    first.discard();
+    origin.mockReturnValue(1_100_000);
+    now = 20;
+    const reloaded = new EventLogger("P-reload", "S-reload");
+    reloaded.beginTrial({ trial_id: "after-reload" });
+    now = 40;
+    reloaded.log({ event_type: "trial_start" });
+    await reloaded.flush();
+    const before = bodyOf(fetchMock.mock.calls[0]).events[0]!;
+    const after = bodyOf(fetchMock.mock.calls[1]).events[0]!;
+    reloaded.discard();
+    expect(after.t_client).toBeGreaterThan(before.t_client as number);
+    expect(after.elapsed_ms).toBe(20);
+  });
+
   it("flushes the buffer on its 500ms interval", async () => {
     vi.useFakeTimers();
     try {

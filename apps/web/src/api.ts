@@ -11,7 +11,12 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
     }
   });
   const text = await response.text();
-  const body = text ? JSON.parse(text) : null;
+  let body: unknown = null;
+  try {
+    body = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(response.ok ? "Invalid server response. Please retry." : `HTTP ${response.status}`);
+  }
   if (!response.ok) {
     const message = body && typeof body === "object" && "error" in body ? String(body.error) : `HTTP ${response.status}`;
     throw new Error(message);

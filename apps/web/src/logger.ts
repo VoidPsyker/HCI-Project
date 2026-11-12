@@ -1,3 +1,4 @@
+import { API_BASE } from "./api";
 import type { EventInput, EventType, InputType, MenuId, StateLabel } from "@meridian/scoring";
 
 interface LoggerContext {
@@ -138,15 +139,15 @@ export class EventLogger {
       participant_id: this.participantId,
       session_id: this.sessionId,
       study: "pilot",
-      block_id: event.block_id ?? this.context.block_id,
-      trial_id: event.trial_id ?? this.context.trial_id,
-      task_id: event.task_id ?? this.context.task_id,
-      target_id: event.target_id ?? this.context.target_id,
-      menu_id: event.menu_id ?? this.context.menu_id,
+      block_id: event.block_id !== undefined ? event.block_id : this.context.block_id,
+      trial_id: event.trial_id !== undefined ? event.trial_id : this.context.trial_id,
+      task_id: event.task_id !== undefined ? event.task_id : this.context.task_id,
+      target_id: event.target_id !== undefined ? event.target_id : this.context.target_id,
+      menu_id: event.menu_id !== undefined ? event.menu_id : this.context.menu_id,
       state_label: event.state_label ?? this.context.state_label,
       condition: event.condition ?? this.context.condition,
       event_type: event.event_type,
-      t_client: now,
+      t_client: performance.timeOrigin + now,
       elapsed_ms: elapsed,
       level: event.level ?? null,
       element_id: event.element_id ?? null,
@@ -194,10 +195,10 @@ export class EventLogger {
     if (events.length === 0) return true;
     if (beacon && typeof navigator !== "undefined" && "sendBeacon" in navigator) {
       const blob = new Blob([JSON.stringify({ events })], { type: "application/json" });
-      const ok = navigator.sendBeacon("/api/events", blob);
+      const ok = navigator.sendBeacon(`${API_BASE}/api/events`, blob);
       if (ok) return true;
     }
-    const response = await fetch("/api/events", {
+    const response = await fetch(`${API_BASE}/api/events`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ events }),
@@ -235,7 +236,7 @@ export class EventLogger {
     if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
       try {
         const blob = new Blob([JSON.stringify({ events: this.queue.slice(0, BATCH_SIZE) })], { type: "application/json" });
-        navigator.sendBeacon("/api/events", blob);
+        navigator.sendBeacon(`${API_BASE}/api/events`, blob);
       } catch {
         // The durable queue will be retried when this session resumes.
       }

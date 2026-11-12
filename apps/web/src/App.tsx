@@ -48,7 +48,7 @@ export function App() {
   if (runMatch?.[1]) {
     return (
       <StageFrame>
-        <ExperimentRunner sessionId={decodeURIComponent(runMatch[1])} />
+        <ExperimentRunner key={runMatch[1]} sessionId={runMatch[1]} />
       </StageFrame>
     );
   }

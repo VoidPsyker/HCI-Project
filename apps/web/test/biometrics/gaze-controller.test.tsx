@@ -214,6 +214,19 @@ describe("GazeController regression tests", () => {
     return controller;
   }
 
+  it("waits for fixation before training and does not train after interruption", async () => {
+    let release!: () => void;
+    const controller = createController({ wait: () => new Promise<void>((resolve) => { release = resolve; }) });
+    await controller.start();
+    const [target] = controller.beginCalibration();
+    const training = controller.trainCalibrationTarget(target!);
+    expect(source.trainCalls).toHaveLength(0);
+    await controller.stop();
+    release();
+    await expect(training).rejects.toThrow("gaze_calibration_interrupted");
+    expect(source.trainCalls).toHaveLength(0);
+  });
+
   async function calibratedController(options: Partial<GazeControllerOptions> = {}) {
     let point: CalibrationTarget | null = null;
     const controller = createController({
@@ -232,6 +245,16 @@ describe("GazeController regression tests", () => {
     expect(controller.finishCalibration().passes).toBe(true);
     return controller;
   }
+
+  it("requires fresh calibration after an acquisition failure and camera retry", async () => {
+    const controller = await calibratedController();
+    expect(controller.calibrationGatePassed).toBe(true);
+    await controller.failAcquisition();
+    expect(controller.status).toBe("failed");
+    await controller.start();
+    expect(controller.calibrationGatePassed).toBe(false);
+    expect(controller.report).toBeNull();
+  });
 
   it("reports stopped uploads and allows the retained samples to be retried", async () => {
     const batch = vi.spyOn(api, "batch");
@@ -589,7 +612,8 @@ describe("GazeController regression tests", () => {
 
       // Emit accurate predictions whenever samples are requested
       const interval = setInterval(() => {
-        source.emit({ x_px: 500, y_px: 500, valid: true });
+        const target = screen.queryByTestId("gaze-calibration-target");
+        if (target) source.emit({ x_px: parseFloat(target.style.left), y_px: parseFloat(target.style.top), valid: true });
       }, 5);
 
       const onCalibrated = vi.fn();

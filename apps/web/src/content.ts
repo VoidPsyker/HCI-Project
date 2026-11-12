@@ -54,6 +54,10 @@ export const OPEN_QUESTIONS = questionnaires.open;
 export const MENU_PREFERENCE = questionnaires.menu_preference;
 export const CREDIBILITY_ITEMS = questionnaires.credibility;
 
+export const DEBRIEF_STOPPED_TITLE = debrief.stopped_title;
+export const DEBRIEF_STOP_REASONS: Record<string, string> = debrief.stop_reasons;
+export const DEBRIEF_STOP_SUPPORT = debrief.stop_support;
+
 export const DEBRIEF_PARAGRAPHS = debrief.paragraphs;
 export const TEST_MODE_NOTICE = debrief.test_mode_notice;
 

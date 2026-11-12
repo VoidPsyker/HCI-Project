@@ -104,3 +104,24 @@ with regular timing, from consent to the end of debrief.
 
 The **Pilot go/no-go** panel computes plan §7.1 from the collected data. Criteria marked
 "verified by Playwright suite" come from `npm run test:e2e`, not from session data.
+
+## Dashboard recovery and stop records
+
+Use the participant label button to open details with a keyboard, or click its row.
+Details follow the latest session list, show the saved stop reason and researcher notes,
+and close when the session is deleted or withdrawn. **Abort & debrief** is available only
+before a session ends; it retains study data. **Delete** permanently removes the session
+and its data after confirmation. A failed stop keeps the reason open for retry.
+
+Refresh and background polling failures appear in the dashboard error banner. A rejected
+admin password returns to sign-in and clears the dashboard; signing out also clears its
+participant links, selection and draft notes. If clipboard access fails, copy the displayed
+participant link manually.
+
+### Event clocks across reloads
+
+Click-event `t_client` is `performance.timeOrigin + performance.now()` in
+milliseconds, so a reload does not restart its ordering clock. Trial
+`elapsed_ms` and gaze capture times retain their existing trial/page-relative
+clocks. Event and check-in exports use server receive time with insertion order
+as a tie-breaker; do not treat raw page-relative gaze times as epoch timestamps.

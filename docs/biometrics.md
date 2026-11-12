@@ -375,11 +375,70 @@ compatibility.
 - No lab tracker, native bridge, or hardware validation.
 - Server-side restricted storage and consent/session/trial UI are implemented;
   isolated synthetic controller-to-HTTP-to-SQLite verification passes 10/10.
-- Concurrent webcam inference and Menu D animation currently fail the 50 fps
-  gate in the fake-camera browser harness (33.3 fps in the latest recorded run).
+- The November 12 isolated fake-camera Menu D check passes the 50 fps gate
+  (59.98 fps, original 180 ms transition); earlier host-specific failures are
+  documented in `biometric-menu-performance.md`.
 - The fake-camera smoke proves offline startup only; real-camera accuracy and
   lab hardware remain unvalidated.
 - GPL/legal review for distribution and the end-of-maintenance risk for
   WebGazer remain open.
 - The 1.5° and 20% gates are deliberately not waived; a webcam participant who
   fails validation is excluded under the plan.
+
+## Calibration coordinate and retry checks (November 2026)
+
+Calibration targets use capture-viewport **CSS pixels**, just like WebGazer
+predictions and `ScreenGeometry.width_px`/`height_px`; device pixel ratio is not
+applied. The participant app renders inside a scaled 1920 × 1080 stage. Targets
+must be portalled to `document.body`, outside that transformed ancestor:
+`position: fixed` inside a transformed stage would scale/offset their viewport
+coordinates again and train the model against a different location from the one
+shown. Training now waits for the same fixation settling interval as validation
+before recording eye features (250 ms by default).
+
+Failed held-out validation shows `GazeFailureScreen`, including the measured
+maximum error and an explicit recalibration action. A retry runs all nine training
+points and all nine held-out validation points again; it does not waive the
+1.5° threshold. The participant can instead continue the behavioural study
+without gaze. No retry count is specified in the current protocol documents;
+the UI leaves this decision to the participant and researcher rather than
+inventing a terminal attempt limit.
+
+Protocol discrepancy: `docs/experimental-plan/experimental-plan.tex` currently
+says error above 1.5° ends the session before scoring, while the current pilot
+policy at the top of this document and the longer plan §11.4 make gaze optional.
+The current UI follows the optional-gaze pilot policy. The plan owner must align
+the shortened TeX plan before treating the documents as one consistent protocol.
+
+Regression evidence: the calibration UI test asserts that targets are direct
+children of `document.body`, exercises React effect replay, and recalibrates after
+failure. Controller tests verify settling before training, cancellation during
+settling, two-pass ordering, and blocking trials after a failed gate. These are
+coordinate/control-flow checks; a real Safari camera session is still required
+to establish participant accuracy and camera behaviour.
+
+### Same-tab debrief recovery
+
+The controller checkpoints the finalization payload after startup, after each
+trial, on pagehide, and before completion. The uploader checkpoints its bounded
+pending queue and batch ID in `sessionStorage`, under the session's own key.
+This permits a debrief reload in the same tab to send pending samples using the
+same idempotency key and finish the restricted server export without restarting
+the camera. `resumeGazeFinalization(sessionId)` returns the saved completion
+receipt on later retries. Upload/recovery errors keep the debrief open; missing
+recovery state for an expected gaze session is not treated as a successful save.
+Sessions that declined gaze or marked it unavailable do not require this path.
+
+The temporary recovery record contains the session-scoped ingestion credential,
+coordinates awaiting upload, and finalization metrics; it contains no video.
+Successful finalization removes the credential, raw queue and payload, retaining
+only the completion receipt. Withdrawal clears the record, and late upload
+acknowledgements cannot recreate it. Closing the tab discards recovery state;
+this does not make camera capture resumable after reload. Browser storage must
+be available: quota/storage failure blocks gaze completion rather than claiming
+that missing data were saved.
+
+The runner also subscribes to tracker error status. During calibration it tears
+down the failed acquisition and offers camera setup retry; a restart invalidates
+any old calibration. During trials it marks gaze unavailable and tells the
+participant they can finish the behavioural study.

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { GazeFailureScreen } from "./GazeFailure";
 import type { CalibrationReport, CalibrationTarget } from "@meridian/analysis";
 import type { GazeController } from "../gaze/GazeController";
 
@@ -23,7 +25,7 @@ function waitForPaint(): Promise<void> {
  * Pass 1 trains all 9 points explicitly; Pass 2 measures held-out accuracy on the
  * final model with zero training calls. The dots are presentation only; training
  * clicks are issued by the source, so mouse movements cannot silently train the
- * model. A failed gate is terminal for the scored trials.
+ * model. Failed validation can be retried before continuing without gaze.
  */
 export function GazeCalibrationScreen({
   controller,
@@ -50,6 +52,7 @@ export function GazeCalibrationScreen({
   const cancelled = useRef(false);
 
   useEffect(() => {
+    cancelled.current = false;
     return () => {
       cancelled.current = true;
     };
@@ -194,7 +197,7 @@ export function GazeCalibrationScreen({
                 recorded[index] === 0 ? " No prediction was captured for the last point; the gate will report it." : ""
               }`}
         </div>
-        {target ? (
+        {target ? createPortal(
           <div
             aria-hidden="true"
             style={{
@@ -213,7 +216,8 @@ export function GazeCalibrationScreen({
               zIndex: 50
             }}
             data-testid="gaze-calibration-target"
-          />
+          />,
+          document.body
         ) : null}
       </section>
     );
@@ -221,10 +225,13 @@ export function GazeCalibrationScreen({
 
   const missing = report ? report.points.filter((point) => point.observation_count === 0).length : 0;
   const passed = report?.passes === true && report.angular_available === true;
+  if (!passed) {
+    return <GazeFailureScreen report={report} onRetry={() => void run()} onContinue={() => onSkip("calibration_failed")} />;
+  }
   return (
     <section className="panel medium" data-testid="gaze-calibration-result">
       <div className="eyebrow">Validation result</div>
-      <h1>{passed ? "Eye tracking passed the gate" : "Eye tracking did not pass the gate"}</h1>
+      <h1>Eye tracking passed the gate</h1>
       {report ? (
         <>
           <p className="lede">
@@ -235,22 +242,18 @@ export function GazeCalibrationScreen({
             {report.target_count} of {report.expected_target_count} points had observations.
             {missing > 0 ? ` ${missing} point${missing === 1 ? "" : "s"} had no prediction.` : ""}
           </div>
-          {!passed ? (
-            <div className="warning-box" role="alert">
-              You can finish the searches and questionnaires. This run will be marked as unavailable for eye-tracking analysis.
-            </div>
-          ) : null}
+
         </>
       ) : null}
       <div className="panel-actions">
         <button
           type="button"
           className="button primary big"
-          onClick={() => report && (passed ? onCalibrated(report) : onSkip("calibration_failed"))}
+          onClick={() => report && onCalibrated(report)}
           disabled={!report}
-          data-testid={passed ? "gaze-calibration-continue" : "gaze-calibration-skip"}
+          data-testid="gaze-calibration-continue"
         >
-          {passed ? "Continue to scored trials" : "Continue without eye tracking"}
+          Continue to scored trials
         </button>
       </div>
     </section>

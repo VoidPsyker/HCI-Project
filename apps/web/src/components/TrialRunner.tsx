@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { useDialogFocus } from "./useDialogFocus";
 import { EVENT_TYPES, type EventType, type StateLabel } from "@meridian/scoring";
 import { NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
 import { SESSION_TIMING } from "../content";
@@ -51,8 +52,12 @@ export function TrialRunner({
   const [starting, setStarting] = useState(false);
   const [gazeError, setGazeError] = useState<string | null>(null);
   const stageRef = useRef<HTMLElement | null>(null);
+  const mountedRef = useRef(true);
+  const startingRef = useRef(false);
+  const dialogRef = useDialogFocus(step !== "instruction" && step !== "menu", undefined, step);
   const gazeStartedRef = useRef(false);
   const finishedRef = useRef(false);
+  const completedRef = useRef(false);
   const lastPointerSample = useRef(-Infinity);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,7 +68,13 @@ export function TrialRunner({
   const targetLabel = useMemo(() => NODE_BY_ID.get(spec.targetId)?.label ?? spec.targetId, [spec.targetId]);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
+      if (gazeStartedRef.current) {
+        gaze?.endActiveTrial?.();
+        gazeStartedRef.current = false;
+      }
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (stuckRef.current) clearTimeout(stuckRef.current);
     };
@@ -177,7 +188,8 @@ export function TrialRunner({
   const startedAtRef = useRef(0);
 
   const start = async () => {
-    if (starting || finishedRef.current) return;
+    if (startingRef.current || finishedRef.current) return;
+    startingRef.current = true;
     setStarting(true);
     setGazeError(null);
     let startMs = performance.now();
@@ -188,10 +200,16 @@ export function TrialRunner({
           menu_id: spec.menuId,
           target_product_id: spec.targetId
         });
+        if (!mountedRef.current) {
+          gaze.endTrial({ trial_id: spec.trialId, end_ms: performance.now() });
+          return;
+        }
         startMs = result.start_ms;
         gazeStartedRef.current = true;
       }
     } catch (gazeStartError) {
+      startingRef.current = false;
+      if (!mountedRef.current) return;
       setGazeError((gazeStartError as Error).message);
       setStarting(false);
       return;
@@ -208,6 +226,7 @@ export function TrialRunner({
     });
     log("trial_start", { elapsed_ms: 0, meta: { practice: spec.practice, trial_index: spec.trialIndex, limit_ms: trialLimitSeconds * 1000, protocol_version: SESSION_TIMING.protocolVersion, viewport_width: window.innerWidth, viewport_height: window.innerHeight } });
     setStep("menu");
+    startingRef.current = false;
     setStarting(false);
     const timeoutMs = trialLimitSeconds * 1000;
     timeoutRef.current = setTimeout(() => {
@@ -263,6 +282,12 @@ export function TrialRunner({
     log("give_up", { meta: { practice: spec.practice, stuck_60s: stuck } });
     finish(false, "give_up");
     setStep("failed");
+  };
+
+  const complete = (success: boolean) => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onComplete({ success });
   };
 
   if (step === "instruction") {
@@ -338,19 +363,19 @@ export function TrialRunner({
       </div>
 
       {step === "product" && correct ? (
-        <div className="product-overlay" role="dialog" aria-label="Product detail">
+        <div ref={dialogRef} tabIndex={-1} className="product-overlay" role="dialog" aria-modal="true" aria-label="Product detail">
           <ProductDetail
             productId={spec.targetId}
             onBack={() => undefined}
             allowBack={false}
-            onNext={() => onComplete({ success: true })}
+            onNext={() => complete(true)}
             nextLabel={spec.practice ? "Next practice" : "Next trial"}
           />
         </div>
       ) : null}
 
       {step === "wrong_product" && wrongProduct ? (
-        <div className="product-overlay" role="dialog" aria-label="Wrong product">
+        <div ref={dialogRef} tabIndex={-1} className="product-overlay" role="dialog" aria-modal="true" aria-label="Wrong product">
           <ProductDetail
             productId={wrongProduct}
             correct={false}
@@ -365,7 +390,7 @@ export function TrialRunner({
       ) : null}
 
       {step === "failed" ? (
-        <div className="product-overlay" role="dialog" aria-label="Trial ended">
+        <div ref={dialogRef} tabIndex={-1} className="product-overlay" role="dialog" aria-modal="true" aria-label="Trial ended">
           <div className="result-card">
             <div className="eyebrow">Trial ended</div>
             <h2>You chose to stop searching.</h2>
@@ -373,7 +398,7 @@ export function TrialRunner({
               The target was <strong>{targetLabel}</strong>. In the main trials this is recorded as a give-up; it is
               better than guessing.
             </p>
-            <button type="button" className="button primary" onClick={() => onComplete({ success: false })}>
+            <button type="button" className="button primary" onClick={() => complete(false)}>
               {spec.practice ? "Next practice" : "Next trial"}
             </button>
           </div>
@@ -381,7 +406,7 @@ export function TrialRunner({
       ) : null}
 
       {step === "timeout" ? (
-        <div className="product-overlay" role="dialog" aria-label="Trial timed out">
+        <div ref={dialogRef} tabIndex={-1} className="product-overlay" role="dialog" aria-modal="true" aria-label="Trial timed out">
           <div className="result-card">
             <div className="eyebrow">Time limit</div>
             <h2>The {trialLimitSeconds}-second limit was reached.</h2>
@@ -389,7 +414,7 @@ export function TrialRunner({
               The target was <strong>{targetLabel}</strong>. The trial is recorded as a timeout. Take a breath and
               continue when ready.
             </p>
-            <button type="button" className="button primary" onClick={() => onComplete({ success: false })}>
+            <button type="button" className="button primary" onClick={() => complete(false)}>
               {spec.practice ? "Next practice" : "Next trial"}
             </button>
           </div>

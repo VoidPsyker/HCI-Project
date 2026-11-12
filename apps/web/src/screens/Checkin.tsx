@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { reportedState } from "@meridian/scoring";
 import { BASELINE_ITEMS, STATE_ITEMS } from "../content";
 import type { CheckinPayload } from "../types";
@@ -67,6 +67,9 @@ export function CheckinScreen({
   });
   const [distress, setDistress] = useState(1);
   const [fatigue, setFatigue] = useState(2);
+  const submitting = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
   const stateValues = STATE_ITEMS.map((item) => states[item.id]);
   const dominant = reportedState({ ...states, valence, arousal });
   const intensity = Math.max(...stateValues);
@@ -149,13 +152,18 @@ export function CheckinScreen({
           ) : null}
         </div>
       </div>
+      {error ? <p role="alert">Your check-in could not be saved. Please try again.</p> : null}
       <div className="panel-actions">
         <span className="small-note">Your answer is logged with the check-in time and block.</span>
         <button
           type="button"
           className={distressHigh ? "button danger" : "button primary"}
-          disabled={busy}
-          onClick={() =>
+          disabled={busy || saving}
+          onClick={() => {
+            if (busy || submitting.current) return;
+            submitting.current = true;
+            setSaving(true);
+            setError(false);
             void onSubmit({
               phase,
               valence,
@@ -168,8 +176,13 @@ export function CheckinScreen({
               fatigue,
               dominant_state: dominant,
               intensity
-            })
-          }
+            }).catch(() => {
+              setError(true);
+            }).finally(() => {
+              submitting.current = false;
+              setSaving(false);
+            });
+          }}
           data-testid="checkin-continue"
         >
           {distressHigh ? "Stop and go to debrief" : phase === "post_induction" ? "Continue to trials" : "Continue"}

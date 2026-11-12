@@ -19,7 +19,7 @@ import { DebriefScreen } from "./screens/Debrief";
 import { BlockIntroScreen, CompleteScreen, InstructionsScreen, NeutralResetScreen } from "./screens/Interstitials";
 import { TrialRunner, type TrialInstruction } from "./components/TrialRunner";
 import { GazeController } from "./gaze/GazeController";
-import { gazeApi } from "./gaze/gazeClient";
+import { gazeApi, resumeGazeFinalization, clearGazeFinalization } from "./gaze/gazeClient";
 import { WebGazerSource } from "./biometrics/webgazer";
 import { loadBundledWebGazer } from "./biometrics/webgazerLoader";
 import { grantGazeConsent } from "./biometrics/consent";
@@ -91,7 +91,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   }, [sessionId, fastMode]);
 
   useEffect(() => {
-    if (!state.session || !state.session.participant_id) return;
+    if (loading || state.sessionId !== sessionId || !state.session?.participant_id) return;
     const instance = new EventLogger(state.session.participant_id, state.session.session_id, setBanner);
     loggerRef.current = instance;
     setLogger(instance);
@@ -100,7 +100,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       loggerRef.current = null;
       setLogger(null);
     };
-  }, [state.session?.participant_id, state.session?.session_id]);
+  }, [loading, sessionId, state.sessionId, state.session?.participant_id, state.session?.session_id]);
 
   useEffect(() => {
     if (!logger) return;
@@ -146,31 +146,37 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   }, [fastMode, logger, state]);
 
   useEffect(() => {
-    if (!state.sessionId || !SERVER_PHASE[state.phase]) return;
+    if (loading || state.sessionId !== sessionId || !SERVER_PHASE[state.phase]) return;
     const timer = setTimeout(() => {
       void patchSessionState(state.sessionId!, { status: "in_progress", phase: SERVER_PHASE[state.phase] }).catch(() => undefined);
     }, 250);
     return () => clearTimeout(timer);
-  }, [state.phase, state.sessionId]);
+  }, [loading, sessionId, state.phase, state.sessionId]);
 
   useEffect(() => {
-    if (!state.sessionId) return;
+    if (loading || state.sessionId !== sessionId) return;
+    let cancelled = false;
     const interval = setInterval(() => {
       void loadSessionStatus(state.sessionId!)
         .then((status) => {
-          if ((status.status === "aborted" || status.status === "withdrawn") && state.phase !== "aborted" && state.phase !== "complete") {
-            state.abort(status.abort_reason ?? "stopped_by_server");
+          if (cancelled || useRunnerStore.getState().sessionId !== sessionId) return;
+          const current = useRunnerStore.getState();
+          if ((status.status === "aborted" || status.status === "withdrawn") && current.phase !== "aborted" && current.phase !== "complete") {
+            loggerRef.current?.interruptTrial(status.abort_reason ?? "stopped_by_server");
+            state.abort(status.abort_reason ?? "stopped_by_server", "system");
+            void gazeRef.current?.stop().catch(() => undefined);
           }
         })
         .catch(() => undefined);
     }, 3000);
-    return () => clearInterval(interval);
+    return () => { cancelled = true; clearInterval(interval); };
     // The poll only needs the id and a stable action.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.sessionId, state.phase]);
+  }, [loading, sessionId, state.sessionId, state.phase]);
 
   useEffect(() => {
     if (state.phase !== "calibration") return;
+    if (loading || state.sessionId !== sessionId) return;
     if (gazeStartingRef.current || (gazeRef.current && gazeRef.current.status !== "failed")) return;
     if (!state.session || !state.gazeConsent || !state.gazeViewport || !state.gazeGeometry) return;
     let cancelled = false;
@@ -188,7 +194,20 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         participant_id: state.session.participant_id,
         session_id: state.session.session_id,
         load: loadBundledWebGazer,
-        viewport: () => ({ width_px: window.innerWidth, height_px: window.innerHeight })
+        viewport: () => ({ width_px: window.innerWidth, height_px: window.innerHeight }),
+        onStatus: (status) => {
+          if (status !== "error") return;
+          setGazeReady(false);
+          if (useRunnerStore.getState().phase === "calibration") {
+            void controller.failAcquisition().catch(() => undefined).then(() => {
+              setGazeStartError("The camera stopped producing eye-tracking data. Check camera permission and retry setup.");
+            });
+          } else {
+            markGazeUnavailable("camera_unavailable");
+            setBanner("The eye tracker stopped. You can finish the study without eye tracking.");
+            void controller.stop().catch(() => undefined);
+          }
+        }
       }),
       api: gazeApi,
       criterionDeg: 1.5,
@@ -211,7 +230,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     controller
       .start()
       .then(() => {
-        if (!cancelled && gazeRef.current === controller && !useRunnerStore.getState().abortReason) setGazeReady(true);
+        if (!cancelled && gazeRef.current === controller && controller.status === "ready" && !useRunnerStore.getState().abortReason) setGazeReady(true);
       })
       .catch((startFailure: Error) => {
         if (cancelled || gazeRef.current !== controller) return;
@@ -231,6 +250,8 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.phase,
+    loading,
+    sessionId,
     gazeAttempt,
     state.session?.session_id,
     state.session?.participant_id,
@@ -252,7 +273,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       const response = await recordConsent(sessionId, version);
-      if (useRunnerStore.getState().abortReason) return;
+      if (useRunnerStore.getState().sessionId !== sessionId || useRunnerStore.getState().abortReason) return;
       logger.log({ event_type: "consent", state_label: "mixed", meta: { version } });
       state.setSession(response.session);
       state.setParticipant({
@@ -302,7 +323,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     if (!markGazeUnavailable(reason)) return;
     setGazeStartError(null);
     setBanner(null);
-    state.setPhase(reason === "consent_declined" ? "demographics" : "block_intro");
+    state.setPhase(reason === "consent_declined" ? "demographics" : state.calibrationResumePhase ?? "block_intro");
     void gazeRef.current?.stop().catch(() => undefined);
   };
 
@@ -315,11 +336,13 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const handleCalibrated = (report: CalibrationReport) => {
-    if (useRunnerStore.getState().abortReason) return;
+    if (useRunnerStore.getState().sessionId !== sessionId || useRunnerStore.getState().abortReason) return;
     setGazeReport(report);
     if (report.passes === true && report.angular_available) {
       gazeCalibratedRef.current = true;
-      state.setPhase("block_intro");
+      const resume = state.calibrationResumePhase ?? "block_intro";
+      useRunnerStore.setState({ calibrationResumePhase: null });
+      state.setPhase(resume);
       return;
     }
     state.setPhase("gaze_failed");
@@ -331,7 +354,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     try {
       const response = await submitDemographics(sessionId, data);
-      if (useRunnerStore.getState().abortReason) return;
+      if (useRunnerStore.getState().sessionId !== sessionId || useRunnerStore.getState().abortReason) return;
       logger.log({
         event_type: "demographics",
         state_label: "mixed",
@@ -380,7 +403,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const handleInductionComplete = () => {
-    if (useRunnerStore.getState().abortReason) return;
+    if (useRunnerStore.getState().sessionId !== sessionId || useRunnerStore.getState().abortReason) return;
     const block = state.design?.blocks[state.blockIndex];
     logger?.setContext({ block_id: block?.blockId ?? null, state_label: block?.stateLabel ?? "mixed" });
     state.setCheckinPhase("post_induction");
@@ -416,6 +439,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   };
 
   const stopForDistress = async (reason: string) => {
+    if (useRunnerStore.getState().abortReason || useRunnerStore.getState().phase === "complete") return;
     if (!logger) {
       state.abort(reason);
       return;
@@ -429,20 +453,21 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         meta: { completed: false, distress_stop: true, stopped_by: "checkin_or_stop" }
       });
     }
+    state.abort(reason);
     logger.interruptTrial(reason);
     try {
       await gazeRef.current?.stop();
+      gazeRef.current = null;
     } catch {
-      // Camera teardown must not prevent the participant from reaching the debrief.
+      // Retain the controller so the debrief can retry unsaved gaze data.
     }
-    gazeRef.current = null;
     setGazeReady(false);
     try {
-      await stopSession(sessionId, reason);
+      const response = await stopSession(sessionId, reason);
+      state.setSession(response.session);
     } catch {
       // The local debrief still runs; the admin dashboard can reconcile the session.
     }
-    state.abort(reason);
   };
 
   const handleStop = (reason: string) => {
@@ -486,6 +511,10 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const finishDebrief = async () => {
     if (state.phase === "aborted" || state.abortReason) {
       try {
+        if (state.stopSource === "participant" && state.session?.status !== "aborted" && state.session?.status !== "withdrawn") {
+          const response = await stopSession(sessionId, state.abortReason ?? "participant_stop");
+          state.setSession(response.session);
+        }
         await gazeRef.current?.stop();
         gazeRef.current = null;
       } catch {
@@ -500,10 +529,17 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       return;
     }
     if (state.gazeConsent && !state.gazeUnavailable && !gazeFinalizedRef.current && !gazeRef.current) {
-      setBanner(
-        "Eye-tracking data could not be finalized because this page lost the gaze session. Do not mark the session complete; ask the researcher for a fresh session link."
-      );
-      return;
+      setBusy(true);
+      setBanner(null);
+      try {
+        await resumeGazeFinalization(sessionId);
+        gazeFinalizedRef.current = true;
+      } catch (error) {
+        setBanner(`Eye-tracking data could not be finalized: ${(error as Error).message}. Keep this page open and retry; ask the researcher if recovery is unavailable.`);
+        return;
+      } finally {
+        setBusy(false);
+      }
     }
     if (gazeRef.current && !state.gazeUnavailable) {
       setBusy(true);
@@ -538,12 +574,16 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const handleWithdraw = async () => {
     setBusy(true);
     try {
-      logger?.discard();
       await gazeRef.current?.withdraw();
       gazeRef.current = null;
       setGazeReady(false);
       await withdrawSession(sessionId);
-      state.reset();
+      clearGazeFinalization(sessionId);
+      logger?.discard();
+      state.abort("withdrawn", "participant");
+    } catch (withdrawError) {
+      setBanner(`Withdrawal could not finish: ${(withdrawError as Error).message}. Please retry.`);
+      throw withdrawError;
     } finally {
       setBusy(false);
     }
@@ -632,7 +672,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       />
     );
   } else if (state.phase === "gaze_failed") {
-    content = <GazeFailureScreen report={gazeReport} onContinue={() => void continueWithoutGaze("viewport_changed")} />;
+    content = <GazeFailureScreen report={gazeReport} onContinue={() => void continueWithoutGaze("calibration_failed")} />;
   } else if (state.phase === "demographics") {
     content = <DemographicsScreen onSubmit={handleDemographics} busy={busy} />;
   } else if (state.phase === "baseline") {
@@ -703,9 +743,10 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       <DebriefScreen
         aborted={state.phase === "aborted"}
         reason={state.abortReason}
+        stopSource={state.stopSource}
         completionCode={state.completionCode}
         busy={busy}
-        onFinish={() => void finishDebrief()}
+        onFinish={finishDebrief}
         onWithdraw={handleWithdraw}
       />
     );

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
-import type { AdminSession, QaCriterion, QaReport } from "../types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { AdminSession, QaCriterion, QaReport, SessionInfo } from "../types";
 import {
+  adminRequest,
   abortAdminSession,
   addAdminNote,
   createAdminSession,
@@ -43,7 +44,7 @@ function download(blob: Blob, name: string) {
   URL.revokeObjectURL(url);
 }
 
-function GazeExports({ sessionId, password }: { sessionId: string; password: string }) {
+function GazeExports({ sessionId, password, onAuthError }: { sessionId: string; password: string; onAuthError: (failure: Error) => void }) {
   const [summary, setSummary] = useState<Awaited<ReturnType<typeof getGazeSummary>>["gaze"]>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +61,9 @@ function GazeExports({ sessionId, password }: { sessionId: string; password: str
       } catch (failure) {
         if (cancelled) return;
         setSummary(undefined);
-        if ((failure as Error).message !== "gaze_session_not_found") setError((failure as Error).message);
+        const message = (failure as Error).message;
+        setError(message === "gaze_session_not_found" ? null : message);
+        if (message === "admin_password_required") onAuthError(failure as Error);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -71,7 +74,7 @@ function GazeExports({ sessionId, password }: { sessionId: string; password: str
       cancelled = true;
       clearInterval(timer);
     };
-  }, [password, sessionId]);
+  }, [password, sessionId, onAuthError]);
 
   const save = async (filename: string) => {
     setDownloading(filename);
@@ -81,6 +84,7 @@ function GazeExports({ sessionId, password }: { sessionId: string; password: str
       download(blob, sessionId + "-" + filename);
     } catch (failure) {
       setError((failure as Error).message);
+      if ((failure as Error).message === "Export failed: HTTP 401") onAuthError(failure as Error);
     } finally {
       setDownloading(null);
     }
@@ -109,66 +113,13 @@ function GazeExports({ sessionId, password }: { sessionId: string; password: str
 export function AdminDashboard() {
   const [password, setPassword] = useState(() => sessionStorage.getItem(STORAGE_KEY) ?? "");
   const [passwordDraft, setPasswordDraft] = useState("");
-  const [sessions, setSessions] = useState<AdminSession[]>([]);
-  const [qa, setQa] = useState<QaReport | null>(null);
-  const [goNoGo, setGoNoGo] = useState<QaCriterion[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [label, setLabel] = useState("");
-  const [createdUrl, setCreatedUrl] = useState<string | null>(null);
-  const [selected, setSelected] = useState<AdminSession | null>(null);
-  const [note, setNote] = useState("");
-  const [abortTarget, setAbortTarget] = useState<AdminSession | null>(null);
-  const [abortReason, setAbortReason] = useState("researcher_stop");
-  const [exportStatus, setExportStatus] = useState<string | null>(null);
-
-  const load = useCallback(async (key: string) => {
-    const [sessionResponse, qaResponse, goResponse] = await Promise.all([
-      getAdminSessions(key),
-      getQa(key),
-      getGoNoGo(key)
-    ]);
-    setSessions(sessionResponse.sessions);
-    setQa(qaResponse);
-    setGoNoGo(goResponse.criteria);
-    setError(null);
+  const signOut = useCallback((message: string | null = null) => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setPassword("");
+    setPasswordDraft("");
+    setError(message);
   }, []);
-
-  useEffect(() => {
-    if (!password) return;
-    let cancelled = false;
-    setBusy((current) => current ?? "refresh");
-    load(password)
-      .catch((loadError: Error) => {
-        if (cancelled) return;
-        if (loadError.message === "admin_password_required") {
-          sessionStorage.removeItem(STORAGE_KEY);
-          setPassword("");
-          setError("That password was not accepted.");
-        } else {
-          setError(loadError.message);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setBusy(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [load, password]);
-
-  useEffect(() => {
-    if (!password) return;
-    const interval = setInterval(() => {
-      void load(password).catch(() => undefined);
-    }, 10_000);
-    return () => clearInterval(interval);
-  }, [load, password]);
-
-  const refresh = () => {
-    if (!password) return;
-    void load(password).catch((refreshError: Error) => setError(refreshError.message));
-  };
 
   if (!password) {
     return (
@@ -202,7 +153,7 @@ export function AdminDashboard() {
                 required
               />
             </label>
-            {error ? <div className="banner error">{error}</div> : null}
+            {error ? <div className="banner error" role="alert">{error}</div> : null}
             <button type="submit" className="button primary">
               Open dashboard
             </button>
@@ -214,6 +165,87 @@ export function AdminDashboard() {
       </div>
     );
   }
+
+  return <AuthenticatedDashboard key={password} password={password} signOut={signOut} />;
+}
+
+function AuthenticatedDashboard({ password, signOut }: { password: string; signOut: (message?: string | null) => void }) {
+  const [sessions, setSessions] = useState<AdminSession[]>([]);
+  const [qa, setQa] = useState<QaReport | null>(null);
+  const [goNoGo, setGoNoGo] = useState<QaCriterion[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [label, setLabel] = useState("");
+  const [createdUrl, setCreatedUrl] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = sessions.find((session) => session.session_id === selectedId) ?? null;
+  const [detail, setDetail] = useState<{ session: SessionInfo; notes: Array<{ note_id: number; note: string; created_at: string }> } | null>(null);
+  const [note, setNote] = useState("");
+  const [abortTarget, setAbortTarget] = useState<AdminSession | null>(null);
+  const [abortReason, setAbortReason] = useState("researcher_stop");
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
+
+  const requestVersion = useRef(0);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+  const handleError = useCallback((failure: Error) => {
+    if (!mounted.current) return;
+    if (failure.message === "admin_password_required" || failure.message === "Export failed: HTTP 401") {
+      signOut("That password was not accepted.");
+    } else {
+      setError(failure.message);
+    }
+  }, [signOut]);
+
+  const load = useCallback(async () => {
+    const version = ++requestVersion.current;
+    const responses = await Promise.allSettled([
+      getAdminSessions(password), getQa(password), getGoNoGo(password)
+    ]);
+    if (version !== requestVersion.current) return;
+    const [sessionResponse, qaResponse, goResponse] = responses;
+    if (sessionResponse.status === "fulfilled") setSessions(sessionResponse.value.sessions);
+    if (qaResponse.status === "fulfilled") setQa(qaResponse.value);
+    if (goResponse.status === "fulfilled") setGoNoGo(goResponse.value.criteria);
+    const failures = responses.filter((response) => response.status === "rejected");
+    const failure = failures.find((response) => response.reason?.message === "admin_password_required") ?? failures[0];
+    if (failure) handleError(failure.reason as Error);
+    else setError(null);
+  }, [password, handleError]);
+
+  useEffect(() => {
+    setBusy("refresh");
+    void load().finally(() => setBusy(null));
+    const interval = setInterval(() => void load(), 10_000);
+    return () => {
+      requestVersion.current++;
+      clearInterval(interval);
+    };
+  }, [load]);
+
+  useEffect(() => {
+    setDetail(null);
+    if (!selected) return;
+    let cancelled = false;
+    void adminRequest<NonNullable<typeof detail>>(`/api/admin/sessions/${encodeURIComponent(selected.session_id)}`, password)
+      .then((response) => { if (!cancelled) setDetail(response); })
+      .catch((failure: Error) => { if (!cancelled) handleError(failure); });
+    return () => { cancelled = true; };
+  }, [selected, password, handleError]);
+
+  useEffect(() => {
+    if (abortTarget && !sessions.some((session) => session.session_id === abortTarget.session_id && !["completed", "aborted", "withdrawn"].includes(session.status))) {
+      setAbortTarget(null);
+    }
+  }, [sessions, abortTarget]);
+
+  const refresh = () => {
+    setBusy("refresh");
+    return load().finally(() => setBusy(null));
+  };
 
   return (
     <div className="admin-shell">
@@ -227,17 +259,14 @@ export function AdminDashboard() {
           <a className="button secondary" href="/lab">
             Menu lab
           </a>
-          <button type="button" className="button secondary" onClick={refresh} disabled={busy === "refresh"}>
+          <button type="button" className="button secondary" onClick={refresh} disabled={busy !== null}>
             {busy === "refresh" ? "Refreshing…" : "Refresh"}
           </button>
           <button
             type="button"
             className="button quiet"
             onClick={() => {
-              sessionStorage.removeItem(STORAGE_KEY);
-              setPassword("");
-              setSessions([]);
-              setQa(null);
+              signOut();
             }}
           >
             Sign out
@@ -271,7 +300,7 @@ export function AdminDashboard() {
         </div>
         <div className="stat-card">
           <span>Stopped / withdrawn</span>
-          <strong>{(qa?.sessions.aborted ?? 0) + sessions.filter((s) => s.status === "withdrawn").length}</strong>
+          <strong>{(qa?.sessions.aborted ?? sessions.filter((s) => s.status === "aborted").length) + sessions.filter((s) => s.status === "withdrawn").length}</strong>
         </div>
         <div className={`stat-card overall ${qa?.overall ?? ""}`}>
           <span>QA overall</span>
@@ -297,9 +326,9 @@ export function AdminDashboard() {
               .then((response) => {
                 setCreatedUrl(`${window.location.origin}${response.participant_url}`);
                 setLabel("");
-                refresh();
+                return refresh();
               })
-              .catch((createError: Error) => setError(createError.message))
+              .catch(handleError)
               .finally(() => setBusy(null));
           }}
         >
@@ -307,7 +336,7 @@ export function AdminDashboard() {
             <span>Participant label (optional)</span>
             <input value={label} maxLength={40} onChange={(event) => setLabel(event.target.value)} placeholder="e.g. P09" />
           </label>
-          <button type="submit" className="button primary" disabled={busy === "create"} data-testid="create-session">
+          <button type="submit" className="button primary" disabled={busy !== null} data-testid="create-session">
             {busy === "create" ? "Creating…" : "Create session link"}
           </button>
         </form>
@@ -318,7 +347,10 @@ export function AdminDashboard() {
             <button
               type="button"
               className="button tiny"
-              onClick={() => void navigator.clipboard?.writeText(createdUrl)}
+              onClick={() => {
+                if (!navigator.clipboard) { setError("Clipboard unavailable. Copy the participant link manually."); return; }
+                void navigator.clipboard.writeText(createdUrl).catch(() => setError("Could not copy the participant link. Copy it manually."));
+              }}
             >
               Copy
             </button>
@@ -358,12 +390,16 @@ export function AdminDashboard() {
                   key={session.session_id}
                   className={selected?.session_id === session.session_id ? "selected-row" : undefined}
                   onClick={() => {
-                    setSelected(session);
+                    setSelectedId(session.session_id);
                     setNote("");
                   }}
                 >
                   <td>
-                    <strong>{session.label}</strong>
+                    <button type="button" className="button tiny quiet" onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedId(session.session_id);
+                      setNote("");
+                    }}>{session.label}</button>
                     <small className="mono">{session.session_id.slice(-8)}</small>
                   </td>
                   <td>
@@ -401,6 +437,7 @@ export function AdminDashboard() {
                       <button
                         type="button"
                         className="button tiny danger-ghost"
+                        disabled={busy !== null || ["completed", "aborted", "withdrawn"].includes(session.status)}
                         onClick={() => {
                           setAbortTarget(session);
                           setAbortReason("researcher_stop");
@@ -411,14 +448,17 @@ export function AdminDashboard() {
                       <button
                         type="button"
                         className="button tiny quiet"
+                        disabled={busy !== null}
                         onClick={() => {
                           if (!window.confirm(`Delete all data for ${session.label}? This cannot be undone.`)) return;
+                          setBusy("delete");
                           void deleteAdminSession(password, session.session_id)
                             .then(() => {
-                              if (selected?.session_id === session.session_id) setSelected(null);
-                              refresh();
+                              if (selected?.session_id === session.session_id) setSelectedId(null);
+                              return refresh();
                             })
-                            .catch((deleteError: Error) => setError(deleteError.message));
+                            .catch(handleError)
+                            .finally(() => setBusy(null));
                         }}
                       >
                         Delete
@@ -478,7 +518,7 @@ export function AdminDashboard() {
               </div>
             </>
           ) : (
-            <p className="small-note">Loading QA…</p>
+            <p className="small-note">{error ? "QA unavailable. Refresh to retry." : "Loading QA…"}</p>
           )}
         </section>
 
@@ -562,7 +602,7 @@ export function AdminDashboard() {
               key={kind}
               type="button"
               className="export-card"
-              disabled={busy === `export-${kind}`}
+              disabled={busy !== null}
               onClick={() => {
                 setBusy(`export-${kind}`);
                 setExportStatus(null);
@@ -571,7 +611,7 @@ export function AdminDashboard() {
                     download(file.blob, kind === "manifest" ? "manifest.json" : kind);
                     setExportStatus(`${kind}: ${file.rows || "?"} rows · SHA-256 ${file.checksum.slice(0, 16)}…`);
                   })
-                  .catch((exportError: Error) => setError(exportError.message))
+                  .catch(handleError)
                   .finally(() => setBusy(null));
               }}
             >
@@ -592,7 +632,7 @@ export function AdminDashboard() {
               <h2>{selected.label}</h2>
               <p className="small-note mono">{selected.session_id}</p>
             </div>
-            <button type="button" className="button quiet" onClick={() => setSelected(null)}>
+            <button type="button" className="button quiet" onClick={() => setSelectedId(null)}>
               Close
             </button>
           </div>
@@ -600,6 +640,10 @@ export function AdminDashboard() {
             <div>
               <span>Status</span>
               <strong>{STATUS_LABEL[selected.status] ?? selected.status}</strong>
+            </div>
+            <div>
+              <span>Stop reason</span>
+              <strong>{detail?.session.abort_reason ?? "—"}</strong>
             </div>
             <div>
               <span>Stratum</span>
@@ -623,10 +667,11 @@ export function AdminDashboard() {
             </div>
             <div>
               <span>Viewport</span>
-              <strong>{selected.viewport_warning ?? "1920x1080 at 1x"}</strong>
+              <strong>{selected.viewport_warning ?? "No viewport warning reported"}</strong>
             </div>
           </div>
-          <GazeExports key={selected.session_id} sessionId={selected.session_id} password={password} />
+          <GazeExports key={selected.session_id} sessionId={selected.session_id} password={password} onAuthError={handleError} />
+          {detail?.notes.map((entry) => <p key={entry.note_id}><time>{formatTime(entry.created_at)}</time> · {entry.note}</p>)}
           <label className="field">
             <span>Researcher note</span>
             <textarea
@@ -640,15 +685,15 @@ export function AdminDashboard() {
           <button
             type="button"
             className="button primary"
-            disabled={!note.trim() || busy === "note"}
+            disabled={!note.trim() || busy !== null}
             onClick={() => {
               setBusy("note");
               void addAdminNote(password, selected.session_id, note.trim())
                 .then(() => {
                   setNote("");
-                  refresh();
+                  return refresh();
                 })
-                .catch((noteError: Error) => setError(noteError.message))
+                .catch(handleError)
                 .finally(() => setBusy(null));
             }}
           >
@@ -668,20 +713,19 @@ export function AdminDashboard() {
               <input value={abortReason} onChange={(event) => setAbortReason(event.target.value)} maxLength={500} />
             </label>
             <div className="modal-actions">
-              <button type="button" className="button secondary" onClick={() => setAbortTarget(null)}>
+              <button type="button" className="button secondary" disabled={busy === "abort"} onClick={() => setAbortTarget(null)}>
                 Cancel
               </button>
               <button
                 type="button"
                 className="button danger"
-                disabled={!abortReason.trim()}
+                disabled={!abortReason.trim() || busy !== null}
                 onClick={() => {
                   const target = abortTarget;
-                  setAbortTarget(null);
                   setBusy("abort");
                   void abortAdminSession(password, target.session_id, abortReason.trim())
-                    .then(refresh)
-                    .catch((abortError: Error) => setError(abortError.message))
+                    .then(() => { setAbortTarget(null); return refresh(); })
+                    .catch(handleError)
                     .finally(() => setBusy(null));
                 }}
               >

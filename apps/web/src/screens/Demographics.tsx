@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DEMOGRAPHICS } from "../content";
 
 const LABELS: Record<string, string> = {
@@ -46,6 +46,9 @@ export function DemographicsScreen({
     colour_vision: "",
     prior_menu_experience: [] as string[]
   });
+  const submitting = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
   const toggleMenuExperience = (id: string) =>
     setForm((current) => ({
       ...current,
@@ -75,8 +78,19 @@ export function DemographicsScreen({
         className="form-grid"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!complete) return;
-          void onSubmit(form);
+          if (!complete || busy || submitting.current) return;
+          submitting.current = true;
+          setSaving(true);
+          setError(false);
+          void onSubmit({
+            ...form,
+            gender_self_describe: form.gender === "self-describe" ? form.gender_self_describe.trim() : ""
+          }).catch(() => {
+            setError(true);
+          }).finally(() => {
+            submitting.current = false;
+            setSaving(false);
+          });
         }}
       >
         <label className="field">
@@ -187,9 +201,10 @@ export function DemographicsScreen({
             </label>
           ))}
         </fieldset>
+        {error ? <p role="alert">Your answers could not be saved. Please try again.</p> : null}
         <div className="panel-actions span-2">
           <span className="small-note">No name, email, or IP address is collected. Gaze data are stored separately from these answers.</span>
-          <button type="submit" className="button primary" disabled={!complete || busy} data-testid="demographics-continue">
+          <button type="submit" className="button primary" disabled={!complete || busy || saving} data-testid="demographics-continue">
             {busy ? "Assigning sequence…" : "Continue to baseline"}
           </button>
         </div>

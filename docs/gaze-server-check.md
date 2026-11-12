@@ -75,3 +75,53 @@ docker run --rm \
 ## Coordinator verification, 2026-10-24 06:56 PKT
 
 The 23/26 result and three defects above describe the historical first acceptance run. After implementation fixes, an independent coordinator Docker run on current mounted source passed all 37 server tests (the 26 acceptance cases plus 11 biometric tests). The server now uses the fixed 1.5 degree threshold, derives missingness from stored raw samples, and excludes empty/invalid records from analysis readiness. Command: docker run --rm with apps/ and packages/ mounted into periwinkle-test:local, no participant data mount, running npm test at /app. Full command/output is recorded in the coordinator temporary verification log; the web tests require NODE_ENV=test because the runtime image defaults to production. Physical participant accuracy remains unverified.
+
+## Gaze-gate repair — 2026-11-12
+
+Defects and repairs:
+
+- `apps/web/src/screens/GazeCalibration.tsx:200`: rings previously inherited
+  the participant stage's CSS transform despite using viewport CSS coordinates.
+  The displayed fixation point therefore differed from the training label on
+  scaled laptop viewports. Targets now render through a portal to `document.body`.
+- `apps/web/src/gaze/GazeController.ts:324`: training previously started immediately
+  after a target moved. Training now observes the same 250 ms settling interval
+  used by validation, with an interruption check before recording features.
+- `apps/web/src/screens/GazeCalibration.tsx:55,229` and `GazeFailure.tsx:3`:
+  effect replay could leave calibration permanently cancelled, and validation
+  failure had no recalibration action. Effect setup resets cancellation; failed
+  validation now shows GazeFailure with recalibration and behavioural continuation.
+- `apps/web/src/ExperimentRunner.tsx:198`: tracker error status was ignored.
+  Calibration errors now tear down acquisition and show camera retry; runtime
+  errors mark gaze unavailable with a participant-facing message. Camera restart
+  invalidates the previous passing calibration (`GazeController.ts:194,620`).
+- `apps/web/src/ExperimentRunner.tsx:535` and `gaze/gazeClient.ts:140`: reloading
+  debrief lost the only finalization handle. The runner now awaits
+  `resumeGazeFinalization(sessionId)` when no controller remains. Its same-tab
+  sessionStorage journal retains the finalization payload, pending samples and
+  original batch ID across reload/retry; acknowledged completion keeps only a
+  receipt. Withdrawal clears recovery state, including when an upload resolves
+  late. Missing recovery or failed uploads keep the expected-gaze session at
+  debrief; unavailable/declined gaze sessions can complete normally.
+
+The 1.5° gate was not relaxed. The shortened TeX plan's session-ending wording
+conflicts with the current optional-gaze pilot policy in biometrics.md; the
+coordinator has asked for protocol clarification. No finite recalibration attempt
+limit appears in the inspected protocol documents, so none was invented.
+
+Verification (host Node, installed lockfile dependencies):
+
+- `npm run test -w @meridian/web`: 20 files, 145 tests passed.
+- `npx tsc -p apps/web/tsconfig.json --noEmit`: passed.
+- `npx vitest run --config tests/gaze-flow/vitest.config.ts`: 11 passed; only
+  Fastify's existing deprecated logging-option warnings.
+- Relevant regressions were observed failing before their fixes: target portal,
+  training settling, camera-restart calibration invalidation, reload finalization,
+  runner recovery/error wiring, and late-acknowledgement withdrawal cleanup.
+
+Safari frame readiness and frame-counter handling belong to the separate
+WebGazer adapter owner; the zero-frame counter concern was relayed there. A real
+Safari/macOS webcam session and deployed Vercel participant run were not performed,
+so this is regression/control-flow evidence rather than measured gaze accuracy.
+Docker was unavailable on this host. No further source changes outside the owned
+files are requested; protocol wording still requires the coordinator's decision.

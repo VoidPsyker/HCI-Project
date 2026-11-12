@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INDUCTIONS, INSTRUCTIONS, MEDIA, SESSION_TIMING, STATE_COPY, type InductionState } from "../content";
 import { LocalClip } from "../components/LocalClip";
 
@@ -95,6 +95,7 @@ export function NeutralResetScreen({
 }) {
   const duration = fastMode ? 1_000 : SESSION_TIMING.neutralResetSeconds * 1000;
   const [remaining, setRemaining] = useState(duration);
+  const advanced = useRef(false);
   useEffect(() => {
     const start = performance.now();
     const interval = setInterval(() => {
@@ -118,7 +119,11 @@ export function NeutralResetScreen({
         <div className="breath-orb" aria-hidden="true">
           <div className="breath-orb-inner">{done ? "Ready" : Math.ceil(remaining / 1000)}</div>
         </div>
-        <button type="button" className="button primary" disabled={!done} onClick={onContinue} data-testid="reset-continue">
+        <button type="button" className="button primary" disabled={!done} onClick={() => {
+          if (!done || advanced.current) return;
+          advanced.current = true;
+          onContinue();
+        }} data-testid="reset-continue">
           {done ? "Continue to the next block" : "Reset in progress…"}
         </button>
       </div>

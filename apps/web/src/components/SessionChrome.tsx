@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useDialogFocus } from "./useDialogFocus";
 import type { RunnerPhase } from "../store";
 import type { SessionInfo } from "../types";
 import { TEST_MODE_NOTICE } from "../content";
@@ -48,6 +49,10 @@ export function SessionChrome({
   children: ReactNode;
 }) {
   const [showStop, setShowStop] = useState(false);
+  const canStop = !["stopped", "aborted", "withdrawn", "completed"].includes(session.status.toLowerCase()) && phase !== "aborted" && phase !== "complete";
+  const dialogOpen = showStop && canStop;
+  const dialogRef = useDialogFocus(dialogOpen, () => setShowStop(false));
+  useEffect(() => { if (!canStop) setShowStop(false); }, [canStop]);
   return (
     <div className="session-shell" data-testid="session-shell">
       <header className="session-bar">
@@ -70,15 +75,15 @@ export function SessionChrome({
         </div>
         <div className="session-actions">
           {fastMode ? <span className="test-badge">{TEST_MODE_NOTICE}</span> : null}
-          <button type="button" className="button stop" onClick={() => setShowStop(true)} data-testid="stop-control">
+          {canStop ? <button type="button" className="button stop" onClick={() => setShowStop(true)} data-testid="stop-control">
             Stop
-          </button>
+          </button> : null}
         </div>
       </header>
       <main className="session-main">{children}</main>
-      {showStop ? (
+      {dialogOpen ? (
         <div className="modal-backdrop" role="presentation">
-          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="stop-title" data-testid="stop-dialog">
+          <div ref={dialogRef} tabIndex={-1} className="modal" role="dialog" aria-modal="true" aria-labelledby="stop-title" data-testid="stop-dialog">
             <div className="eyebrow">Stop control</div>
             <h2 id="stop-title">Do you want to stop?</h2>
             <p>
@@ -86,7 +91,7 @@ export function SessionChrome({
               take you through the debrief. Partial data may be retained unless you ask for withdrawal.
             </p>
             <div className="modal-actions">
-              <button type="button" className="button secondary" onClick={() => setShowStop(false)} autoFocus>
+              <button type="button" className="button secondary" onClick={() => setShowStop(false)}>
                 Keep going
               </button>
               <button

@@ -99,6 +99,66 @@ export const gazeApi: GazeApi = {
   }
 };
 
+interface GazeFinalizationRecord {
+  token: string | null;
+  payload: GazeCompletionPayload | null;
+  queue: GazeSample[];
+  pending: GazeBatch | null;
+  completion: GazeCompleteResponse | null;
+  failure: string | null;
+}
+
+function finalizationKey(sessionId: string): string {
+  return `meridian:gaze-finalization:${sessionId}`;
+}
+
+function readFinalization(sessionId: string): GazeFinalizationRecord | null {
+  if (typeof sessionStorage === "undefined") return null;
+  const stored = sessionStorage.getItem(finalizationKey(sessionId));
+  return stored ? JSON.parse(stored) as GazeFinalizationRecord : null;
+}
+
+function writeFinalization(sessionId: string, record: GazeFinalizationRecord): void {
+  if (typeof sessionStorage !== "undefined") sessionStorage.setItem(finalizationKey(sessionId), JSON.stringify(record));
+}
+
+export function clearGazeFinalization(sessionId: string): void {
+  if (typeof sessionStorage !== "undefined") sessionStorage.removeItem(finalizationKey(sessionId));
+}
+
+/** Same-tab recovery only; cleared on withdrawal and stripped of credentials after completion. */
+export function saveGazeFinalization(sessionId: string, token: string, payload: GazeCompletionPayload): void {
+  const previous = readFinalization(sessionId);
+  writeFinalization(sessionId, { token, payload, queue: previous?.queue ?? [], pending: previous?.pending ?? null, completion: null, failure: previous?.failure ?? null });
+}
+
+export function confirmGazeFinalization(sessionId: string, completion: GazeCompleteResponse): void {
+  writeFinalization(sessionId, { token: null, payload: null, queue: [], pending: null, completion, failure: null });
+}
+
+/** Resume at debrief without reopening the camera or generating new gaze observations. */
+export async function resumeGazeFinalization(sessionId: string, api: GazeApi = gazeApi): Promise<GazeCompleteResponse> {
+  const record = readFinalization(sessionId);
+  if (record?.completion) return record.completion;
+  if (record?.failure) throw new Error(record.failure);
+  if (!record?.token || !record.payload) throw new Error("gaze_finalization_not_available");
+  // Persist the batch id before sending so a lost acknowledgement remains idempotent.
+  while (record.queue.length > 0) {
+    const batch = record.pending ?? { batch_id: uuid(), samples: record.queue.slice(0, 250) };
+    record.pending = batch;
+    writeFinalization(sessionId, record);
+    await api.batch(sessionId, record.token, batch);
+    if (readFinalization(sessionId)?.token !== record.token) throw new Error("gaze_finalization_cancelled");
+    record.queue.splice(0, batch.samples.length);
+    record.pending = null;
+    writeFinalization(sessionId, record);
+  }
+  const response = await api.complete(sessionId, record.token, record.payload);
+  if (readFinalization(sessionId)?.token !== record.token) throw new Error("gaze_finalization_cancelled");
+  confirmGazeFinalization(sessionId, response);
+  return response;
+}
+
 function uuid(): string {
   const value = globalThis.crypto?.randomUUID?.();
   if (value) return value;
@@ -118,6 +178,7 @@ export interface GazeUploaderOptions {
   autoFlushMs?: number | null;
   wait?: (milliseconds: number) => Promise<void>;
   onError?: (message: string | null) => void;
+  persist?: boolean;
 }
 
 /**
@@ -127,6 +188,7 @@ export interface GazeUploaderOptions {
  * refused rather than pretending the data are complete.
  */
 export class GazeUploader {
+  private readonly persist: boolean;
   private readonly sessionId: string;
   private readonly token: string;
   private readonly postBatch: GazeUploaderOptions["postBatch"];
@@ -140,8 +202,10 @@ export class GazeUploader {
   private timer: ReturnType<typeof setInterval> | null = null;
   private lastError: string | null = null;
   private fatalError: string | null = null;
+  private cleared = false;
 
   constructor(options: GazeUploaderOptions) {
+    this.persist = options.persist ?? false;
     this.sessionId = options.sessionId;
     this.token = options.token;
     this.postBatch = options.postBatch;
@@ -171,15 +235,32 @@ export class GazeUploader {
   }
 
   push(sample: GazeSample): boolean {
-    if (this.fatalError) return false;
+    if (this.cleared || this.fatalError) return false;
     if (this.queue.length >= this.maxQueue) {
       this.fatalError = "gaze_upload_queue_overflow";
       this.setError(this.fatalError);
+      this.persistQueue();
       return false;
     }
     this.queue.push(sample);
+    this.persistQueue();
     if (this.queue.length >= this.batchSize) void this.flush().catch(() => undefined);
     return true;
+  }
+
+  private persistQueue(): void {
+    if (!this.persist || this.cleared) return;
+    try {
+      const previous = readFinalization(this.sessionId);
+      writeFinalization(this.sessionId, {
+        token: this.token, payload: previous?.payload ?? null,
+        queue: this.queue, pending: this.pending, completion: null, failure: this.fatalError
+      });
+    } catch {
+      try { clearGazeFinalization(this.sessionId); } catch { /* Storage may be disabled. */ }
+      this.fatalError = "gaze_recovery_storage_failed";
+      this.setError(this.fatalError);
+    }
   }
 
   private setError(message: string | null): void {
@@ -197,6 +278,7 @@ export class GazeUploader {
           samples: this.queue.slice(0, this.batchSize)
         } satisfies GazeBatch);
       this.pending = batch;
+      this.persistQueue();
       try {
         await this.postBatch(this.sessionId, this.token, batch);
       } catch (error) {
@@ -205,7 +287,8 @@ export class GazeUploader {
       }
       this.queue.splice(0, batch.samples.length);
       this.pending = null;
-      this.setError(null);
+      this.persistQueue();
+      this.setError(this.fatalError);
     }
   }
 
@@ -241,6 +324,7 @@ export class GazeUploader {
         samples: this.queue.slice(0, this.batchSize)
       } satisfies GazeBatch);
     this.pending = batch;
+    this.persistQueue();
     void fetch(`${API_BASE}/api/gaze/sessions/${encodeURIComponent(this.sessionId)}/batches`, {
       method: "POST",
       keepalive: true,
@@ -255,7 +339,9 @@ export class GazeUploader {
   }
 
   clear(): void {
+    this.cleared = true;
     this.stop();
+    if (this.persist) clearGazeFinalization(this.sessionId);
     this.queue = [];
     this.pending = null;
     this.lastError = null;

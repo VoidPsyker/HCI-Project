@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MENU_IDS, type MenuId } from "@meridian/taxonomy";
 import { MENU_NAMES } from "../components/MenuChrome";
 import type { EventLogger } from "../logger";
@@ -48,15 +48,18 @@ export function QuestionnairesScreen({
   const [tab, setTab] = useState(0);
   const [preferredMenu, setPreferredMenu] = useState("");
   const [sus, setSus] = useState<Record<number, number>>({});
-  const [nasa, setNasa] = useState<Record<string, number>>(() =>
-    Object.fromEntries(NASA_ITEMS.map((item) => [item.id, 50]))
-  );
+  const [nasa, setNasa] = useState<Record<string, number>>({});
+  const submitting = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
   const [open, setOpen] = useState<Record<string, string>>({});
   const [credibility, setCredibility] = useState<Record<string, number>>({});
   const current = TABS[tab]!;
   const answeredSus = SUS_ITEMS.every((_, index) => typeof sus[index] === "number");
   const answeredCredibility = CREDIBILITY_ITEMS.every((item) => typeof credibility[item.id] === "number");
-  const answeredCurrent = current.kind !== "sus" || (answeredSus && preferredMenu !== "");
+  const answeredNasa = NASA_ITEMS.every((item) => typeof nasa[item.id] === "number");
+  const answeredCurrent = current.kind === "sus" ? answeredSus && preferredMenu !== ""
+    : current.kind === "nasa" ? answeredNasa : current.kind === "credibility" ? answeredCredibility : true;
 
   const fillNeutral = () => {
     setPreferredMenu("none");
@@ -95,7 +98,7 @@ export function QuestionnairesScreen({
         session_id: sessionId,
         instrument: "NASA_TLX",
         item_id: item.id,
-        value: nasa[item.id] ?? 50,
+        value: nasa[item.id],
         text_value: null,
         answered_at: now
       });
@@ -126,7 +129,10 @@ export function QuestionnairesScreen({
   };
 
   const submit = () => {
-    if (!answeredSus || !answeredCredibility || preferredMenu === "") return;
+    if (busy || submitting.current || !answeredSus || !answeredNasa || !answeredCredibility || preferredMenu === "") return;
+    submitting.current = true;
+    setSaving(true);
+    setError(false);
     const responses = buildResponses();
     for (const instrument of ["PREFERENCE", "SUS", "NASA_TLX", "OPEN", "CREDIBILITY"] as const) {
       logger.log({
@@ -134,7 +140,12 @@ export function QuestionnairesScreen({
         meta: { instrument, count: responses.filter((r) => r.instrument === instrument).length }
       });
     }
-    void onSubmit(responses);
+    void onSubmit(responses).catch(() => {
+      setError(true);
+    }).finally(() => {
+      submitting.current = false;
+      setSaving(false);
+    });
   };
 
   return (
@@ -195,11 +206,12 @@ export function QuestionnairesScreen({
         {current.kind === "nasa" ? (
           <div className="nasa-page" data-testid="nasa-page">
             <h2>NASA-TLX</h2>
-            <p className="small-note">Move each slider from low to high. 0 = low, 100 = high.</p>
+            <p className="small-note">Rate every item using its labelled endpoints. Move the slider or confirm the midpoint.</p>
             {NASA_ITEMS.map((item) => (
-              <label key={item.id} className="nasa-row">
+              <div key={item.id} className="nasa-row">
                 <span>{item.label}</span>
                 <input
+                  aria-label={item.label}
                   type="range"
                   min={0}
                   max={100}
@@ -207,11 +219,16 @@ export function QuestionnairesScreen({
                   value={nasa[item.id] ?? 50}
                   onChange={(event) => setNasa((currentNasa) => ({ ...currentNasa, [item.id]: Number(event.target.value) }))}
                 />
-                <strong>{nasa[item.id] ?? 50}</strong>
+                <strong>{nasa[item.id] ?? "Not answered"}</strong>
+                {nasa[item.id] === undefined ? (
+                  <button type="button" className="button secondary" onClick={() => setNasa((currentNasa) => ({ ...currentNasa, [item.id]: 50 }))}>
+                    Use midpoint (50) for {item.label}
+                  </button>
+                ) : null}
                 <small>
                   {item.low} — {item.high}
                 </small>
-              </label>
+              </div>
             ))}
           </div>
         ) : null}
@@ -260,6 +277,7 @@ export function QuestionnairesScreen({
           </div>
         ) : null}
       </div>
+      {error ? <p role="alert">Your questionnaires could not be saved. Please try again.</p> : null}
       <div className="q-actions">
         <button type="button" className="button secondary" disabled={tab === 0} onClick={() => setTab((currentTab) => Math.max(0, currentTab - 1))}>
           ← Previous
@@ -277,7 +295,7 @@ export function QuestionnairesScreen({
             Next section →
           </button>
         ) : (
-          <button type="button" className="button primary" onClick={submit} disabled={busy || !answeredSus || !answeredCredibility || preferredMenu === ""} data-testid="submit-questionnaires">
+          <button type="button" className="button primary" onClick={submit} disabled={busy || saving || !answeredSus || !answeredNasa || !answeredCredibility || preferredMenu === ""} data-testid="submit-questionnaires">
             {busy ? "Submitting…" : "Submit questionnaires"}
           </button>
         )}

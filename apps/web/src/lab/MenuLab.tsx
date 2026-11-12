@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MENU_IDS, NODE_BY_ID, type ColourMapping, type MenuId, type TaxonomyNode } from "@meridian/taxonomy";
 import type { StateLabel } from "@meridian/scoring";
+import { useDialogFocus } from "../components/useDialogFocus";
 import { MENU_NAMES, ProductDetail } from "../components/MenuChrome";
 import { MenuA } from "../menus/MenuA";
 import { MenuB } from "../menus/MenuB";
@@ -44,6 +45,13 @@ export function MenuLab() {
   const mapping = useMemo(() => MAPPINGS.find((item) => item.id === mappingId)?.value ?? MAPPINGS[0]!.value, [mappingId]);
   const Menu = MENUS[menuId];
   const { viewportRef, scale } = useLabStageScale();
+  const dialogRef = useDialogFocus(Boolean(leaf), () => setLeaf(null));
+  useEffect(() => {
+    if (!leaf) return;
+    const onBack = () => setLeaf(null);
+    window.addEventListener("popstate", onBack);
+    return () => window.removeEventListener("popstate", onBack);
+  }, [leaf]);
 
   return (
     <div className="lab-shell">
@@ -100,6 +108,7 @@ export function MenuLab() {
             </div>
             <Menu
               menuId={menuId}
+              disabled={Boolean(leaf)}
               colourMapping={mapping}
               onLeafSelect={(node) => {
                 setLeaf(node);
@@ -112,7 +121,7 @@ export function MenuLab() {
               }}
             />
             {leaf ? (
-              <div className="product-overlay">
+              <div ref={dialogRef} tabIndex={-1} className="product-overlay" role="dialog" aria-modal="true" aria-label="Product detail">
                 <ProductDetail
                   productId={leaf.productId ?? leaf.id}
                   onBack={() => setLeaf(null)}

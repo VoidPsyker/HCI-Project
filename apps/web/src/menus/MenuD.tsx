@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   DEPARTMENTS,
@@ -61,17 +61,37 @@ function layoutTiles(items: TaxonomyNode[], hasBack: boolean): Tile[] {
 
 export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled = false }: MenuProps) {
   const [path, setPath] = useState<TaxonomyNode[]>([]);
-  const [busy, setBusy] = useState(false);
-  const shellRef = useInert<HTMLElement>(disabled);
   const sceneRef = useRef<SVGGElement>(null);
+  const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const shellRef = useInert<HTMLElement>(disabled);
   const items = path.length === 0 ? DEPARTMENTS : path.length === 1 ? childrenOf(path[0]!.id) : childrenOf(path[1]!.id);
   const tiles = layoutTiles(items, path.length > 0);
   const dept = path.length > 0 ? departmentOf(path[path.length - 1]!.id) : null;
   const colour = dept ? PALETTE[departmentColour(dept.id, colourMapping)] : PALETTE.teal;
-  const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const visibleOptions = items.length;
   const log = createMenuLog(onEvent, visibleOptions, disabled);
   useMenuOpened(log);
+
+  const cancelZoom = () => {
+    if (sceneRef.current) d3.select(sceneRef.current).interrupt().attr("transform", null);
+  };
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (disabled) cancelZoom();
+    return () => { if (scene) d3.select(scene).interrupt().attr("transform", null); };
+  }, [disabled]);
+
+  const zoom = (tile: Tile) => {
+    cancelZoom();
+    if (reduced || !sceneRef.current) return;
+    const scene = d3.select(sceneRef.current);
+    const scale = 1.35;
+    const cx = tile.x + tile.w / 2;
+    const cy = tile.y + tile.h / 2;
+    scene.transition().duration(180)
+      .attr("transform", `translate(${W / 2 - cx * scale}, ${H / 2 - cy * scale}) scale(${scale})`)
+      .on("end", () => scene.attr("transform", null));
+  };
 
   const back = (source: BackSource = "control") => {
     if (disabled) return;
@@ -79,6 +99,7 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
       log("back", { level: 0, meta: { source, at_root: true } });
       return;
     }
+    cancelZoom();
     const current = path[path.length - 1];
     log("back", {
       level: path.length,
@@ -90,29 +111,8 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
   };
   useBrowserBack(back);
 
-  const zoom = (tile: Tile, callback: () => void) => {
-    if (busy) return;
-    if (reduced || !sceneRef.current) {
-      callback();
-      return;
-    }
-    setBusy(true);
-    const cx = tile.x + tile.w / 2;
-    const cy = tile.y + tile.h / 2;
-    const scale = 1.35;
-    d3.select(sceneRef.current)
-      .transition()
-      .duration(180)
-      .attr("transform", `translate(${W / 2 - cx * scale}, ${H / 2 - cy * scale}) scale(${scale})`)
-      .on("end", () => {
-        callback();
-        d3.select(sceneRef.current).attr("transform", null);
-        setBusy(false);
-      });
-  };
-
   const choose = (tile: Tile, inputType: "keyboard" | "mouse") => {
-    if (disabled || busy) return;
+    if (disabled) return;
     if (tile.back) {
       back("control");
       return;
@@ -120,6 +120,7 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
     const node = tile.node;
     if (!node) return;
     if (node.level === 3) {
+      cancelZoom();
       onLeafSelect(node, inputType);
       return;
     }
@@ -139,11 +140,14 @@ export function MenuD({ menuId, colourMapping, onLeafSelect, onEvent, disabled =
       parent_id: node.parentId,
       meta: { visible_options: nextVisible, stage: node.id }
     });
-    zoom(tile, () => setPath([...path, node]));
+    // Navigation commits now; animation completion never owns input or path state.
+    setPath([...path, node]);
+    zoom(tile);
   };
 
   const reset = () => {
     if (disabled) return;
+    cancelZoom();
     setPath([]);
   };
 

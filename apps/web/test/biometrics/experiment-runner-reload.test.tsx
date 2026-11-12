@@ -6,6 +6,8 @@ import type { SessionInfo, StudyDesign } from "../../src/types";
 
 const mocks = vi.hoisted(() => ({
   start: vi.fn(),
+  resumeGazeFinalization: vi.fn(),
+  sourceStatus: null as null | ((status: string) => void),
   stop: vi.fn(),
   loadSession: vi.fn(),
   patchSessionState: vi.fn(),
@@ -43,21 +45,26 @@ vi.mock("../../src/gaze/GazeController", () => ({
   GazeController: class {
     status = "idle";
     report = null;
-    start() {
-      return mocks.start();
+    async start() {
+      await mocks.start();
+      this.status = "ready";
     }
     stop() {
       return mocks.stop();
     }
+    async failAcquisition() { await mocks.stop(); this.status = "failed"; }
   }
 }));
 
 vi.mock("../../src/gaze/gazeClient", () => ({
+  resumeGazeFinalization: mocks.resumeGazeFinalization,
+  clearGazeFinalization: vi.fn(),
   gazeApi: { consent: vi.fn(), batch: vi.fn(), complete: vi.fn() }
 }));
 
 vi.mock("../../src/biometrics/webgazer", () => ({
   WebGazerSource: class {
+    constructor(options: { onStatus?: (status: string) => void }) { mocks.sourceStatus = options.onStatus ?? null; }
     info = { kind: "webcam", adapter: "test", device: "test", nominal_hz: null, hardware_backed: false, synthetic: false, capabilities: ["gaze"], notes: "" };
   }
 }));
@@ -123,6 +130,7 @@ describe("ExperimentRunner calibration reload", () => {
     mocks.patchSessionState.mockResolvedValue({ session: {} });
     mocks.stopSession.mockResolvedValue({ session: {} });
     mocks.flush.mockResolvedValue(true);
+    mocks.resumeGazeFinalization.mockRejectedValue(new Error("gaze_finalization_not_available"));
   });
 
   afterEach(() => {
@@ -213,6 +221,38 @@ describe("ExperimentRunner calibration reload", () => {
     });
     expect(useRunnerStore.getState().phase).toBe("debrief");
   });
+  it("finalizes recovered gaze before completing a reloaded debrief", async () => {
+    mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "debrief", gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 }, gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true } });
+    mocks.resumeGazeFinalization.mockResolvedValue({ ok: true });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("debrief-screen");
+    fireEvent.click(screen.getByTestId("finish-session"));
+    await waitFor(() => expect(useRunnerStore.getState().phase).toBe("complete"));
+    expect(mocks.resumeGazeFinalization).toHaveBeenCalledWith("S-race");
+  });
+
+  it("completes a reloaded debrief when gaze was unavailable and never collected", async () => {
+    mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "debrief", gazeUnavailable: "camera_unavailable" });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("debrief-screen");
+    fireEvent.click(screen.getByTestId("finish-session"));
+    await waitFor(() => expect(useRunnerStore.getState().phase).toBe("complete"));
+    expect(mocks.resumeGazeFinalization).not.toHaveBeenCalled();
+  });
+
+  it("shows camera failure when a running source reports an error", async () => {
+    mocks.start.mockResolvedValue(undefined);
+    mocks.stop.mockResolvedValue(undefined);
+    mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true }, gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 } });
+    render(<ExperimentRunner sessionId="S-race" />);
+    await screen.findByTestId("gaze-calibration-start");
+    act(() => mocks.sourceStatus?.("error"));
+    expect(await screen.findByTestId("gaze-calibration-retry")).toBeVisible();
+  });
+
   it("keeps a run available after the 15-minute target", async () => {
     const participant = { label: "Participant", consent_version: "v1", consented_at: new Date(Date.now() - 901_000).toISOString() };
     mocks.loadSession.mockResolvedValue({ session: session(), participant, design });

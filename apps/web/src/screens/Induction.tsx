@@ -30,6 +30,7 @@ export function InductionScreen({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [confirmedRows, setConfirmedRows] = useState<Set<number>>(new Set());
   const startedRef = useRef(0);
+  const advancedRef = useRef(false);
   const endedRef = useRef(false);
   const logStartRef = useRef(false);
 
@@ -72,11 +73,15 @@ export function InductionScreen({
   }, [done]);
 
   const distressStop = () => {
+    if (advancedRef.current) return;
+    advancedRef.current = true;
     endedRef.current = true;
     onDistressStop();
   };
 
   const continueAfter = (earlyExit = false) => {
+    if (advancedRef.current) return;
+    advancedRef.current = true;
     end(earlyExit ? { completed: false, distress_stop: false, early_exit: true } : { completed: true, distress_stop: false });
     onComplete(Math.round(performance.now() - startedRef.current));
   };

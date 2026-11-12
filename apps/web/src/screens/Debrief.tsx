@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { DEBRIEF_PARAGRAPHS } from "../content";
+import { useRef, useState } from "react";
+import { DEBRIEF_PARAGRAPHS, DEBRIEF_STOPPED_TITLE, DEBRIEF_STOP_REASONS, DEBRIEF_STOP_SUPPORT } from "../content";
 
 export function DebriefScreen({
   aborted,
+  stopSource,
   reason,
   completionCode,
   busy,
@@ -10,14 +11,34 @@ export function DebriefScreen({
   onWithdraw
 }: {
   aborted: boolean;
+  stopSource: "participant" | "system" | null;
   reason: string | null;
   completionCode: string | null;
   busy: boolean;
-  onFinish: () => void;
+  onFinish: () => void | Promise<void>;
   onWithdraw: () => Promise<void>;
 }) {
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
+  const withdrawing = useRef(false);
+  const finished = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [finishError, setFinishError] = useState(false);
+  const [error, setError] = useState(false);
+  const withdraw = async () => {
+    if (busy || withdrawing.current || finished.current) return;
+    withdrawing.current = true;
+    setSaving(true);
+    setError(false);
+    try {
+      await onWithdraw();
+      setWithdrawn(true);
+    } catch {
+      withdrawing.current = false;
+      setSaving(false);
+      setError(true);
+    }
+  };
   if (withdrawn) {
     return (
       <section className="panel narrow" data-testid="withdrawn-screen">
@@ -33,11 +54,11 @@ export function DebriefScreen({
   return (
     <section className="panel wide debrief-panel" data-testid="debrief-screen">
       <div className="eyebrow">{aborted ? "Session stopped" : "Debrief"}</div>
-      <h1>{aborted ? "Thank you for stopping" : "That is the end of the session"}</h1>
+      <h1>{aborted ? stopSource === "participant" ? "Thank you for taking part" : DEBRIEF_STOPPED_TITLE : "That is the end of the session"}</h1>
       {aborted ? (
         <div className="warning-box" role="alert">
-          <strong>The session was stopped.</strong> Reason recorded: {reason ?? "participant stop"}. The researcher will
-          check on you now. Nothing you did caused a problem.
+          <strong>{DEBRIEF_STOP_REASONS[reason ?? "default"] ?? DEBRIEF_STOP_REASONS.default}</strong>{" "}
+          {DEBRIEF_STOP_SUPPORT}
         </div>
       ) : null}
       <div className="debrief-copy">
@@ -52,6 +73,8 @@ export function DebriefScreen({
           <small>Give this code to the researcher. It contains no personal data.</small>
         </div>
       ) : null}
+      {finishError ? <p role="alert">The session could not be closed. Please try again.</p> : null}
+      {error ? <p role="alert">Your data could not be deleted. Please try again or ask the researcher for help.</p> : null}
       <div className="panel-actions">
         <div className="debrief-secondary">
           {!confirmWithdraw ? (
@@ -64,24 +87,32 @@ export function DebriefScreen({
               <button
                 type="button"
                 className="button danger"
-                disabled={busy}
-                onClick={() => {
-                  void (async () => {
-                    await onWithdraw();
-                    setWithdrawn(true);
-                  })();
-                }}
+                disabled={busy || saving}
+                onClick={() => void withdraw()}
                 data-testid="confirm-withdraw"
               >
                 Yes, delete my data
               </button>
-              <button type="button" className="button secondary" onClick={() => setConfirmWithdraw(false)}>
+              <button type="button" className="button secondary" disabled={busy || saving} onClick={() => setConfirmWithdraw(false)}>
                 Cancel
               </button>
             </div>
           )}
         </div>
-        <button type="button" className="button primary" onClick={onFinish} disabled={busy} data-testid="finish-session">
+        <button type="button" className="button primary" onClick={() => {
+          if (busy || withdrawing.current || finished.current) return;
+          finished.current = true;
+          setFinishError(false);
+          void (async () => {
+            try {
+              await onFinish();
+            } catch {
+              setFinishError(true);
+            } finally {
+              finished.current = false;
+            }
+          })();
+        }} disabled={busy || saving} data-testid="finish-session">
           {aborted ? "Close debrief" : "Finish and mark complete"}
         </button>
       </div>

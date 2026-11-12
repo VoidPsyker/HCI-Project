@@ -16,7 +16,7 @@ import {
 } from "@meridian/analysis";
 import { NODE_BY_ID } from "@meridian/taxonomy";
 import type { GazeApi, GazeCompleteResponse } from "./gazeClient";
-import { GazeUploader as Uploader } from "./gazeClient";
+import { GazeUploader as Uploader, saveGazeFinalization, confirmGazeFinalization, clearGazeFinalization } from "./gazeClient";
 
 export interface CalibrationCapableSource extends GazeSource {
   recordCalibrationTarget?(target: CalibrationTarget): Promise<void>;
@@ -200,6 +200,7 @@ export class GazeController implements GazeTrialHandle {
 
   async start(): Promise<void> {
     if (this.state !== "idle" && this.state !== "failed") throw new Error("gaze_controller_already_started");
+    this.calibrationReport = null;
     this.setStatus("starting");
     this.watchViewport();
     const currentGen = ++this.generation;
@@ -221,6 +222,7 @@ export class GazeController implements GazeTrialHandle {
       this.uploader = new Uploader({
         sessionId: this.options.session_id,
         token,
+        persist: true,
         postBatch: (sessionId, token, batch) => this.api.batch(sessionId, token, batch),
         ...(this.options.batchSize === undefined ? {} : { batchSize: this.options.batchSize }),
         ...(this.options.maxQueue === undefined ? {} : { maxQueue: this.options.maxQueue }),
@@ -271,6 +273,7 @@ export class GazeController implements GazeTrialHandle {
         throw viewportError;
       }
       this.setStatus("ready");
+      this.saveFinalization();
     } catch (error) {
       this.unwatchViewport?.();
       this.unwatchViewport = null;
@@ -317,6 +320,9 @@ export class GazeController implements GazeTrialHandle {
     if (this.state !== "calibrating" || this.validationStarted) throw new Error("gaze_training_closed");
     this.assertCalibrationTarget(target);
     const gen = this.generation;
+    // Let the participant fixate after the target moves before labelling eye features.
+    await this.wait(this.options.settleMs ?? 250);
+    if (this.isInterrupted(gen)) throw new Error("gaze_calibration_interrupted");
     if (this.source.recordCalibrationTarget) await this.source.recordCalibrationTarget(target);
     if (this.isInterrupted(gen)) throw new Error("gaze_calibration_interrupted");
     this.trainedTargets.add(target.id);
@@ -449,6 +455,7 @@ export class GazeController implements GazeTrialHandle {
     this.closeSnapshot(endMs);
     this.session.endTrial({ trial_id: input.trial_id, end_ms: endMs });
     this.active = null;
+    this.saveFinalization();
     this.setStatus("ready");
     void this.uploader?.flush().catch(() => undefined);
   }
@@ -610,6 +617,14 @@ export class GazeController implements GazeTrialHandle {
     }
   }
 
+  async failAcquisition(): Promise<void> {
+    try {
+      await this.stop();
+    } finally {
+      if (this.state === "stopped") this.setStatus("failed");
+    }
+  }
+
   async withdraw(): Promise<void> {
     this.generation++;
     this.unwatchViewport?.();
@@ -621,13 +636,34 @@ export class GazeController implements GazeTrialHandle {
       await this.session?.withdraw();
     } finally {
       this.uploader?.clear();
+      clearGazeFinalization(this.options.session_id);
       this.unsubscribe?.();
       this.unsubscribe = null;
     }
   }
 
   flushBeacon(): void {
+    this.saveFinalization();
     this.uploader?.flushKeepalive();
+  }
+
+  private finalizationPayload() {
+    if (!this.session) throw new Error("gaze_controller_not_started");
+    return {
+      calibration: this.session.getCalibration(),
+      quality: this.session.getQuality(),
+      metrics: this.session.getMetrics(),
+      clock: this.source.clock,
+      max_samples: this.options.maxSamples ?? 500_000,
+      rejected_samples: this.session.getRejectedSampleCount(),
+      dropped_samples: this.session.getDroppedSampleCount()
+    };
+  }
+
+  private saveFinalization(): void {
+    if (!this.session || !this.token || this.state === "withdrawn" || this.completion) return;
+    if (this.uploader?.overflowed) throw new Error(this.uploader.error ?? "gaze_upload_queue_overflow");
+    saveGazeFinalization(this.options.session_id, this.token, this.finalizationPayload());
   }
 
   /**
@@ -638,6 +674,7 @@ export class GazeController implements GazeTrialHandle {
   async complete(): Promise<GazeCompleteResponse> {
     if (this.completion) return this.completion;
     if (!this.session || !this.uploader || !this.token) throw new Error("gaze_controller_not_started");
+    const gen = this.generation;
     this.onViewportChange();
     if (this.viewportInvalidated) throw new Error("gaze_viewport_changed");
     this.endActiveTrial();
@@ -645,17 +682,11 @@ export class GazeController implements GazeTrialHandle {
     this.unwatchViewport?.();
     this.unwatchViewport = null;
     if (this.uploader.overflowed) throw new Error("gaze_upload_queue_overflow");
+    this.saveFinalization();
     await this.uploader.flushAll(3, 500);
-    const quality = this.session.getQuality();
-    const response = await this.api.complete(this.options.session_id, this.token, {
-      calibration: this.session.getCalibration(),
-      quality,
-      metrics: this.session.getMetrics(),
-      clock: this.source.clock,
-      max_samples: this.options.maxSamples ?? 500_000,
-      rejected_samples: this.session.getRejectedSampleCount(),
-      dropped_samples: this.session.getDroppedSampleCount()
-    });
+    const response = await this.api.complete(this.options.session_id, this.token, this.finalizationPayload());
+    if (this.isInterrupted(gen)) throw new Error("gaze_completion_interrupted");
+    confirmGazeFinalization(this.options.session_id, response);
     this.uploader.stop();
     this.completion = response;
     this.setStatus("completed");
