@@ -109,3 +109,53 @@ node tests/biometric-runtime/run-check.mjs
 - Playwright spec: `tests/biometric-runtime/webgazer-runtime.spec.ts`
 - Playwright config: `tests/biometric-runtime/playwright.config.ts`
 - Suite runner: `tests/biometric-runtime/run-check.mjs`
+
+## Integration audit (2026-11-12)
+
+The wrapper now rejects a second start while paused/stopping, ignores gaze
+callbacks outside the running session, guards late resume and calibration
+completion by session generation, releases all tracks attached to the video
+before upstream teardown, and stops acquisition on tracker inference failure.
+Runtime failures remain inspectable through `WebGazerSource.errorReason` and
+`status`; the participant controller must propagate source status changes to
+its UI (the source's optional `onStatus` callback is the existing hook).
+
+A zero `getVideoPlaybackQuality().totalVideoFrames` no longer becomes a
+permanent duplicate key. When decoded counters are unavailable/zero, advancing
+video `currentTime` is used before presented-frame metadata, because hidden
+video can stop rVFC delivery. This fallback indicates advancing media time,
+not a guarantee of exactly one inference per decoded frame. The zero-counter
+freeze is reproduced by a unit test; it is a plausible Safari low-sample-rate
+cause, not a confirmed diagnosis of the participant's failure.
+
+WebGazer 3.5.3's installed source confirms `begin()` already awaits loaded video
+data and the first inference, and permission errors reject its promise. No
+extra readiness sleep or coordinate scaling is appropriate: explicit training
+uses viewport CSS pixels (`clientX/clientY` upstream), matching the wrapper's
+viewport and calibration coordinates. The asset-copy command succeeds against
+the installed package's `dist/mediapipe`; no asset-path change was needed.
+
+Regression command: `npm run test -w @meridian/web --
+test/biometrics/webgazer.test.ts test/biometrics/webgazer-lifecycle.test.ts
+test/biometrics/bridge.test.ts` (35 passing). The added cases were observed
+failing before their fixes. Real-camera Safari/Firefox accuracy and the menu
+50 fps gate require separate measured runs; these unit tests do not establish
+those outcomes.
+
+The Chromium bundled-runtime check was rerun on 2026-11-12:
+`npx playwright test --config tests/biometric-runtime/playwright.config.ts`
+passed (1/1, 19.2 seconds), including local model assets, no external requests,
+callback dispatch and all-track teardown. `npx tsc -p apps/web/tsconfig.json
+--noEmit` passed. The broader `test/biometrics` run encountered unrelated
+runner storage errors (`storage.setItem is not a function`); the focused
+source tests above all pass. Historical measured-metrics.json is preserved.
+
+Remaining integration follow-up outside this worker's ownership: connect
+`WebGazerSource`'s `onStatus("error")` in `ExperimentRunner` to the controller /
+participant error path so a mid-session model failure gets an immediate
+message instead of only eventual missing-sample quality failure. Upstream
+`src/index.mjs` also calls `localforage.clear()` without awaiting its promise
+inside `clearData`; IndexedDB rejection can escape the upstream promise.
+Correcting that storage promise requires an upstream dependency fix, beyond
+this wrapper's owned files; no claim is made that upstream storage internals
+are error-free.

@@ -108,6 +108,7 @@ export class WebGazerSource implements GazeSource {
   private generation = 0;
   private starting = false;
   private frameGate: FrameGate | null = null;
+  errorReason: string | null = null;
 
   constructor(options: WebGazerSourceOptions) {
     this.options = options;
@@ -137,12 +138,13 @@ export class WebGazerSource implements GazeSource {
   }
 
   async start(consent: GazeConsent | null): Promise<void> {
-    if (this.starting || this.state === "running" || this.state === "starting") throw new Error("webgazer_already_started");
+    if (this.starting || this.state === "running" || this.state === "paused" || this.state === "stopping" || this.state === "starting") throw new Error("webgazer_already_started");
     assertCameraConsent(consent, this.options.participant_id, this.options.session_id);
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) throw new Error("camera_unavailable");
     assertWebGazerContext();
     this.viewport = this.options.viewport();
     assertViewport(this.viewport);
+    this.errorReason = null;
     this.clockSync.reset();
     this.setStatus("starting");
     const currentGen = ++this.generation;
@@ -175,12 +177,15 @@ export class WebGazerSource implements GazeSource {
         return;
       }
       api.removeMouseEventListeners?.();
-      api.setGazeListener((data, elapsedTime) => this.onGaze(data, elapsedTime));
+      api.setGazeListener((data, elapsedTime) => {
+        if (this.generation === currentGen && this.state === "running") this.onGaze(data, elapsedTime);
+      });
       this.installFrameGate(api);
       this.setStatus("running");
     } catch (error) {
       await this.releaseApi(api);
       if (this.isInterrupted(currentGen)) return;
+      this.errorReason = error instanceof Error ? error.message : String(error);
       this.setStatus("error");
       throw error;
     } finally {
@@ -222,16 +227,34 @@ export class WebGazerSource implements GazeSource {
       }
       if (typeof element.getVideoPlaybackQuality === "function") {
         const quality = element.getVideoPlaybackQuality();
-        if (Number.isFinite(quality.totalVideoFrames)) {
+        if (Number.isFinite(quality.totalVideoFrames) && quality.totalVideoFrames > 0) {
           // Decoded frame count is stable for hidden video and avoids a
           // one-frame double inference when rVFC metadata first arrives.
           return `decoded:${quality.totalVideoFrames}`;
         }
       }
+      // Hidden video may stop presenting frames while capture keeps advancing.
+      if (Number.isFinite(element.currentTime) && element.currentTime > 0) {
+        return `media:${element.currentTime}`;
+      }
       if (latestPresented) {
         return `presented:${latestPresented.presentedFrames}:${latestPresented.mediaTime}`;
       }
       return null;
+    };
+
+    const gen = this.generation;
+    const infer = async (element: HTMLVideoElement, canvas: HTMLCanvasElement, width: number, height: number): Promise<unknown> => {
+      try {
+        return await original.call(tracker, element, canvas, width, height);
+      } catch (error) {
+        if (!this.isInterrupted(gen)) {
+          this.errorReason = error instanceof Error ? error.message : String(error);
+          await this.releaseApi(api);
+          if (!this.isInterrupted(gen)) this.setStatus("error");
+        }
+        return null;
+      }
     };
 
     const wrapper = async (
@@ -242,7 +265,7 @@ export class WebGazerSource implements GazeSource {
     ): Promise<unknown> => {
       if (stopped || !enabled) {
         duplicate = false;
-        return original.call(tracker, element, canvas, width, height);
+        return infer(element, canvas, width, height);
       }
       const key = frameKey(element);
       if (key !== null && key === lastInferredKey) {
@@ -252,7 +275,7 @@ export class WebGazerSource implements GazeSource {
         return null;
       }
       duplicate = false;
-      const patches = await original.call(tracker, element, canvas, width, height);
+      const patches = await infer(element, canvas, width, height);
       if (key !== null) lastInferredKey = key;
       return patches;
     };
@@ -328,6 +351,13 @@ export class WebGazerSource implements GazeSource {
     if (this.api === api) this.api = null;
     if (!api) return;
     this.frameGate?.dispose();
+    // Upstream stopVideo stops only the first track and may throw on partial init.
+    const video = document.getElementById(api.params.videoElementId ?? "webgazerVideoFeed") as HTMLVideoElement | null;
+    const stream = video?.srcObject;
+    if (stream && "getTracks" in stream) {
+      for (const track of stream.getTracks()) track.stop();
+      video.srcObject = null;
+    }
     try {
       api.clearGazeListener();
     } catch {
@@ -369,8 +399,19 @@ export class WebGazerSource implements GazeSource {
 
   async resume(): Promise<void> {
     if (this.state !== "paused" || !this.api) return;
-    await this.api.resume();
-    this.setStatus("running");
+    const api = this.api;
+    const gen = this.generation;
+    try {
+      await api.resume();
+      if (!this.isInterrupted(gen) && this.api === api) this.setStatus("running");
+    } catch (error) {
+      if (this.isInterrupted(gen)) return;
+      await this.releaseApi(api);
+      if (this.isInterrupted(gen)) return;
+      this.errorReason = error instanceof Error ? error.message : String(error);
+      this.setStatus("error");
+      throw error;
+    }
   }
 
   subscribe(listener: GazeSampleListener): () => void {
@@ -386,6 +427,8 @@ export class WebGazerSource implements GazeSource {
   async recordCalibrationTarget(target: CalibrationTarget): Promise<void> {
     if (this.state !== "running" || !this.api) throw new Error("webgazer_not_running");
     if (!this.api.recordScreenPosition) throw new Error("webgazer_calibration_unavailable");
+    const gen = this.generation;
+    const api = this.api;
     const repetitions = this.options.calibrationRepetitions ?? 5;
     if (!Number.isInteger(repetitions) || repetitions < 1) throw new Error("webgazer_calibration_repetitions_invalid");
     const delay = this.options.repetitionDelayMs ?? 120;
@@ -395,10 +438,10 @@ export class WebGazerSource implements GazeSource {
     gate?.setEnabled(false);
     try {
       for (let index = 0; index < repetitions; index += 1) {
-        if (this.state !== "running") throw new Error("webgazer_not_running");
+        if (this.state !== "running" || this.generation !== gen) throw new Error("webgazer_not_running");
         await this.wait(delay);
-        if (this.state !== "running" || !this.api) throw new Error("webgazer_not_running");
-        this.api.recordScreenPosition(target.x_px, target.y_px, "click");
+        if (this.state !== "running" || this.generation !== gen || this.api !== api) throw new Error("webgazer_not_running");
+        api.recordScreenPosition!(target.x_px, target.y_px, "click");
       }
     } finally {
       gate?.setEnabled(true);

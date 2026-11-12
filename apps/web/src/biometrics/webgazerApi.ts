@@ -8,6 +8,7 @@ export interface WebGazerGazeData {
 
 export interface WebGazerParams {
   faceMeshSolutionPath: string;
+  videoElementId?: string;
   saveDataAcrossSessions: boolean;
   showVideo: boolean;
   showFaceOverlay: boolean;

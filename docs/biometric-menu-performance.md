@@ -1,6 +1,6 @@
 # Concurrent menu and gaze performance
 
-Run from the root with the local Vite app available on port 5173:
+Run from the root; the check starts and stops its own Vite app on an allocated local port:
 
 ```
 node tests/biometric-menu-performance/run-check.mjs
@@ -11,11 +11,16 @@ TrialRunner/Menu D in one page. Non-local requests are blocked. The fake video
 contains no face; callbacks are expected to be invalid/no_prediction. This
 tests runtime contention, not calibrated human gaze quality.
 
-Current gate: **fail**. Latest default-capture raw observation: 180 ms configured,
-189.6 ms observed transition, 30.01 fps during active motion, five concurrent inference
-callbacks. Earlier observations ranged from 24 to 33 fps. The required 50 fps has not been
-waived. Even a separate production menu-only rerun measured 43.6 fps, so hardware
-and host load must be controlled before interpreting the inference overhead.
+Current gate: **pass** on the November 12 integration run. With the original
+180 ms zoom restored, the isolated fake-camera check measured 208.7 ms elapsed,
+59.98 fps over 11 active frame intervals, and four concurrent gaze callbacks.
+The gate still requires at least 50 fps; no timing or cadence threshold changed.
+The harness now owns an allocated port instead of accepting an arbitrary app
+already listening on 5173. See performance-run.txt and measured-metrics.json.
+
+Historical October observations on a different host ranged from 24 to 33 fps;
+a separate menu-only run measured 43.6 fps. Those results demonstrate host and
+hardware sensitivity, not a reproducible regression in the current build.
 
 The diagnostic measured 57.14 fps before inference with Intel Iris Xe/D3D11
 hardware acceleration. A test-only 320×240 capture experiment achieved 32.72 fps
@@ -140,3 +145,14 @@ The paired spec is deliberately separate so the gate and its artifacts remain
 byte-for-byte untouched; its recorder/inference instrumentation duplicates
 part of the gate harness and should be factored into a shared helper in a
 later, separately reviewed change.
+
+## Browser frame identity correction (2026-11-12)
+
+Zero decoded-frame counters are now treated as unavailable. Advancing video
+media time is used before rVFC metadata in that case to avoid suppressing all
+subsequent observations when hidden-video presentation callbacks stall.
+Positive decoded counters retain precedence. The media-time fallback may
+infer more than once per decoded frame, so unique-frame claims above apply
+only to decoded-counter paths. Unit regression coverage reproduces the
+zero-counter starvation; no new performance or human accuracy result is
+claimed, and the existing failed performance gate remains unchanged.

@@ -383,6 +383,35 @@ describe("WebGazerSource", () => {
     await webgazer.stop();
   });
 
+  it("does not freeze on a zero decoded count when hidden video time advances", async () => {
+    installCamera();
+    const api = new FakeWebGazerWithTracker();
+    const frames = fakeVideo({ rvfc: true, decodedFrameCount: true });
+    const webgazer = source(api);
+    await webgazer.start(cameraConsent());
+    Object.defineProperty(frames.video, "currentTime", { value: 1, writable: true });
+    await api.tracker.getEyePatches(frames.video, CANVAS, 640, 480);
+    frames.video.currentTime = 2;
+    await api.tracker.getEyePatches(frames.video, CANVAS, 640, 480);
+    expect(api.tracker.calls).toHaveLength(2);
+    await api.tracker.getEyePatches(frames.video, CANVAS, 640, 480);
+    expect(api.tracker.calls).toHaveLength(2);
+    await webgazer.stop();
+  });
+
+  it("handles inference rejection without leaving a live stranded source", async () => {
+    installCamera();
+    const api = new FakeWebGazerWithTracker();
+    api.tracker.getEyePatches = async () => { throw new Error("model_failed"); };
+    const webgazer = source(api);
+    await webgazer.start(cameraConsent());
+    const frames = fakeVideo({ rvfc: false, decodedFrameCount: false });
+    await expect(api.tracker.getEyePatches(frames.video, CANVAS, 640, 480)).resolves.toBeNull();
+    expect(webgazer.status).toBe("error");
+    expect(webgazer.cameraActive).toBe(false);
+    expect(api.calls).toContain("stopVideo");
+  });
+
   it("uses totalVideoFrames when requestVideoFrameCallback is unavailable", async () => {
     installCamera();
     const api = new FakeWebGazerWithTracker();
