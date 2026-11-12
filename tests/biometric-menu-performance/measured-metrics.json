@@ -1,0 +1,151 @@
+{
+  "timestamp": "2026-11-12T07:48:12.448Z",
+  "durationMs": 3371,
+  "chromeNative": true,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "configuredDurationMs": 180,
+  "observedDurationMs": 208.69999999925494,
+  "activeFps": 59.978189749182086,
+  "frameCount": 11,
+  "frameDeltas": [
+    16.800000000000182,
+    16.59999999999991,
+    16.699999999999818,
+    16.600000000000364,
+    16.699999999999818,
+    16.699999999999818,
+    16.700000000000273,
+    16.59999999999991,
+    16.699999999999818,
+    16.600000000000364,
+    16.699999999999818
+  ],
+  "fpsRequirementMet": true,
+  "gazeRuntimeRunning": true,
+  "totalGazeSamples": 21,
+  "gazeSamplesDuringZoom": 4,
+  "sampleSlice": [
+    {
+      "seq": 1,
+      "t_ms": 1993,
+      "t_source_ms": 328.30000000074506,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 2,
+      "t_ms": 2017.8999999985099,
+      "t_source_ms": 354,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 3,
+      "t_ms": 2067.561293917033,
+      "t_source_ms": 403.5,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 4,
+      "t_ms": 2117.8082562682066,
+      "t_source_ms": 453.69999999925494,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 5,
+      "t_ms": 2168.122034837315,
+      "t_source_ms": 503.80000000074506,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 6,
+      "t_ms": 2219.086687969807,
+      "t_source_ms": 554,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 7,
+      "t_ms": 2270.241057909603,
+      "t_source_ms": 604.3999999985099,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 8,
+      "t_ms": 2322.3310164228938,
+      "t_source_ms": 654.1999999992549,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 9,
+      "t_ms": 2373.4540861755318,
+      "t_source_ms": 704.0999999977648,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    },
+    {
+      "seq": 10,
+      "t_ms": 2424.0176060439912,
+      "t_source_ms": 754,
+      "x_px": null,
+      "y_px": null,
+      "valid": false,
+      "invalid_reason": "no_prediction",
+      "trial_id": null
+    }
+  ],
+  "seqStrictlyIncreasing": true,
+  "syntheticLimits": {
+    "fakeVideoDevice": true,
+    "detectedFace": false,
+    "calibratedHumanCapture": false,
+    "expectedPrediction": "no_prediction"
+  },
+  "teardownStatus": "stopped",
+  "cameraActiveAfterTeardown": false,
+  "trackCount": 1,
+  "allTracksEnded": true,
+  "externalRequests": [],
+  "localMediaPipeAssetsLoaded": [
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh.binarypb",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets.data",
+    "/vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm"
+  ]
+}

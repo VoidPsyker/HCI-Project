@@ -1,36 +1,10 @@
+import { EVENT_TYPES } from "@meridian/scoring";
 import { MENU_IDS, MENU_NAMES, semanticPath } from "./support/data";
 import { expect, test } from "./support/fixtures";
 import { navigateToLeaf } from "./support/menu-actions";
 import { installSyntheticSession, pathIds, semanticIds, startTrial, waitForTrialEnd } from "./support/session";
 
-const ALLOWED_EVENT_TYPES = new Set([
-  "session_start",
-  "consent",
-  "demographics",
-  "practice_start",
-  "block_start",
-  "induction_start",
-  "induction_end",
-  "checkin",
-  "trial_start",
-  "menu_open",
-  "menu_close",
-  "node_hover",
-  "node_click",
-  "leaf_select",
-  "product_view",
-  "back",
-  "search_attempt",
-  "timeout",
-  "give_up",
-  "trial_end",
-  "block_end",
-  "adaptation_shown",
-  "adaptation_accepted",
-  "adaptation_reverted",
-  "questionnaire",
-  "session_end"
-]);
+const ALLOWED_EVENT_TYPES = new Set<string>(EVENT_TYPES);
 
 /**
  * Event reconstruction through the real runner, with the API intercepted.

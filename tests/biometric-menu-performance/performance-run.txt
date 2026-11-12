@@ -1,12 +1,157 @@
 =================================================================
-Biometric Menu D Performance Verification Run - FAILED
+Biometric Menu D Performance Verification Run - SUCCEEDED
 =================================================================
-Start Time: 2026-10-24T04:42:46.993Z
-End Time:   2026-10-24T04:43:31.494Z
-Exit Code:  1
-Command:    npx.cmd playwright test --config tests/biometric-menu-performance/playwright.config.ts
+Start Time: 2026-11-12T07:48:08.109Z
+End Time:   2026-11-12T07:48:12.531Z
+Total Test Duration: 3371ms
+Exit Code:  0
+Command:    npx playwright test --config tests/biometric-menu-performance/playwright.config.ts
 
---- TEST EXECUTION ERROR ---
+--- MEASURED PERFORMANCE EVIDENCE ---
+1. Genuine Chromium Environment:
+   - window.chrome natively present: true
+   - Viewport: 1920x1080
+
+2. Menu D Zoom Motion Cadence & Duration:
+   - Configured D3 transition duration: 180ms (spec: 180-220ms)
+   - Observed transition duration: 208.70ms (spec bound: 170-240ms)
+   - Active zoom frame count: 11
+   - Active zoom measured FPS: 59.98 fps (study requirement: >=50 fps)
+   - Requirement >= 50 fps met: true
+   - Frame deltas (ms): [16.8, 16.6, 16.7, 16.6, 16.7, 16.7, 16.7, 16.6, 16.7, 16.6, 16.7]
+
+3. Concurrent FaceMesh Runtime Activity:
+   - FaceMesh active during run: true
+   - Total gaze samples produced: 21
+   - Gaze samples emitted during zoom window: 4
+   - Sequence numbers strictly increasing: true
+   - Sample slice inspected (first 10 samples):
+[
+    {
+        "seq": 1,
+        "t_ms": 1993,
+        "t_source_ms": 328.30000000074506,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 2,
+        "t_ms": 2017.8999999985099,
+        "t_source_ms": 354,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 3,
+        "t_ms": 2067.561293917033,
+        "t_source_ms": 403.5,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 4,
+        "t_ms": 2117.8082562682066,
+        "t_source_ms": 453.69999999925494,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 5,
+        "t_ms": 2168.122034837315,
+        "t_source_ms": 503.80000000074506,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 6,
+        "t_ms": 2219.086687969807,
+        "t_source_ms": 554,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 7,
+        "t_ms": 2270.241057909603,
+        "t_source_ms": 604.3999999985099,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 8,
+        "t_ms": 2322.3310164228938,
+        "t_source_ms": 654.1999999992549,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 9,
+        "t_ms": 2373.4540861755318,
+        "t_source_ms": 704.0999999977648,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    },
+    {
+        "seq": 10,
+        "t_ms": 2424.0176060439912,
+        "t_source_ms": 754,
+        "x_px": null,
+        "y_px": null,
+        "valid": false,
+        "invalid_reason": "no_prediction",
+        "trial_id": null
+    }
+]
+
+4. Exact Synthetic & Accuracy Boundary:
+   - Fake video device active: true
+   - Face detected: false (expected: false with synthetic pacman/color bars)
+   - Calibrated human capture claimed: false (do NOT claim human accuracy)
+   - Expected prediction label: no_prediction
+
+5. Hardware Teardown & MediaStream Cleanup:
+   - Final wrapper status: stopped
+   - Camera active after stop: false
+   - Total MediaStreamTracks captured: 1
+   - All tracks ended (readyState === "ended"): true
+
+6. Offline Isolation & Local Assets:
+   - External requests attempted: 0
+   - External URLs blocked: []
+   - Local MediaPipe FaceMesh assets loaded:
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh.binarypb
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_packed_assets.data
+     * /vendor/webgazer/mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm
+
+--- PLAYWRIGHT OUTPUT ---
 Running 1 test using 1 worker
 
 MEASURED MOTION DATA: {
@@ -18,22 +163,31 @@ MEASURED MOTION DATA: {
     }
   ],
   "configuredDuration": 180,
-  "measuredDuration": 233.10000000149012,
+  "measuredDuration": 208.69999999925494,
   "deltas": [
-    83.39999999999782,
-    66.70000000000073
+    16.800000000000182,
+    16.59999999999991,
+    16.699999999999818,
+    16.600000000000364,
+    16.699999999999818,
+    16.699999999999818,
+    16.700000000000273,
+    16.59999999999991,
+    16.699999999999818,
+    16.600000000000364,
+    16.699999999999818
   ],
-  "totalMs": 150.09999999999854,
-  "fps": 13.324450366422514,
-  "samplesAtFirst": 28,
-  "samplesAtEnd": 30,
-  "samplesDuringZoom": 2,
-  "totalSamples": 31,
+  "totalMs": 183.4000000000001,
+  "fps": 59.978189749182086,
+  "samplesAtFirst": 15,
+  "samplesAtEnd": 19,
+  "samplesDuringZoom": 4,
+  "totalSamples": 21,
   "sampleSlice": [
     {
       "seq": 1,
-      "t_ms": 19068.30000000447,
-      "t_source_ms": 10634.60000000149,
+      "t_ms": 1993,
+      "t_source_ms": 328.30000000074506,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -42,8 +196,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 2,
-      "t_ms": 19111.20000000298,
-      "t_source_ms": 10683.60000000149,
+      "t_ms": 2017.8999999985099,
+      "t_source_ms": 354,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -52,8 +206,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 3,
-      "t_ms": 19148.04250011243,
-      "t_source_ms": 10720.10000000149,
+      "t_ms": 2067.561293917033,
+      "t_source_ms": 403.5,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -62,8 +216,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 4,
-      "t_ms": 19183.858726122344,
-      "t_source_ms": 10757.10000000149,
+      "t_ms": 2117.8082562682066,
+      "t_source_ms": 453.69999999925494,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -72,8 +226,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 5,
-      "t_ms": 19217.36910068839,
-      "t_source_ms": 10790.20000000298,
+      "t_ms": 2168.122034837315,
+      "t_source_ms": 503.80000000074506,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -82,8 +236,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 6,
-      "t_ms": 19249.699809183643,
-      "t_source_ms": 10823.70000000298,
+      "t_ms": 2219.086687969807,
+      "t_source_ms": 554,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -92,8 +246,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 7,
-      "t_ms": 19281.202071674452,
-      "t_source_ms": 10855.10000000149,
+      "t_ms": 2270.241057909603,
+      "t_source_ms": 604.3999999985099,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -102,8 +256,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 8,
-      "t_ms": 19320.369242132263,
-      "t_source_ms": 10889.10000000149,
+      "t_ms": 2322.3310164228938,
+      "t_source_ms": 654.1999999992549,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -112,8 +266,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 9,
-      "t_ms": 19370.075072246404,
-      "t_source_ms": 10934,
+      "t_ms": 2373.4540861755318,
+      "t_source_ms": 704.0999999977648,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -122,8 +276,8 @@ MEASURED MOTION DATA: {
     },
     {
       "seq": 10,
-      "t_ms": 19423.055420951838,
-      "t_source_ms": 10982.70000000298,
+      "t_ms": 2424.0176060439912,
+      "t_source_ms": 754,
       "x_px": null,
       "y_px": null,
       "valid": false,
@@ -132,32 +286,7 @@ MEASURED MOTION DATA: {
     }
   ]
 }
-  x  1 tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference (25.6s)
+  ✓  1 tests/biometric-menu-performance/biometric-menu-performance.spec.ts:71:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference (3.4s)
 
-
-  1) tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference
-
-    Error: must sample multiple frames during active zoom
-
-    expect(received).toBeGreaterThanOrEqual(expected)
-
-    Expected: >= 5
-    Received:    2
-
-      409 |
-      410 |       // B. Frame count during active zoom
-    > 411 |       expect(motionData.deltas.length, "must sample multiple frames during active zoom").toBeGreaterThanOrEqual(5);
-          |                                                                                          ^
-      412 |
-      413 |       // C. Observed runtime duration bound with frame quantization tolerance [170ms, 240ms]
-      414 |       expect(motionData.measuredDuration, "measured D3 zoom duration must not be null").not.toBeNull();
-        at C:\Users\Cauti\orca\workspaces\HCI-Project\periwinkle\tests\biometric-menu-performance\biometric-menu-performance.spec.ts:411:90
-
-    Error Context: test-results\biometric-menu-performance-65be0--bundled-FaceMesh-inference\error-context.md
-
-    Error Context: test-results\biometric-menu-performance-65be0--bundled-FaceMesh-inference\error-context.md
-
-  1 failed
-    tests\biometric-menu-performance\biometric-menu-performance.spec.ts:77:3 › Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency › verifies Menu D zoom cadence (>=50fps) and transition duration concurrently with bundled FaceMesh inference
-
+  1 passed (4.0s)
 =================================================================

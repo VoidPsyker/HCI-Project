@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { createServer, type ViteDevServer } from "vite";
 import path from "node:path";
-import http from "node:http";
+import net from "node:net";
 import fs from "node:fs";
 
 export interface MeasuredPerformanceReport {
@@ -45,26 +45,20 @@ export interface MeasuredPerformanceReport {
 
 test.describe("Biometric Menu Performance: Menu D + Bundled FaceMesh Concurrency", () => {
   let vite: ViteDevServer | null = null;
-  const baseUrl = "http://127.0.0.1:5173";
+  let baseUrl: string;
 
   test.beforeAll(async () => {
-    const isRunning = await new Promise<boolean>((resolve) => {
-      const req = http.get(baseUrl, () => resolve(true));
-      req.on("error", () => resolve(false));
-      req.setTimeout(1000, () => {
-        req.destroy();
-        resolve(false);
-      });
+    const socket = net.createServer();
+    await new Promise<void>((resolve) => socket.listen(0, "127.0.0.1", resolve));
+    const port = (socket.address() as net.AddressInfo).port;
+    await new Promise<void>((resolve) => socket.close(() => resolve()));
+    vite = await createServer({
+      root: path.resolve(process.cwd(), "apps/web"),
+      configFile: path.resolve(process.cwd(), "apps/web/vite.config.ts"),
+      server: { host: "127.0.0.1", port, strictPort: true }
     });
-
-    if (!isRunning) {
-      vite = await createServer({
-        root: path.resolve(process.cwd(), "apps/web"),
-        configFile: path.resolve(process.cwd(), "apps/web/vite.config.ts"),
-        server: { host: "127.0.0.1", port: 5173, strictPort: true }
-      });
-      await vite.listen();
-    }
+    await vite.listen();
+    baseUrl = `http://127.0.0.1:${port}`;
   });
 
   test.afterAll(async () => {

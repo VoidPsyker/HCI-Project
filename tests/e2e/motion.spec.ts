@@ -102,7 +102,7 @@ async function startD3Recorder(page: import("@playwright/test").Page): Promise<v
     let lastTime: number | null = null;
     const tick = (now: number) => {
       const state = recorder.__d3!;
-      const transitions = (scene as unknown as { __transition?: Record<string, { duration?: number }> }).__transition;
+      const transitions = (scene as unknown as { __transition?: Record<string, { duration?: number; time?: number }> }).__transition;
       if (transitions && state.configuredDuration === null) {
         for (const k of Object.keys(transitions)) {
           const dur = transitions[k]?.duration;
@@ -114,7 +114,7 @@ async function startD3Recorder(page: import("@playwright/test").Page): Promise<v
       }
       const transform = scene.getAttribute("transform");
       if (state.first === null && transform) {
-        state.first = now;
+        state.first = Object.values(transitions ?? {}).find((transition) => typeof transition.time === "number")?.time ?? now;
         lastTime = now;
       } else if (state.first !== null && transform) {
         if (lastTime !== null) {

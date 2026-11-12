@@ -92,7 +92,7 @@ test.afterEach(async ({ request }) => {
 for (const failCalibration of [false, true]) test("@session completes the pilot with " + (failCalibration ? "failed calibration" : "valid gaze"), async ({ page, request, net }) => {
   test.setTimeout(600_000);
   page.setDefaultTimeout(20_000);
-  const created = await request.post("/api/admin/sessions", { headers: ADMIN, data: { label: "SYNTHETIC scripted participant" } });
+  const created = await request.post("/api/admin/sessions", { headers: ADMIN, data: { label: `SYNTHETIC scripted participant ${failCalibration ? "failed" : "valid"}` } });
   expect(created.ok()).toBe(true);
   sessionId = (await created.json()).session.session_id as string;
   await page.route("**/node_modules/.vite/deps/webgazer.js*", (route) =>
@@ -134,7 +134,7 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   }
 
   await page.getByTestId("gaze-calibration-start").click();
-  await page.getByTestId(failCalibration ? "gaze-calibration-skip" : "gaze-calibration-continue").click({ timeout: 60_000 });
+  await page.getByTestId(failCalibration ? "gaze-failure-continue" : "gaze-calibration-continue").click({ timeout: 60_000 });
   if (failCalibration) {
     await page.reload();
     await expect(page.getByTestId("start-induction")).toBeVisible();
@@ -266,7 +266,7 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   await page.getByLabel("Admin password").fill(ADMIN["x-admin-password"]);
   await page.getByRole("button", { name: "Open dashboard" }).click();
   await expect(page.getByRole("button", { name: "demographics.csv", exact: false })).toBeVisible();
-  await page.getByText("SYNTHETIC scripted participant", { exact: true }).click();
+  await page.getByText(`SYNTHETIC scripted participant ${failCalibration ? "failed" : "valid"}`, { exact: true }).click();
   const gazeExports = page.getByTestId("gaze-exports");
   await expect(gazeExports.getByRole("button", { name: "gaze_quality.json" })).toBeVisible();
   const download = page.waitForEvent("download");

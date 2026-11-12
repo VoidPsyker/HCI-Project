@@ -30,11 +30,12 @@ async function coreConsent(page: import("@playwright/test").Page) {
   await expect(page.getByTestId("gaze-consent-screen")).toBeVisible();
 }
 
-test("requires separate consent and refusal ends the session without camera access", async ({ page, request }) => {
+test("requires separate consent and refusal continues core study without camera access", async ({ page, request }) => {
   await coreConsent(page);
   await expect(page.getByTestId("gaze-consent-grant")).toBeDisabled();
   await page.getByTestId("gaze-consent-refuse").click();
-  await expect.poll(async () => (await (await request.get(`/api/sessions/${sessionId}/status`)).json()).status).toBe("aborted");
+  await expect.poll(async () => (await (await request.get(`/api/sessions/${sessionId}/status`)).json()).status).toBe("consented");
+  await expect(page.getByTestId("demographics-screen")).toBeVisible();
   expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(0);
   await expect(page.getByTestId("start-trial")).toHaveCount(0);
 });
@@ -99,7 +100,7 @@ test("reload after gaze consent stops at authorization recovery without camera a
   expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(0);
 });
 
-test("reload at debrief without a gaze controller cannot mark the session complete", async ({ page, request }) => {
+test("reload at debrief finalizes the camera-denied outcome without reopening the camera", async ({ page, request }) => {
   await calibrationFixture(page, request);
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("meridian.runner.v2")!);
@@ -109,9 +110,9 @@ test("reload at debrief without a gaze controller cannot mark the session comple
   await page.reload();
   await expect(page.getByTestId("debrief-screen")).toBeVisible();
   await page.getByTestId("finish-session").click();
-  await expect(page.getByText(/could not be finalized/i)).toBeVisible();
-  await expect(page.getByTestId("complete-screen")).toHaveCount(0);
+  await expect(page.getByTestId("complete-screen")).toBeVisible();
+  expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(0);
   await expect
     .poll(async () => (await (await request.get(`/api/sessions/${sessionId}/status`)).json()).status)
-    .not.toBe("completed");
+    .toBe("completed");
 });
