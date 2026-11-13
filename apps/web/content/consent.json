@@ -11,12 +11,12 @@
     "By continuing you confirm that you have read this placeholder information, that your questions have been answered, and that you agree to take part."
   ],
   "gaze": {
-    "version": "pilot-gaze-consent-placeholder-v3",
+    "version": "pilot-gaze-consent-placeholder-v4",
     "paragraphs": [
       "This is a separate consent for eye tracking. The core study consent above is not enough on its own.",
       "The pilot uses the camera in this computer to estimate where you look during the scored search trials. The camera starts only after you agree here. It does not record video, images, or audio, and no face images leave the browser.",
       "Gaze coordinates, timing, calibration results, and screen geometry estimated from the browser are stored in a separate restricted dataset. They are not mixed into the click-event log or questionnaire tables. Researchers can export them only from the password-protected console.",
-      "Webcam eye tracking is less accurate than a dedicated research tracker. A measured nine-point calibration and held-out validation decide whether gaze can be used. If the error is above 1.5° or cannot be evaluated, the study continues without eye tracking.",
+      "Webcam eye tracking is less accurate than a dedicated research tracker. A nine-point calibration and accuracy check measure how accurate it is for you. That result is stored with your gaze data, and the researchers decide later which recordings are accurate enough to analyse.",
       "You can refuse now and continue without eye tracking, or stop at any time. Withdrawal deletes the gaze files together with the rest of the session data."
     ]
   }

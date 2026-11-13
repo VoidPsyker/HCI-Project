@@ -1,6 +1,6 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { manipulationCheckPassed, reportedState, type GazeUnavailableReason, type StateLabel } from "@meridian/scoring";
-import { estimateScreenGeometry, type CalibrationReport, type GazeSourceStatus } from "@meridian/analysis";
+import { estimateScreenGeometry, type GazeSourceStatus } from "@meridian/analysis";
 import { loadSession, loadSessionStatus, patchSessionState, recordConsent, stopSession, submitDemographics, submitQuestionnaires, withdrawSession } from "./api";
 import { EventLogger } from "./logger";
 import { useRunnerStore } from "./store";
@@ -64,7 +64,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const [gazeStarting, setGazeStarting] = useState(false);
   const [gazeStartError, setGazeStartError] = useState<string | null>(null);
   const [gazeReady, setGazeReady] = useState(false);
-  const [gazeReport, setGazeReport] = useState<CalibrationReport | null>(null);
   const fastMode = new URLSearchParams(window.location.search).get("fast") === "1";
 
   useEffect(() => {
@@ -182,7 +181,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     gazeStartingRef.current = true;
     setGazeStarting(true);
     setGazeStartError(null);
-    setGazeReport(null);
     let previousSourceStatus: GazeSourceStatus = "idle";
     // Captured when the camera starts, so earlier window changes cannot invalidate calibration.
     const viewport = { width_px: window.innerWidth, height_px: window.innerHeight };
@@ -215,12 +213,10 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         }
       }),
       api: gazeApi,
-      criterionDeg: 1.5,
       onError: (message) => {
         if (message === "gaze_viewport_changed") {
           if (useRunnerStore.getState().phase === "calibration") {
             setGazeReady(false);
-            setGazeReport(controller.report);
             state.setPhase("gaze_failed");
           } else {
             markGazeUnavailable("viewport_changed");
@@ -330,17 +326,13 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     void gazeRef.current?.stop().catch(() => undefined);
   };
 
-  const handleCalibrated = (report: CalibrationReport) => {
+  // Gaze continues whatever the calibration error; the stored error decides inclusion at analysis.
+  const handleCalibrated = () => {
     if (useRunnerStore.getState().sessionId !== sessionId || useRunnerStore.getState().abortReason) return;
-    setGazeReport(report);
-    if (report.passes === true && report.angular_available) {
-      gazeCalibratedRef.current = true;
-      const resume = state.calibrationResumePhase ?? "block_intro";
-      useRunnerStore.setState({ calibrationResumePhase: null });
-      state.setPhase(resume);
-      return;
-    }
-    state.setPhase("gaze_failed");
+    gazeCalibratedRef.current = true;
+    const resume = state.calibrationResumePhase ?? "block_intro";
+    useRunnerStore.setState({ calibrationResumePhase: null });
+    state.setPhase(resume);
   };
 
   const handleDemographics = async (data: Record<string, unknown>) => {
@@ -661,11 +653,11 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
           setGazeAttempt((attempt) => attempt + 1);
         }}
         onCalibrated={handleCalibrated}
-        onSkip={(reason) => void continueWithoutGaze(reason)}
+        onSkip={() => void continueWithoutGaze("camera_unavailable")}
       />
     );
   } else if (state.phase === "gaze_failed") {
-    content = <GazeFailureScreen report={gazeReport} onContinue={() => void continueWithoutGaze("calibration_failed")} />;
+    content = <GazeFailureScreen onContinue={() => void continueWithoutGaze("viewport_changed")} />;
   } else if (state.phase === "demographics") {
     content = <DemographicsScreen onSubmit={handleDemographics} busy={busy} />;
   } else if (state.phase === "baseline") {

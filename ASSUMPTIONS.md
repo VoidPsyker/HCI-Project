@@ -8,8 +8,13 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 - **Webcam eye tracking is kept and required for scored trials.** The build prompt says "no
   webcam or biometrics", and plan §3.3 calls eye tracking an *optional* extension with a
   screen-based tracker (§11.4). This build uses WebGazer with separate consent, estimated screen
-  geometry, a 9-point calibration plus held-out validation and the plan's 1.5° gate. Refusing
-  or failing it ends the session before scored trials. Emotion is still never inferred from
+  geometry and a 9-point calibration plus held-out validation. Refusing it or a camera failure
+  continues the study without gaze.
+- **Calibration error is recorded, not a gate.** The plan's 1.5° gate is far below webcam
+  accuracy (WebGazer reports ~4° on average), so it would exclude nearly everyone. Gaze is
+  recorded for every participant who completes calibration and each session stores its
+  held-out error; a 10° cutoff marks sessions analysis-ready for now, and the final cutoff is
+  chosen at analysis time from the stored errors. Emotion is still never inferred from
   face or gaze. The plan requires separate ethics approval for gaze (§11.4). See
   `docs/biometrics.md`.
 

@@ -38,7 +38,7 @@ export const EVENT_TYPES = [
 
 export type EventType = (typeof EVENT_TYPES)[number];
 
-const GAZE_UNAVAILABLE_REASONS = ["consent_declined", "calibration_failed", "camera_unavailable", "viewport_changed"] as const;
+const GAZE_UNAVAILABLE_REASONS = ["consent_declined", "camera_unavailable", "viewport_changed"] as const;
 export type GazeUnavailableReason = (typeof GAZE_UNAVAILABLE_REASONS)[number];
 
 export function isGazeUnavailableReason(value: unknown): value is GazeUnavailableReason {

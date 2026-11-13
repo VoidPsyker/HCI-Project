@@ -2,9 +2,10 @@
 
 The current pilot treats gaze as optional, as described in §11.4 of the longer research
 plan. Participants can finish the behavioural study if they decline gaze consent, the camera
-cannot start, or the tracker fails validation. Scored gaze capture requires separate consent
-and a held-out calibration error of at most 1.5°. Use the gaze quality report when determining
-whether samples qualify for gaze analysis. The trial and event exports record when gaze
+cannot start. Scored gaze capture requires separate consent and a completed calibration;
+the held-out error never blocks capture. Each session's manifest stores `calibration`
+(`max_error_deg`, `mean_error_deg`, `cutoff_deg`, `within_cutoff`); sessions within the
+10° cutoff are `analysis_ready`, and a different cutoff can be applied at analysis. The trial and event exports record when gaze
 became unavailable. See the [researcher guide](researcher-guide.md) for the current flow.
 
 The development notes below include earlier implementation stages and the former mandatory
@@ -49,8 +50,8 @@ no biometrics” is now wrong and must be changed by that integration.
    targets first via `trainCalibrationTarget`, then evaluate held-out predictions
    across all nine targets on the final model without retraining
    (`validateCalibrationTarget`, zero training calls during validation). The
-   gate is the worst per-participant held-out point (≤ 1.5°), not a device spec
-   or a population mean.
+   cutoff is compared with the worst per-participant held-out point, not a
+   device spec or a population mean. It labels the session; it never stops capture.
 5. **Run trials**: `startTrial` / `endTrial` around the exact trial window;
    register stable AOIs before the trial. Samples outside trials are not
    retained for human sources.
@@ -74,7 +75,7 @@ summarizeCalibration(
 `CalibrationObservation` has `target_id`, `x_px`, `y_px`, and optional `t_ms`.
 `summarizeCalibration` reports per-point and aggregate pixel/degree error.
 `passes` is `null` when geometry is missing or no angular error exists; it is
-never inferred. The gate uses the worst point's maximum error.
+never inferred. The cutoff uses the worst point's maximum error.
 
 ```ts
 class GazeSession {
@@ -143,7 +144,7 @@ video frames.
 - `rejected_samples`, `dropped_samples`, and per-check `checks`/`exclusions`.
 
 Required checks are nine calibration points, no calibration observation with an
-unknown target id, measured held-out calibration error ≤ 1.5°, missing gaze
+unknown target id, held-out calibration error ≤ the 10° cutoff, missing gaze
 ≤ 20%, received-sample coverage ≥ 80% (matching the 20% missing gate over
 duration), zero trust-boundary rejects/drops, valid separate gaze consent with
 `raw_video_retention: false`, and, if configured, a clock residual and
@@ -151,10 +152,10 @@ sample-rate floor. `angular_metrics_ready` additionally
 requires measured geometry and a calibration angular error. `analysis_ready`
 is true only for a non-synthetic `pass`.
 
-The 1.5° gate is never waived because WebGazer is a webcam source. WebGazer's
-published mean visual-angle error of 4.17° is context only; the participant's
-measured held-out validation decides. A failed participant is excluded under
-the pre-registered rule, not silently accepted.
+The plan's 1.5° gate is below webcam accuracy (WebGazer's published mean
+visual-angle error is 4.17°), so it is not used to stop capture. Every
+calibrated participant's gaze is kept with its measured error; `analysis_ready`
+reflects the 10° cutoff and the analysis may apply a stricter one.
 
 Fixations use I-VT at 30°/s with a 100 ms minimum. Angular values require
 measured geometry; without it they are `null`/not evaluable. The geometry
@@ -384,8 +385,8 @@ compatibility.
   lab hardware remain unvalidated.
 - GPL/legal review for distribution and the end-of-maintenance risk for
   WebGazer remain open.
-- The 1.5° and 20% gates are deliberately not waived; a webcam participant who
-  fails validation is excluded under the plan.
+- Calibration error no longer stops capture (see `ASSUMPTIONS.md`); the 20%
+  missing-gaze gate still decides `analysis_ready`.
 
 ## Calibration coordinate and retry checks (November 2026)
 
@@ -398,11 +399,10 @@ coordinates again and train the model against a different location from the one
 shown. Training now waits for the same fixation settling interval as validation
 before recording eye features (250 ms by default).
 
-Failed held-out validation shows `GazeFailureScreen`, including the measured
-maximum error and an explicit recalibration action. A retry runs all nine training
-points and all nine held-out validation points again; it does not waive the
-1.5° threshold. The participant can instead continue the behavioural study
-without gaze. No retry count is specified in the current protocol documents;
+The validation result shows the measured maximum and mean error with an
+optional recalibration action. A retry runs all nine training points and all
+nine held-out validation points again. Whatever the error, the participant
+continues to the trials with gaze recorded. No retry count is specified in the current protocol documents;
 the UI leaves this decision to the participant and researcher rather than
 inventing a terminal attempt limit.
 
@@ -415,7 +415,7 @@ the shortened TeX plan before treating the documents as one consistent protocol.
 Regression evidence: the calibration UI test asserts that targets are direct
 children of `document.body`, exercises React effect replay, and recalibrates after
 failure. Controller tests verify settling before training, cancellation during
-settling, two-pass ordering, and blocking trials after a failed gate. These are
+settling, two-pass ordering, and that trials record gaze beyond the cutoff. These are
 coordinate/control-flow checks; a real Safari camera session is still required
 to establish participant accuracy and camera behaviour.
 

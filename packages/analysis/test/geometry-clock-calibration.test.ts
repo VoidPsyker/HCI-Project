@@ -112,13 +112,14 @@ describe("9-point calibration", () => {
     expect(report.angular_available).toBe(true);
   });
 
-  it("applies the 1.5 degree gate per participant", () => {
-    const passing = summarizeCalibration(TARGETS, observationsAtTargets(TARGETS, 5, 10), GEOMETRY);
-    expect(passing.max_error_deg).toBeCloseTo(1.1458, 3);
-    expect(passing.passes).toBe(true);
-    const failing = summarizeCalibration(TARGETS, observationsAtTargets(TARGETS, 5, 20), GEOMETRY);
-    expect(failing.max_error_deg).toBeCloseTo(2.2904, 3);
-    expect(failing.passes).toBe(false);
+  it("compares each participant with the 10 degree analysis cutoff", () => {
+    const within = summarizeCalibration(TARGETS, observationsAtTargets(TARGETS, 5, 20), GEOMETRY);
+    expect(within.max_error_deg).toBeCloseTo(2.2904, 3);
+    expect(within.criterion_deg).toBe(10);
+    expect(within.passes).toBe(true);
+    const beyond = summarizeCalibration(TARGETS, observationsAtTargets(TARGETS, 5, 120), GEOMETRY);
+    expect(beyond.max_error_deg).toBeGreaterThan(10);
+    expect(beyond.passes).toBe(false);
   });
 
   it("fails when a point is missing and is not evaluable without geometry", () => {

@@ -3,6 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import Database from "better-sqlite3";
+import { DEFAULT_CALIBRATION_ERROR_DEG } from "@meridian/analysis";
 import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { toCsv } from "./exports";
@@ -1102,7 +1103,8 @@ export class Repository {
   /**
    * Finalises a gaze session and writes the restricted bundle. The server
    * recomputes analysis_ready from the submitted gates; a client can never mark
-   * synthetic data analysis-ready or bypass a failed calibration gate.
+   * synthetic data analysis-ready or move the calibration cutoff. Gaze above the
+   * cutoff is still stored, with its error, so the cutoff can change at analysis.
    */
   completeGazeSession(
     sessionId: string,
@@ -1125,8 +1127,7 @@ export class Repository {
     const synthetic = row.synthetic === 1 || source.synthetic === true || source.kind === "synthetic";
     const calibration = input.calibration;
     const maxError = calibration && typeof calibration.max_error_deg === "number" ? calibration.max_error_deg : null;
-    const FIXED_STUDY_GATE_DEG = 1.5;
-    const calibrationPassed = calibration?.passes === true && maxError !== null && maxError >= 0 && maxError <= FIXED_STUDY_GATE_DEG && calibration.angular_available === true && calibration.unknown_observations === 0 && Number(calibration.target_count) >= Number(calibration.expected_target_count);
+    const calibrationPassed = calibration?.passes === true && maxError !== null && maxError >= 0 && maxError <= DEFAULT_CALIBRATION_ERROR_DEG && calibration.angular_available === true && calibration.unknown_observations === 0 && Number(calibration.target_count) >= Number(calibration.expected_target_count);
     const qualityPassed = input.quality.overall === "pass" && input.quality.analysis_ready === true;
     const at = nowIso();
     const samples = this.getGazeSamples(sessionId);
@@ -1162,6 +1163,12 @@ export class Repository {
       viewport,
       clock: input.clock,
       quality_overall: input.quality.overall,
+      calibration: {
+        max_error_deg: maxError,
+        mean_error_deg: typeof calibration?.mean_error_deg === "number" ? calibration.mean_error_deg : null,
+        cutoff_deg: DEFAULT_CALIBRATION_ERROR_DEG,
+        within_cutoff: calibrationPassed
+      },
       analysis_ready: analysisReady,
       angular_metrics_ready: analysisReady && input.quality.angular_metrics_ready === true,
       streams: {

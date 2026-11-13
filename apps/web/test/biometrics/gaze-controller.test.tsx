@@ -248,11 +248,11 @@ describe("GazeController regression tests", () => {
 
   it("requires fresh calibration after an acquisition failure and camera retry", async () => {
     const controller = await calibratedController();
-    expect(controller.calibrationGatePassed).toBe(true);
+    expect(controller.calibrated).toBe(true);
     await controller.failAcquisition();
     expect(controller.status).toBe("failed");
     await controller.start();
-    expect(controller.calibrationGatePassed).toBe(false);
+    expect(controller.calibrated).toBe(false);
     expect(controller.report).toBeNull();
   });
 
@@ -278,13 +278,13 @@ describe("GazeController regression tests", () => {
     viewport = { ...TEST_VIEWPORT, width_px: TEST_VIEWPORT.width_px - 100 };
     fireEvent(window, new Event("resize"));
     await waitFor(() => expect(source.status).toBe("stopped"));
-    expect(controller.calibrationGatePassed).toBe(false);
+    expect(controller.calibrated).toBe(false);
     expect(controller.report?.passes).toBe(false);
     expect(controller.report?.note).toBe("gaze_viewport_changed");
     expect(onError).toHaveBeenCalledWith("gaze_viewport_changed");
     viewport = TEST_VIEWPORT;
     await expect(controller.beginTrial({ trial_id: "after-restore", menu_id: "A", target_product_id: "prod-1" }))
-      .rejects.toThrow("gaze_calibration_gate_not_passed");
+      .rejects.toThrow("gaze_not_calibrated");
     expect(controller.getQuality()?.analysis_ready).toBe(false);
   });
 
@@ -320,15 +320,15 @@ describe("GazeController regression tests", () => {
     expect(() => controller.beginCalibration()).toThrow("gaze_controller_not_ready");
     await expect(
       controller.beginTrial({ trial_id: "after-startup-resize", menu_id: "A", target_product_id: "prod-1" })
-    ).rejects.toThrow("gaze_calibration_gate_not_passed");
+    ).rejects.toThrow("gaze_not_calibrated");
   });
 
   it("cannot start another trial after stopping a calibrated controller", async () => {
     const controller = await calibratedController();
     await controller.stop();
-    expect(controller.calibrationGatePassed).toBe(false);
+    expect(controller.calibrated).toBe(false);
     await expect(controller.beginTrial({ trial_id: "after-stop", menu_id: "A", target_product_id: "prod-1" }))
-      .rejects.toThrow("gaze_calibration_gate_not_passed");
+      .rejects.toThrow("gaze_not_calibrated");
   });
 
   it("retries failed camera startup with its existing consent token", async () => {
@@ -489,7 +489,7 @@ describe("GazeController regression tests", () => {
     });
   });
 
-  describe("Two-pass calibration and 1.5° validation gate", () => {
+  describe("Two-pass calibration and held-out validation", () => {
     it("requires all known training targets before validation and freezes training afterward", async () => {
       const controller = createController();
       await controller.start();
@@ -545,10 +545,10 @@ describe("GazeController regression tests", () => {
       expect(report.max_error_deg).not.toBeNull();
       expect(report.max_error_deg!).toBeLessThan(1.5);
       expect(controller.status).toBe("calibrated");
-      expect(controller.calibrationGatePassed).toBe(true);
+      expect(controller.calibrated).toBe(true);
     });
 
-    it("fails calibration gate and blocks trials when held-out error exceeds 1.5 degrees", async () => {
+    it("records trials with the error kept when held-out error exceeds the analysis cutoff", async () => {
       const controller = createController();
       await controller.start();
 
@@ -569,14 +569,16 @@ describe("GazeController regression tests", () => {
 
       const report = controller.finishCalibration();
       expect(report.passes).toBe(false);
-      expect(report.max_error_deg!).toBeGreaterThan(1.5);
-      expect(controller.status).toBe("failed");
-      expect(controller.calibrationGatePassed).toBe(false);
+      expect(report.max_error_deg!).toBeGreaterThan(report.criterion_deg);
+      expect(controller.status).toBe("calibrated");
+      expect(controller.calibrated).toBe(true);
+      expect(controller.report).toBe(report);
 
-      // Trials must be prevented
+      // Gaze is still recorded; the cutoff is applied at analysis time.
       await expect(
         controller.beginTrial({ trial_id: "trial-1", menu_id: "menu-a", target_product_id: "prod-1" })
-      ).rejects.toThrow("gaze_calibration_gate_not_passed");
+      ).resolves.toEqual({ start_ms: expect.any(Number) });
+      await controller.stop();
     });
 
     it("prevents trials when controller is stopped or withdrawn", async () => {
@@ -586,7 +588,7 @@ describe("GazeController regression tests", () => {
 
       await expect(
         controller.beginTrial({ trial_id: "trial-1", menu_id: "menu-a", target_product_id: "prod-1" })
-      ).rejects.toThrow("gaze_calibration_gate_not_passed");
+      ).rejects.toThrow("gaze_not_calibrated");
     });
   });
 

@@ -76,7 +76,7 @@ function max(values: number[]): number | null {
  * Summarises held-out calibration observations against a 9-point target grid.
  *
  * `passes` is `null` (not evaluable) when screen geometry is missing, because
- * the plan's 1.5° gate is angular. It is never inferred from device model or
+ * the cutoff is angular. It is never inferred from device model or
  * from a population mean. A measured per-participant held-out error decides.
  */
 export function summarizeCalibration(
@@ -147,6 +147,6 @@ export function summarizeCalibration(
     note:
       geometry === null
         ? "Angular calibration error is not evaluable without measured screen size and viewing distance."
-        : "Held-out calibration error compared with the pre-registered 1.5° gate per participant."
+        : `Held-out calibration error compared with the ${criterionDeg}° analysis cutoff per participant.`
   };
 }

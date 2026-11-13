@@ -35,7 +35,8 @@ comparison still uses search performance in each emotional context.
 Calibrate before the first induction so setup does not consume the induced mood. If gaze is declined,
 unavailable or fails validation, the participant can still finish the behavioural study. The
 original short experimental plan ended such runs. This pilot follows the longer plan’s
-optional eye-tracking extension. The 1.5-degree gate still applies to gaze analysis. Keep baseline,
+optional eye-tracking extension. Gaze is recorded whatever the calibration error; the cutoff
+is chosen at analysis (10° marks sessions analysis-ready for now). Keep baseline,
 post-induction and post-block self-reports, continuous valence/arousal and fatigue ratings,
 neutral resets, distress stops, counterbalancing, and neutral trial feedback. Use reported state
 and manipulation-check results, not intended state, for labels. No emotion is inferred from faces.

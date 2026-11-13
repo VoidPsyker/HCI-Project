@@ -10,7 +10,9 @@ export const GAZE_SCHEMA_VERSION = "meridian.gaze/1" as const;
 export const BRIDGE_PROTOCOL_VERSION = "meridian.gaze.bridge/1" as const;
 
 export const DEFAULT_CALIBRATION_POINTS = 9;
-export const DEFAULT_CALIBRATION_ERROR_DEG = 1.5;
+// Analysis cutoff for held-out error. It only labels sessions; gaze is recorded for everyone,
+// so a different cutoff can be applied at analysis time from each session's stored error.
+export const DEFAULT_CALIBRATION_ERROR_DEG = 10;
 export const DEFAULT_MAX_MISSING_PCT = 20;
 export const DEFAULT_IVT_VELOCITY_DEG_S = 30;
 export const DEFAULT_MIN_FIXATION_MS = 100;

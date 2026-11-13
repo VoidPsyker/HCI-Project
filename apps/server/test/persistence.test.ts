@@ -45,7 +45,7 @@ it("rolls back events when trial scoring fails, allowing a complete retry", () =
   expect(repo.allEvents()).toHaveLength(1);
 });
 
-it.each(["consent_declined", "calibration_failed", "camera_unavailable", "viewport_changed"])(
+it.each(["consent_declined", "camera_unavailable", "viewport_changed"])(
   "records core completion with the explicit gaze outcome %s",
   (reason) => {
     const unavailable: EventInput = { ...event, event_type: "gaze_unavailable", meta: { reason } };

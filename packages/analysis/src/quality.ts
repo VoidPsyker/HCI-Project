@@ -73,10 +73,9 @@ function median(values: readonly number[]): number | null {
 }
 
 /**
- * Applies the plan's pre-registered gates to measured data. The 1.5° gate is
- * evaluated on each participant's held-out calibration error; it is never
- * waived because a device is webcam-based and never inferred from a population
- * mean. Synthetic data can never be analysis-ready.
+ * Applies the quality gates to measured data. The calibration cutoff is
+ * evaluated on each participant's held-out calibration error and never inferred
+ * from a population mean. Synthetic data can never be analysis-ready.
  */
 export function auditGazeQuality(input: {
   source: GazeSourceInfo;

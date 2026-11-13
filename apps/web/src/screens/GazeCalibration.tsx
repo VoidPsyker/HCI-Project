@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { GazeFailureScreen } from "./GazeFailure";
 import type { CalibrationReport, CalibrationTarget } from "@meridian/analysis";
 import type { GazeController } from "../gaze/GazeController";
 import { describeGazeStartError } from "../gaze/startErrors";
@@ -26,7 +25,8 @@ function waitForPaint(): Promise<void> {
  * Pass 1 trains all 9 points explicitly; Pass 2 measures held-out accuracy on the
  * final model with zero training calls. The dots are presentation only; training
  * clicks are issued by the source, so mouse movements cannot silently train the
- * model. Failed validation can be retried before continuing without gaze.
+ * model. The measured error is stored with the gaze data and never blocks the trials;
+ * the cutoff is applied at analysis time. Participants may recalibrate first.
  */
 export function GazeCalibrationScreen({
   controller,
@@ -40,8 +40,8 @@ export function GazeCalibrationScreen({
   starting: boolean;
   startError: string | null;
   onRetry: () => void;
-  onCalibrated: (report: CalibrationReport) => void;
-  onSkip: (reason: "calibration_failed" | "camera_unavailable") => void;
+  onCalibrated: () => void;
+  onSkip: () => void;
 }) {
   const [step, setStep] = useState<"intro" | "running" | "done">("intro");
   const [phase, setPhase] = useState<"train" | "validate">("train");
@@ -128,7 +128,7 @@ export function GazeCalibrationScreen({
               Retry camera setup
             </button>
           ) : null}
-          <button type="button" className="button primary" onClick={() => onSkip("camera_unavailable")}>
+          <button type="button" className="button primary" onClick={onSkip}>
             Continue without eye tracking
           </button>
         </div>
@@ -157,8 +157,8 @@ export function GazeCalibrationScreen({
           advance automatically through nine training points and then nine accuracy checks.
         </p>
         <div className="warning-box soft">
-          The pre-registered gate is a maximum held-out error of 1.5°. If the measured error is above the gate, or
-          cannot be evaluated, you can finish the study without eye tracking.
+          The accuracy check is stored with your eye-tracking data. Whatever the result, you then continue to the
+          searches with eye tracking on.
         </div>
         {error ? (
           <div className="warning-box" role="alert">
@@ -191,7 +191,7 @@ export function GazeCalibrationScreen({
           {isTraining
             ? `Training point ${index + 1} of ${targets.length}. All points are trained before validation.`
             : `Validated ${recorded.length} point${recorded.length === 1 ? "" : "s"}.${
-                recorded[index] === 0 ? " No prediction was captured for the last point; the gate will report it." : ""
+                recorded[index] === 0 ? " No prediction was captured for the last point; it is recorded as missing." : ""
               }`}
         </div>
         {target ? createPortal(
@@ -221,32 +221,30 @@ export function GazeCalibrationScreen({
   }
 
   const missing = report ? report.points.filter((point) => point.observation_count === 0).length : 0;
-  const passed = report?.passes === true && report.angular_available === true;
-  if (!passed) {
-    return <GazeFailureScreen report={report} onRetry={() => void run()} onContinue={() => onSkip("calibration_failed")} />;
-  }
   return (
     <section className="panel medium" data-testid="gaze-calibration-result">
       <div className="eyebrow">Validation result</div>
-      <h1>Eye tracking passed the gate</h1>
+      <h1>Calibration complete</h1>
       {report ? (
         <>
           <p className="lede">
             Maximum held-out error: <strong>{formatDegrees(report.max_error_deg)}</strong>. Mean held-out error:{" "}
-            <strong>{formatDegrees(report.mean_error_deg)}</strong>. Gate: {report.criterion_deg.toFixed(2)}°.
+            <strong>{formatDegrees(report.mean_error_deg)}</strong>. Analysis cutoff: {report.criterion_deg.toFixed(2)}°.
           </p>
           <div className="small-note">
-            {report.target_count} of {report.expected_target_count} points had observations.
-            {missing > 0 ? ` ${missing} point${missing === 1 ? "" : "s"} had no prediction.` : ""}
+            {report.points.length - missing} of {report.points.length} points had observations. Eye tracking stays on
+            whatever the error; recalibrate first if your position or lighting was poor.
           </div>
-
         </>
       ) : null}
       <div className="panel-actions">
+        <button type="button" className="button secondary" onClick={() => void run()}>
+          Recalibrate
+        </button>
         <button
           type="button"
           className="button primary big"
-          onClick={() => report && onCalibrated(report)}
+          onClick={onCalibrated}
           disabled={!report}
           data-testid="gaze-calibration-continue"
         >

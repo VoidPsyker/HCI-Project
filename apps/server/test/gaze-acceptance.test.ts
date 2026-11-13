@@ -992,7 +992,7 @@ describe("Server Biometric Acceptance Tests", () => {
       expect(manifest.contains_click_events).toBe(false);
     });
 
-    it("trust-boundary gate: enforces fixed study gate 1.5 deg and never trusts client-inflated criterion", async () => {
+    it("trust-boundary gate: enforces the study's 10 deg cutoff, never trusts a client-inflated criterion, and keeps the error", async () => {
       const { session } = await createTestSession(true);
       const consentRes = await app.inject({
         method: "POST",
@@ -1009,13 +1009,14 @@ describe("Server Biometric Acceptance Tests", () => {
         payload: sampleBatchPayload(crypto.randomUUID(), 1, 5)
       });
 
-      // Client sends inflated criterion_deg: 1000 with max_error_deg: 10.0 and passes: true
+      // Client sends inflated criterion_deg: 1000 with max_error_deg: 12.5 and passes: true
       const forgedCompletePayload = sampleCompletePayload(5, {
         calibration: {
           target_count: 9,
           expected_target_count: 9,
-          max_error_deg: 10.0,
-          criterion_deg: 1000.0, // Attempting to bypass the 1.5 deg gate
+          max_error_deg: 12.5,
+          mean_error_deg: 8.0,
+          criterion_deg: 1000.0, // Attempting to bypass the 10 deg cutoff
           passes: true,
           angular_available: true,
           unknown_observations: 0,
@@ -1041,7 +1042,7 @@ describe("Server Biometric Acceptance Tests", () => {
       });
       expect(completeRes.statusCode).toBe(200);
 
-      // Verify server recomputed analysis_ready: must be FALSE because max_error 10.0 > study criterion 1.5
+      // Verify server recomputed analysis_ready: must be FALSE because max_error 12.5 > study cutoff 10
       const manifestRes = await app.inject({
         method: "GET",
         url: `/api/admin/gaze/sessions/${session.session_id}/export/manifest.json`,
@@ -1049,6 +1050,9 @@ describe("Server Biometric Acceptance Tests", () => {
       });
       const manifest = manifestRes.json();
       expect(manifest.analysis_ready).toBe(false);
+      // Gaze is kept regardless, with the error needed to choose a cutoff at analysis time.
+      expect(manifest.calibration).toEqual({ max_error_deg: 12.5, mean_error_deg: 8, cutoff_deg: 10, within_cutoff: false });
+      expect(manifest.counts.samples).toBe(5);
     });
 
     it("trust-boundary gate: rejects analysis_ready when stored samples are all invalid despite client claiming missing_pct:0", async () => {

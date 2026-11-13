@@ -59,7 +59,9 @@ save verification. Older PDFs describe the earlier protocol.
 
 Eye tracking requires separate consent and nine training points followed by held-out validation.
 Screen size and viewing distance are estimated automatically from the browser window when the
-camera starts (CSS reference pixel), so degrees are approximate. The 1.5° gate applies to gaze.
+camera starts (CSS reference pixel), so degrees are approximate. Gaze is recorded for everyone
+who completes calibration; each session stores its calibration error, sessions within the 10°
+cutoff are marked analysis-ready, and a different cutoff can be applied at analysis.
 Participants can finish the study if they decline eye tracking or calibration fails.
 Resizing after capture starts invalidates gaze. Camera startup can retry in the same page.
 Raw video is never retained. Synthetic gaze is never eligible for analysis.

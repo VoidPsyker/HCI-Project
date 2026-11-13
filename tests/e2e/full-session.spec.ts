@@ -8,7 +8,7 @@ import { navigateToLeaf, nodeLocator, resetMenu } from "./support/menu-actions";
  * (?fast=1 shortens timers only). Needs the API server and live Vite (PW_BASE_URL=http://127.0.0.1:5173).
  *
  * A stand-in replaces the bundled WebGazer module and "looks at" the active calibration target, so the
- * real nine-point calibration, held-out validation and 1.5° gate run unchanged. It never touches a
+ * real nine-point calibration and held-out validation run unchanged. It never touches a
  * camera, so this proves the flow and data pipeline, not human gaze accuracy.
  */
 const scriptedGaze = (failCalibration: boolean) => `
@@ -89,7 +89,7 @@ test.afterEach(async ({ request }) => {
   sessionId = null;
 });
 
-for (const failCalibration of [false, true]) test("@session completes the pilot with " + (failCalibration ? "failed calibration" : "valid gaze"), async ({ page, request, net }) => {
+for (const failCalibration of [false, true]) test("@session completes the pilot with " + (failCalibration ? "gaze recorded beyond the calibration cutoff" : "valid gaze"), async ({ page, request, net }) => {
   test.setTimeout(600_000);
   page.setDefaultTimeout(20_000);
   const created = await request.post("/api/admin/sessions", { headers: ADMIN, data: { label: `SYNTHETIC scripted participant ${failCalibration ? "failed" : "valid"}` } });
@@ -128,11 +128,8 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   }
 
   await page.getByTestId("gaze-calibration-start").click();
-  await page.getByTestId(failCalibration ? "gaze-failure-continue" : "gaze-calibration-continue").click({ timeout: 60_000 });
-  if (failCalibration) {
-    await page.reload();
-    await expect(page.getByTestId("start-induction")).toBeVisible();
-  }
+  // Gaze continues whatever the calibration error; the cutoff is applied at analysis.
+  await page.getByTestId("gaze-calibration-continue").click({ timeout: 60_000 });
 
   let mainIndex = 0;
   for (const block of design.blocks) {
@@ -229,16 +226,12 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
 
   const gazeCsvPath = "/api/admin/gaze/sessions/" + sessionId + "/export/gaze_samples.csv";
   expect((await request.get(gazeCsvPath)).status()).toBe(401);
+  const manifest = await (await request.get(`/api/admin/gaze/sessions/${sessionId}/export/manifest.json`, { headers: ADMIN })).json();
+  expect(manifest.calibration.cutoff_deg).toBe(10);
+  expect(manifest.calibration.within_cutoff).toBe(!failCalibration);
   if (failCalibration) {
-    expect(trialEvents.some((row) => row.event_type === "trial_start")).toBe(true);
-    const recordedEvents = (await events.text()).trim().split("\n").map((line) => JSON.parse(line));
-    expect(recordedEvents).toContainEqual(expect.objectContaining({
-      session_id: sessionId,
-      event_type: "gaze_unavailable",
-      meta: { reason: "calibration_failed" }
-    }));
-    expect((await request.get(gazeCsvPath, { headers: ADMIN })).status()).toBe(404);
-    return;
+    expect(manifest.calibration.max_error_deg).toBeGreaterThan(10);
+    expect(manifest.analysis_ready).toBe(false);
   }
   const gazeCsv = await request.get(gazeCsvPath, { headers: ADMIN });
   expect(gazeCsv.ok()).toBe(true);

@@ -351,7 +351,7 @@ describe("End-to-End Deterministic Synthetic Biometric Pipeline Flow", () => {
     await readyController.stop();
   });
 
-  it("4. Calibration gate enforcement: failing calibration strictly denies trial initiation", async () => {
+  it("4. Calibration beyond the cutoff still records trials and keeps the error", async () => {
     const { session } = await createConsentedSession();
     const source = new SyntheticDeterministicSource();
     source.mode = "fail"; // Emits observations deviating by >10 degrees
@@ -391,22 +391,23 @@ describe("End-to-End Deterministic Synthetic Biometric Pipeline Flow", () => {
 
     const report = controller.finishCalibration();
     expect(report.passes).toBe(false);
-    expect(controller.calibrationGatePassed).toBe(false);
-    expect(controller.status).toBe("failed");
+    expect(report.max_error_deg!).toBeGreaterThan(report.criterion_deg);
+    expect(controller.calibrated).toBe(true);
+    expect(controller.status).toBe("calibrated");
 
-    // Calibration gate must strictly prevent beginning trials
+    // Gaze is recorded anyway; the cutoff is applied at analysis time.
     await expect(
       controller.beginTrial({
-        trial_id: "trial-blocked",
+        trial_id: "trial-beyond-cutoff",
         menu_id: "A",
         target_product_id: "sport.prodiver.titanium-deep"
       })
-    ).rejects.toThrow("gaze_calibration_gate_not_passed");
+    ).resolves.toEqual({ start_ms: expect.any(Number) });
 
     await controller.stop();
   });
 
-  it("5. Calibration gate pass: accurate synthetic calibration passes gate and enables trial", async () => {
+  it("5. Accurate synthetic calibration is within the cutoff and enables trial", async () => {
     const { session } = await createConsentedSession();
     const source = new SyntheticDeterministicSource();
     source.mode = "pass"; // Minimal error (< 0.5 degrees)
@@ -444,7 +445,7 @@ describe("End-to-End Deterministic Synthetic Biometric Pipeline Flow", () => {
     const report = controller.finishCalibration();
     expect(report.passes).toBe(true);
     expect(report.angular_available).toBe(true);
-    expect(controller.calibrationGatePassed).toBe(true);
+    expect(controller.calibrated).toBe(true);
     expect(controller.status).toBe("calibrated");
 
     await controller.stop();

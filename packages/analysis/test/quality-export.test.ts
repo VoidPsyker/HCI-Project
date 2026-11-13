@@ -53,7 +53,7 @@ describe("gaze quality", () => {
     expect(report.angular_metrics_ready).toBe(true);
     expect(report.missing_pct).toBe(0);
     expect(report.effective_sample_rate_hz).toBeCloseTo(100, 6);
-    expect(report.thresholds).toMatchObject({ calibration_points: 9, calibration_error_deg: 1.5, missing_pct: 20 });
+    expect(report.thresholds).toMatchObject({ calibration_points: 9, calibration_error_deg: 10, missing_pct: 20 });
   });
 
   it("fails when more than 20 percent of gaze is missing", () => {
@@ -97,12 +97,13 @@ describe("gaze quality", () => {
     expect(report.exclusions).toContain("calibration_points_incomplete");
   });
 
-  it("fails the 1.5 degree gate on measured held-out error, regardless of device model", () => {
-    const report = quality({ calibration: calibration({ offsetPx: 20 }) });
+  it("marks held-out error above the 10 degree cutoff as not analysis-ready", () => {
+    expect(quality({ calibration: calibration({ offsetPx: 20 }) }).analysis_ready).toBe(true);
+    const report = quality({ calibration: calibration({ offsetPx: 120 }) });
     const check = report.checks.find((item) => item.id === "calibration_error_deg");
     expect(check?.status).toBe("fail");
-    expect(check?.value).toContain("2.29");
     expect(report.overall).toBe("fail");
+    expect(report.analysis_ready).toBe(false);
   });
 
   it("is not evaluable without measured geometry rather than fabricating degrees", () => {

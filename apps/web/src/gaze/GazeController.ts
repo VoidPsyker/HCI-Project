@@ -61,7 +61,6 @@ export interface GazeControllerOptions {
   now?: () => number;
   wait?: (milliseconds: number) => Promise<void>;
   viewportNow?: () => Viewport;
-  criterionDeg?: number;
   settleMs?: number;
   dwellMs?: number;
   batchSize?: number;
@@ -111,8 +110,8 @@ function visible(element: HTMLElement): boolean {
 /**
  * Participant-side gaze orchestration: server consent first, then camera,
  * calibration/held-out validation, trial windows and AOI snapshots, bounded
- * ingestion, and a restricted completion bundle. The calibration gate is
- * checked here and again on the server; a failed gate never reaches trials.
+ * ingestion, and a restricted completion bundle. Calibration error never blocks
+ * trials; it is stored, and the server recomputes the analysis cutoff.
  */
 export class GazeController implements GazeTrialHandle {
   readonly targets: CalibrationTarget[];
@@ -171,9 +170,9 @@ export class GazeController implements GazeTrialHandle {
     return this.calibrationReport;
   }
 
-  get calibrationGatePassed(): boolean {
-    return ["calibrated", "ready", "trials", "paused"].includes(this.state) &&
-      this.calibrationReport?.passes === true && this.calibrationReport.angular_available === true;
+  /** Calibration finished in this window. Its error never blocks trials; analysis applies the cutoff. */
+  get calibrated(): boolean {
+    return ["calibrated", "ready", "trials", "paused"].includes(this.state) && this.calibrationReport !== null;
   }
 
   get pendingUploads(): number {
@@ -371,12 +370,11 @@ export class GazeController implements GazeTrialHandle {
     const report = summarizeCalibration(
       this.targetsForViewport,
       this.observations,
-      this.options.geometry,
-      this.options.criterionDeg ?? 1.5
+      this.options.geometry
     );
     this.calibrationReport = report;
     this.session.setCalibration(report);
-    this.setStatus(report.passes === true && report.angular_available ? "calibrated" : "failed");
+    this.setStatus("calibrated");
     return report;
   }
 
@@ -422,11 +420,11 @@ export class GazeController implements GazeTrialHandle {
   };
 
   async beginTrial(input: GazeTrialStart): Promise<{ start_ms: number }> {
-    if (!this.session || !this.calibrationGatePassed) throw new Error("gaze_calibration_gate_not_passed");
+    if (!this.session || !this.calibrated) throw new Error("gaze_not_calibrated");
     if (this.active) throw new Error("gaze_trial_already_active");
     this.assertViewport();
     if (this.source.status === "paused") await this.source.resume();
-    if (!this.calibrationGatePassed || this.source.status !== "running") throw new Error("gaze_calibration_gate_not_passed");
+    if (!this.calibrated || this.source.status !== "running") throw new Error("gaze_not_calibrated");
     const startMs = this.now();
     this.session.startTrial({
       trial_id: input.trial_id,
