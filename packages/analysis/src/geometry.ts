@@ -19,6 +19,27 @@ export function assertScreenGeometry(geometry: ScreenGeometry): void {
   }
 }
 
+const MM_PER_INCH = 25.4;
+// CSS reference pixel: one 96-dpi pixel viewed at arm's length (28 in), about 0.0213° of visual angle.
+const CSS_PX_PER_INCH = 96;
+const CSS_REFERENCE_DISTANCE_MM = 28 * MM_PER_INCH;
+
+/**
+ * Participants cannot measure their screen and browsers do not expose its physical size, so
+ * geometry is estimated from the CSS reference pixel, which browsers and operating systems
+ * scale displays to approximate. Degrees are therefore approximate, not measured.
+ */
+export function estimateScreenGeometry(viewport: Viewport): ScreenGeometry {
+  assertViewport(viewport);
+  return {
+    width_px: viewport.width_px,
+    height_px: viewport.height_px,
+    width_mm: (viewport.width_px / CSS_PX_PER_INCH) * MM_PER_INCH,
+    height_mm: (viewport.height_px / CSS_PX_PER_INCH) * MM_PER_INCH,
+    viewing_distance_mm: CSS_REFERENCE_DISTANCE_MM
+  };
+}
+
 /**
  * The pixel dimensions used for angular conversion must be the same capture
  * viewport the tracker reports coordinates in. A screen resolution that does

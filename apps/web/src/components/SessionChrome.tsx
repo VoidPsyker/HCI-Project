@@ -9,7 +9,6 @@ const PHASE_LABEL: Record<RunnerPhase, string> = {
   error: "Error",
   consent: "Consent",
   gaze_consent: "Gaze consent",
-  gaze_setup: "Screen setup",
   calibration: "Eye calibration",
   gaze_failed: "Gaze excluded",
   demographics: "Demographics",

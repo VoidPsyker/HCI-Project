@@ -1,6 +1,6 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { manipulationCheckPassed, reportedState, type GazeUnavailableReason, type StateLabel } from "@meridian/scoring";
-import type { CalibrationReport, GazeSourceStatus, ScreenGeometry } from "@meridian/analysis";
+import { estimateScreenGeometry, type CalibrationReport, type GazeSourceStatus } from "@meridian/analysis";
 import { loadSession, loadSessionStatus, patchSessionState, recordConsent, stopSession, submitDemographics, submitQuestionnaires, withdrawSession } from "./api";
 import { EventLogger } from "./logger";
 import { useRunnerStore } from "./store";
@@ -8,7 +8,6 @@ import type { CheckinPayload, SessionInfo, StudyDesign } from "./types";
 import { SessionChrome } from "./components/SessionChrome";
 import { ConsentScreen } from "./screens/Consent";
 import { GazeConsentScreen } from "./screens/GazeConsent";
-import { GazeSetupScreen } from "./screens/GazeSetup";
 import { GazeCalibrationScreen } from "./screens/GazeCalibration";
 import { GazeFailureScreen } from "./screens/GazeFailure";
 import { DemographicsScreen } from "./screens/Demographics";
@@ -28,7 +27,6 @@ import { GAZE_CONSENT_VERSION, SESSION_TIMING } from "./content";
 
 const SERVER_PHASE: Partial<Record<string, string>> = {
   gaze_consent: "consent",
-  gaze_setup: "setup",
   calibration: "calibration",
   gaze_failed: "excluded",
   baseline: "baseline",
@@ -179,19 +177,21 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     if (state.phase !== "calibration") return;
     if (loading || state.sessionId !== sessionId) return;
     if (gazeStartingRef.current || (gazeRef.current && gazeRef.current.status !== "failed")) return;
-    if (!state.session || !state.gazeConsent || !state.gazeViewport || !state.gazeGeometry) return;
+    if (!state.session || !state.gazeConsent) return;
     let cancelled = false;
     gazeStartingRef.current = true;
     setGazeStarting(true);
     setGazeStartError(null);
     setGazeReport(null);
     let previousSourceStatus: GazeSourceStatus = "idle";
+    // Captured when the camera starts, so earlier window changes cannot invalidate calibration.
+    const viewport = { width_px: window.innerWidth, height_px: window.innerHeight };
     const controller: GazeController = gazeRef.current ?? new GazeController({
       participant_id: state.session.participant_id,
       session_id: state.session.session_id,
       consent: state.gazeConsent,
-      viewport: state.gazeViewport,
-      geometry: state.gazeGeometry,
+      viewport,
+      geometry: estimateScreenGeometry(viewport),
       source: new WebGazerSource({
         participant_id: state.session.participant_id,
         session_id: state.session.session_id,
@@ -260,9 +260,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     gazeAttempt,
     state.session?.session_id,
     state.session?.participant_id,
-    state.gazeConsent,
-    state.gazeViewport,
-    state.gazeGeometry
+    state.gazeConsent
   ]);
 
   useEffect(() => {
@@ -306,7 +304,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         camera_used: cameraUsed
       });
       state.setGazeConsent(consent);
-      state.setPhase("gaze_setup");
+      state.setPhase("demographics");
     } catch (gazeConsentError) {
       setBanner((gazeConsentError as Error).message);
     } finally {
@@ -330,14 +328,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setBanner(null);
     state.setPhase(reason === "consent_declined" ? "demographics" : state.calibrationResumePhase ?? "block_intro");
     void gazeRef.current?.stop().catch(() => undefined);
-  };
-
-  const handleGazeSetup = (geometry: ScreenGeometry) => {
-    state.setGazeSetup({
-      viewport: { width_px: geometry.width_px, height_px: geometry.height_px },
-      geometry
-    });
-    state.setPhase("demographics");
   };
 
   const handleCalibrated = (report: CalibrationReport) => {
@@ -660,8 +650,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         error={banner}
       />
     );
-  } else if (state.phase === "gaze_setup") {
-    content = <GazeSetupScreen onSubmit={handleGazeSetup} busy={busy} error={banner} />;
   } else if (state.phase === "calibration") {
     content = (
       <GazeCalibrationScreen

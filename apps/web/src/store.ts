@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { GazeUnavailableReason } from "@meridian/scoring";
-import type { GazeConsent, ScreenGeometry, Viewport } from "@meridian/analysis";
+import type { GazeConsent } from "@meridian/analysis";
 import type { StudyDesign, SessionInfo, ParticipantInfo } from "./types";
 
 export type RunnerPhase =
@@ -9,7 +9,6 @@ export type RunnerPhase =
   | "error"
   | "consent"
   | "gaze_consent"
-  | "gaze_setup"
   | "calibration"
   | "gaze_failed"
   | "demographics"
@@ -48,8 +47,6 @@ interface RunnerState {
   calibrationResumePhase: RunnerPhase | null;
   gazeConsent: GazeConsent | null;
   gazeUnavailable: GazeUnavailableReason | null;
-  gazeViewport: Viewport | null;
-  gazeGeometry: ScreenGeometry | null;
   setBootstrap: (bundle: {
     session: SessionInfo;
     participant: ParticipantInfo | null;
@@ -63,7 +60,6 @@ interface RunnerState {
   setStartedLogged: (value: boolean) => void;
   setCheckinPhase: (phase: "baseline" | "post_induction" | "post_trials") => void;
   setGazeConsent: (consent: GazeConsent) => void;
-  setGazeSetup: (setup: { viewport: Viewport; geometry: ScreenGeometry }) => void;
   setGazeUnavailable: (reason: GazeUnavailableReason) => void;
   clearGaze: () => void;
   startPractice: () => void;
@@ -93,9 +89,7 @@ const initial = {
   stopSource: null,
   calibrationResumePhase: null,
   gazeConsent: null,
-  gazeUnavailable: null,
-  gazeViewport: null,
-  gazeGeometry: null
+  gazeUnavailable: null
 };
 
 function resumePhase(phase: RunnerPhase, hasGaze: boolean): RunnerPhase {
@@ -117,8 +111,6 @@ export const useRunnerStore = create<RunnerState>()(
         const restore = (patch: Partial<RunnerState>) => set(same ? patch : { ...initial, ...patch });
         const gazeConsent = same ? previous.gazeConsent : null;
         const gazeUnavailable = same ? previous.gazeUnavailable : null;
-        const gazeViewport = same ? previous.gazeViewport : null;
-        const gazeGeometry = same ? previous.gazeGeometry : null;
         if (session.status === "completed") {
           restore({
             sessionId: session.session_id,
@@ -127,9 +119,7 @@ export const useRunnerStore = create<RunnerState>()(
             design,
             phase: "complete",
             fastMode,
-            gazeConsent,
-            gazeViewport,
-            gazeGeometry
+            gazeConsent
           });
           return;
         }
@@ -143,9 +133,7 @@ export const useRunnerStore = create<RunnerState>()(
             fastMode,
             abortReason: session.abort_reason ?? "stopped_by_server",
             stopSource: same && previous.stopSource ? previous.stopSource : session.abort_reason === "participant_stop" || session.abort_reason?.startsWith("distress_") ? "participant" : "system",
-            gazeConsent,
-            gazeViewport,
-            gazeGeometry
+            gazeConsent
           });
           return;
         }
@@ -157,9 +145,7 @@ export const useRunnerStore = create<RunnerState>()(
             design,
             phase: "consent",
             fastMode,
-            gazeConsent: null,
-            gazeViewport: null,
-            gazeGeometry: null
+            gazeConsent: null
           });
           return;
         }
@@ -171,23 +157,7 @@ export const useRunnerStore = create<RunnerState>()(
             design,
             phase: "gaze_consent",
             fastMode,
-            gazeConsent: null,
-            gazeViewport: null,
-            gazeGeometry: null
-          });
-          return;
-        }
-        if (!gazeGeometry && !gazeUnavailable) {
-          restore({
-            sessionId: session.session_id,
-            session,
-            participant,
-            design,
-            phase: "gaze_setup",
-            fastMode,
-            gazeConsent,
-            gazeViewport,
-            gazeGeometry: null
+            gazeConsent: null
           });
           return;
         }
@@ -199,9 +169,7 @@ export const useRunnerStore = create<RunnerState>()(
             design: null,
             phase: "demographics",
             fastMode,
-            gazeConsent,
-            gazeViewport,
-            gazeGeometry
+            gazeConsent
           });
           return;
         }
@@ -212,8 +180,7 @@ export const useRunnerStore = create<RunnerState>()(
           phase === "error" ||
           phase === "consent" ||
           phase === "demographics" ||
-          phase === "gaze_consent" ||
-          phase === "gaze_setup"
+          phase === "gaze_consent"
         ) {
           phase = "baseline";
         }
@@ -241,9 +208,7 @@ export const useRunnerStore = create<RunnerState>()(
           trialIndex: same ? previous.trialIndex : 0,
           checkinPhase: same ? previous.checkinPhase : "baseline",
           startedLogged: same ? previous.startedLogged : false,
-          gazeConsent,
-          gazeViewport,
-          gazeGeometry
+          gazeConsent
         });
       },
       setPhase: (phase) => {
@@ -256,10 +221,8 @@ export const useRunnerStore = create<RunnerState>()(
       setStartedLogged: (startedLogged) => set({ startedLogged }),
       setCheckinPhase: (checkinPhase) => set({ checkinPhase }),
       setGazeConsent: (gazeConsent) => set({ gazeConsent }),
-      setGazeSetup: ({ viewport, geometry }) =>
-        set({ gazeViewport: viewport, gazeGeometry: geometry }),
       setGazeUnavailable: (gazeUnavailable) => set({ gazeUnavailable }),
-      clearGaze: () => set({ gazeConsent: null, gazeViewport: null, gazeGeometry: null }),
+      clearGaze: () => set({ gazeConsent: null }),
       startPractice: () => {
         if (get().abortReason || get().phase === "complete") return;
         set({ phase: "practice_intro", practiceIndex: 0 });
@@ -324,9 +287,7 @@ export const useRunnerStore = create<RunnerState>()(
         stopSource: state.stopSource,
         calibrationResumePhase: state.calibrationResumePhase,
         gazeConsent: state.gazeConsent,
-        gazeUnavailable: state.gazeUnavailable,
-        gazeViewport: state.gazeViewport,
-        gazeGeometry: state.gazeGeometry
+        gazeUnavailable: state.gazeUnavailable
       })
     }
   )

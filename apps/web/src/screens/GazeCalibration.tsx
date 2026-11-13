@@ -166,7 +166,7 @@ export function GazeCalibrationScreen({
           </div>
         ) : null}
         <div className="panel-actions">
-          <span className="small-note">Keep the browser fullscreen or the measured window unchanged.</span>
+          <span className="small-note">Keep this browser window the same size until the study ends.</span>
           <button type="button" className="button primary big" onClick={() => void run()} data-testid="gaze-calibration-start">
             Begin calibration
           </button>

@@ -174,9 +174,7 @@ describe("ExperimentRunner calibration reload", () => {
         camera_used: true,
         raw_video_retention: false,
         separate_from_core_consent: true
-      },
-      gazeViewport: { width_px: 1920, height_px: 1080 },
-      gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 }
+      }
     });
 
     render(<ExperimentRunner sessionId="S-race" />);
@@ -206,9 +204,7 @@ describe("ExperimentRunner calibration reload", () => {
         camera_used: true,
         raw_video_retention: false,
         separate_from_core_consent: true
-      },
-      gazeViewport: { width_px: 1920, height_px: 1080 },
-      gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 }
+      }
     });
 
     render(<ExperimentRunner sessionId="S-race" />);
@@ -223,7 +219,7 @@ describe("ExperimentRunner calibration reload", () => {
   });
   it("finalizes recovered gaze before completing a reloaded debrief", async () => {
     mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
-    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "debrief", gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 }, gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true } });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "debrief", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true } });
     mocks.resumeGazeFinalization.mockResolvedValue({ ok: true });
     render(<ExperimentRunner sessionId="S-race" />);
     await screen.findByTestId("debrief-screen");
@@ -246,7 +242,7 @@ describe("ExperimentRunner calibration reload", () => {
     mocks.start.mockResolvedValue(undefined);
     mocks.stop.mockResolvedValue(undefined);
     mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
-    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true }, gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 } });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true } });
     render(<ExperimentRunner sessionId="S-race" />);
     await screen.findByTestId("gaze-calibration-start");
     act(() => {
@@ -266,7 +262,7 @@ describe("ExperimentRunner calibration reload", () => {
     });
     mocks.stop.mockResolvedValue(undefined);
     mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
-    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true }, gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 } });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true } });
     render(<ExperimentRunner sessionId="S-race" />);
     expect(await screen.findByText(/camera is busy/)).toBeVisible();
     await new Promise((resolve) => setTimeout(resolve, 50));

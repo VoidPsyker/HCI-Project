@@ -13,7 +13,7 @@ it("distinguishes server termination from participant stop across bootstrap", ()
   expect(useRunnerStore.getState().stopSource).toBe("participant");
 });
 it("returns to the interrupted trial after reload calibration", () => {
-  useRunnerStore.setState({ sessionId: "s", phase: "trial", gazeConsent: {} as never, gazeGeometry: {} as never });
+  useRunnerStore.setState({ sessionId: "s", phase: "trial", gazeConsent: {} as never });
   useRunnerStore.getState().setBootstrap(bundle);
   expect(useRunnerStore.getState()).toMatchObject({ phase: "calibration", calibrationResumePhase: "trial_intro" });
 });

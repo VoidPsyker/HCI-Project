@@ -7,7 +7,7 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 
 - **Webcam eye tracking is kept and required for scored trials.** The build prompt says "no
   webcam or biometrics", and plan §3.3 calls eye tracking an *optional* extension with a
-  screen-based tracker (§11.4). This build uses WebGazer with separate consent, measured screen
+  screen-based tracker (§11.4). This build uses WebGazer with separate consent, estimated screen
   geometry, a 9-point calibration plus held-out validation and the plan's 1.5° gate. Refusing
   or failing it ends the session before scored trials. Emotion is still never inferred from
   face or gaze. The plan requires separate ethics approval for gaze (§11.4). See
@@ -52,7 +52,11 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   after 3 attempts. Bored: an early-exit button, logged as `induction_end` with
   `early_exit: true`. Each block's neutral reset opens with that induction's debrief line.
   Credibility is one 7-point item per induction.
-- **Session order.** Gaze consent and screen measurement come straight after core consent.
+- **Session order.** Gaze consent comes straight after core consent.
+- **Screen geometry is estimated, not measured.** Participants cannot measure their screen and
+  browsers do not report its physical size. When the camera starts, millimetres are derived from
+  the CSS reference pixel (96 px per inch, viewed at 28 in), so 1 px ≈ 0.0213°. Real displays
+  can differ by roughly a third, which scales every reported angle by the same factor.
   Calibration runs after the first post-induction check-in, immediately before the first
   scored trial.
 - **Abort & debrief** asks for a reason before it stops the session, to prevent accidental

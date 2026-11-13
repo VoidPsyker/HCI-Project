@@ -104,12 +104,6 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   await page.getByTestId("consent-continue").click();
   await page.getByTestId("gaze-consent-checkbox").check();
   await page.getByTestId("gaze-consent-grant").click();
-  await page.getByTestId("gaze-width-mm").fill("530");
-  await page.getByTestId("gaze-height-mm").fill("300");
-  await page.getByTestId("gaze-distance-mm").fill("600");
-  await page.getByTestId("gaze-measured-confirm").check();
-  await page.getByTestId("gaze-windowed-confirm").check();
-  await page.getByTestId("gaze-setup-continue").click();
 
   const field = (label: string) =>
     page.locator("label.field", { has: page.locator("span", { hasText: new RegExp(`^${label}$`) }) }).locator("select");

@@ -35,9 +35,10 @@ no biometrics” is now wrong and must be changed by that integration.
    explicit and versioned; webcam use additionally needs camera consent. There
    is no default grant. Refusal or withdrawal means no eye-tracking data; never
    substitute synthetic data for a refusing participant.
-2. **Measure the display**: physical width/height in millimetres and viewing
-   distance in millimetres, plus the CSS-pixel viewport used for gaze
-   coordinates. `ScreenGeometry.width_px`/`height_px` must equal the capture
+2. **Estimate the display** when the camera starts: `estimateScreenGeometry`
+   derives millimetres and viewing distance from the CSS reference pixel
+   (96 px per inch at 28 in) for the CSS-pixel viewport used for gaze
+   coordinates. Angles are approximate; see `ASSUMPTIONS.md`. `ScreenGeometry.width_px`/`height_px` must equal the capture
    viewport exactly; `GazeSession` and export reject a mismatch.
 3. **Start acquisition** only after server consent. `GazeController.start()`
    awaits `api.consent`, then creates the session and starts the camera.
@@ -313,8 +314,8 @@ fallback.
 1. Add a gaze/camera consent screen after core consent, with explicit
    grant/refuse and versioning. Wire refusal to “no biometrics” and the study's
    exclusion/stop rule. Remove the old “no webcam / no biometrics” copy.
-2. Capture measured screen millimetres, viewing distance, and the exact capture
-   viewport. Persist them with the session; never infer from resolution.
+2. Capture the exact capture viewport and its estimated geometry when the
+   camera starts, and persist them with the session.
 3. Create the source (`loadBundledWebGazer` for webcam, bound
    `WebSocketGazeSource` for a lab bridge) and a `GazeSession` with the same
    participant/session IDs, viewport, geometry, consent, and explicit

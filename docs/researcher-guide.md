@@ -31,12 +31,12 @@ pixel ratio; that warning is never shown to the participant.
 2. Open the link on the participant machine. The server assigns the sequence (block order,
    menu order, target set, colour mapping) after demographics and writes it to
    `assignments_audit`; the participant's browser never chooses a condition.
-3. Have a measuring tape ready: the eye-tracking setup asks for the visible screen width and
-   height in millimetres and the eye-to-screen distance.
+3. Ask the participant to keep the browser window the same size from calibration onwards;
+   screen geometry is estimated automatically when the camera starts.
 
 ## 3. During the session
 
-The participant works through: consent → eye-tracking consent and screen measurement →
+The participant works through: consent → eye-tracking consent →
 demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
 blocks (scenario → check-in → three trials → check-in with fatigue → 15-s neutral reset) →
 questionnaires → debrief. Eye-tracking calibration runs before the first induction;

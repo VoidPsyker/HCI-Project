@@ -40,19 +40,11 @@ test("requires separate consent and refusal continues core study without camera 
   await expect(page.getByTestId("start-trial")).toHaveCount(0);
 });
 
-test("keeps camera off through setup and invalidates measurements after resize", async ({ page }) => {
+test("goes from gaze consent to demographics without asking for screen measurements or the camera", async ({ page }) => {
   await coreConsent(page);
   await page.getByTestId("gaze-consent-checkbox").check();
   await page.getByTestId("gaze-consent-grant").click();
-  await expect(page.getByTestId("gaze-setup-screen")).toBeVisible();
-  await page.getByTestId("gaze-width-mm").fill("530");
-  await page.getByTestId("gaze-height-mm").fill("300");
-  await page.getByTestId("gaze-distance-mm").fill("600");
-  await page.getByTestId("gaze-measured-confirm").check();
-  await page.getByTestId("gaze-windowed-confirm").check();
-  await expect(page.getByTestId("gaze-setup-continue")).toBeEnabled();
-  await page.setViewportSize({ width: 1600, height: 900 });
-  await expect(page.getByTestId("gaze-setup-continue")).toBeDisabled();
+  await expect(page.getByTestId("demographics-screen")).toBeVisible();
   expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(0);
 });
 
@@ -60,12 +52,7 @@ async function calibrationFixture(page: import("@playwright/test").Page, request
   await coreConsent(page);
   await page.getByTestId("gaze-consent-checkbox").check();
   await page.getByTestId("gaze-consent-grant").click();
-  await page.getByTestId("gaze-width-mm").fill("530");
-  await page.getByTestId("gaze-height-mm").fill("300");
-  await page.getByTestId("gaze-distance-mm").fill("600");
-  await page.getByTestId("gaze-measured-confirm").check();
-  await page.getByTestId("gaze-windowed-confirm").check();
-  await page.getByTestId("gaze-setup-continue").click();
+  await expect(page.getByTestId("demographics-screen")).toBeVisible();
   const response = await request.post(`/api/sessions/${sessionId}/demographics`, { data: {
     age_band: "25-34", gender: "prefer not to say", education: "undergraduate",
     shopping_freq: "monthly", watch_expertise: 4, tech_savvy: 4, colour_vision: "typical"

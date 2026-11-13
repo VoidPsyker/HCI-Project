@@ -3,6 +3,7 @@ import {
   ClockSynchronizer,
   angularDistanceDeg,
   angularVelocityDegS,
+  estimateScreenGeometry,
   ninePointTargets,
   pingPongEstimate,
   summarizeCalibration
@@ -23,6 +24,15 @@ describe("screen geometry", () => {
     expect(centre).toBeCloseTo(11.3099, 3);
     expect(edge).toBeCloseTo(6.3402, 3);
     expect(edge).toBeLessThan(centre!);
+  });
+
+  it("estimates geometry from the CSS reference pixel (0.0213° per px at the centre)", () => {
+    const geometry = estimateScreenGeometry({ width_px: 1920, height_px: 1080 });
+    expect(geometry).toMatchObject({ width_px: 1920, height_px: 1080 });
+    expect(geometry.viewing_distance_mm).toBeCloseTo(711.2, 6);
+    expect(geometry.width_mm).toBeCloseTo(508, 6);
+    expect(geometry.height_mm).toBeCloseTo(285.75, 6);
+    expect(angularDistanceDeg({ x_px: 960, y_px: 540 }, { x_px: 961, y_px: 540 }, geometry)).toBeCloseTo(0.0213, 4);
   });
 
   it("rejects impossible geometry instead of guessing", () => {

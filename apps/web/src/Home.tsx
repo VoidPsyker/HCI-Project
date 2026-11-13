@@ -74,7 +74,7 @@ export function Home() {
             <span className="home-card-number">01</span>
             <h2>Participant run</h2>
             <p>
-              Consent, separate gaze consent, measured screen setup, calibration, demographics, baseline affect, six
+              Consent, separate gaze consent, calibration, demographics, baseline affect, six
               practice trials, four counterbalanced scenarios, twelve scored trials, check-ins, neutral resets,
               questionnaires, and debrief.
             </p>

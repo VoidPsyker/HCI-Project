@@ -17,7 +17,7 @@ sample three menus per state and each menu twice; they do not cover all 24 cells
 | End questionnaires | 1:15 |
 | Total | 15:00 |
 
-The estimates assume the researcher has screen measurements ready and that the participant
+The estimates assume the participant
 finishes most searches well before the individual limit. The longer plan expects a typical
 scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes 17 minutes.
 Measure the full session in a rehearsal and allow people enough time to read consent, calibrate,
