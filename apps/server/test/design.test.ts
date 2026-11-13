@@ -8,9 +8,8 @@ import {
   balancedLatinSquare,
   BLOCK_ORDERS,
   generateDesign,
-  SEQUENCE_BLOCK_SIZE,
+  SEQUENCE_CYCLE,
   sequenceFactors,
-  stratumSequenceIndex,
   type StateLabel
 } from "../src/design";
 import { Repository } from "../src/repository";
@@ -43,53 +42,64 @@ describe("Latin squares", () => {
 });
 
 describe("generateDesign", () => {
-  it("is reproducible from the seed and changes with it", () => {
+  const cycle = Array.from({ length: SEQUENCE_CYCLE }, (_, i) => design(i));
+  const tally = (keys: string[]) => Object.values(keys.reduce<Record<string, number>>((acc, k) => ({ ...acc, [k]: (acc[k] ?? 0) + 1 }), {}));
+
+  it("is a fixed schedule: the same sequence gives the same searches whatever the seed", () => {
     expect(design(5)).toEqual(design(5));
-    expect(design(5, "another-seed").practiceTrials).not.toEqual(design(5).practiceTrials);
+    expect(design(5, "another-seed").trials).toEqual(design(5).trials);
+    expect(design(5, "another-seed").practiceTrials).toEqual(design(5).practiceTrials);
   });
 
-  it("satisfies every structural rule for a full sequence block", () => {
-    for (let i = 0; i < SEQUENCE_BLOCK_SIZE; i++) expect(designErrors(`S${i}`, design(i))).toEqual([]);
+  it("satisfies every structural rule for a full cycle", () => {
+    for (const [i, d] of cycle.entries()) expect(designErrors(`S${i}`, d)).toEqual([]);
   });
 
-  it("balances every factor within one 24-sequence block", () => {
-    const factors = Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, i) => sequenceFactors(i));
-    const tally = (key: keyof (typeof factors)[number]) =>
-      Object.values(factors.reduce<Record<number, number>>((acc, f) => ({ ...acc, [f[key]]: (acc[f[key]] ?? 0) + 1 }), {}));
-    expect(tally("blockOrderRow")).toEqual([6, 6, 6, 6]);
-    expect(tally("menuRow")).toEqual([4, 4, 4, 4, 4, 4]);
-    expect(tally("targetSet")).toEqual([6, 6, 6, 6]);
+  it("meets every block order with every menu row once per 24 people", () => {
+    const factors = cycle.map((d) => sequenceFactors(d.sequenceIndex));
+    expect(tally(factors.map((f) => String(f.blockOrderRow)))).toEqual([6, 6, 6, 6]);
+    expect(tally(factors.map((f) => String(f.menuRow)))).toEqual([4, 4, 4, 4, 4, 4]);
+    expect(new Set(factors.map((f) => `${f.blockOrderRow}:${f.menuRow}`)).size).toBe(24);
     expect(new Set(factors.map((f) => f.colourRow)).size).toBe(24);
-    expect(new Set(factors.map((f) => `${f.targetSet}:${f.blockOrderRow}`)).size).toBe(16);
   });
 
-  it("gives every participant the plan's 12 tasks once, mixing difficulty within each block", () => {
-    for (let i = 0; i < SEQUENCE_BLOCK_SIZE; i++) {
-      const d = design(i);
+  it("gives every participant all 24 tasks once, two of each difficulty in every block", () => {
+    for (const d of cycle) {
       expect(d.trials.map((t) => t.taskId).sort()).toEqual(SCORED_TASKS.map((t) => t.id).sort());
       for (const block of d.blocks) {
-        const tiers = new Set(d.trials.filter((t) => t.blockId === block.blockId).map((t) => t.difficulty));
-        expect(tiers.size).toBeGreaterThanOrEqual(2);
+        expect(tally(d.trials.filter((t) => t.blockId === block.blockId).map((t) => t.difficulty))).toEqual([2, 2, 2]);
       }
     }
   });
 
-  it("moves each scored task through every block across the four task rotations", () => {
-    const blocksByTask = new Map<string, Set<number>>();
-    for (let i = 0; i < 4; i++) {
-      for (const trial of design(i).trials) blocksByTask.set(trial.taskId, (blocksByTask.get(trial.taskId) ?? new Set()).add(trial.blockIndex));
-    }
-    for (const blocks of blocksByTask.values()) expect([...blocks].sort()).toEqual([0, 1, 2, 3]);
+  it("puts each menu in each position after every emotion's scenario equally often", () => {
+    const trials = cycle.flatMap((d) => d.trials);
+    const counts = tally(trials.map((t) => `${t.stateLabel}:${t.menuId}:${t.trialIndex}`));
+    expect(counts).toHaveLength(4 * 6 * 6);
+    expect(new Set(counts)).toEqual(new Set([4]));
   });
 
-  it("practises the six plan-style practice tasks, one per menu", () => {
-    const practice = design(3).practiceTrials;
-    expect(practice.map((p) => p.taskId).sort()).toEqual(PRACTICE_TASKS.map((t) => t.id).sort());
-    expect(new Set(practice.map((p) => p.menuId)).size).toBe(6);
+  it("pairs every task with every menu equally often and every emotion with every task group", () => {
+    const trials = cycle.flatMap((d) => d.trials);
+    const taskMenu = tally(trials.map((t) => `${t.taskId}:${t.menuId}`));
+    expect(taskMenu).toHaveLength(24 * 6);
+    expect(new Set(taskMenu)).toEqual(new Set([4]));
+    const stateTask = tally(trials.map((t) => `${t.stateLabel}:${t.taskId}`));
+    expect(stateTask).toHaveLength(4 * 24);
+    expect(new Set(stateTask)).toEqual(new Set([6]));
+  });
+
+  it("practises the six practice tasks, one per menu, in an order no scored block uses", () => {
+    for (const d of cycle) {
+      const practice = d.practiceTrials;
+      expect(practice.map((p) => p.taskId)).toEqual(PRACTICE_TASKS.map((t) => t.id));
+      expect(new Set(practice.map((p) => p.menuId)).size).toBe(6);
+      for (const block of d.blocks) expect(block.menuIds).not.toEqual(practice.map((p) => p.menuId));
+    }
   });
 
   it("reports a balanced chi-square audit for a complete block", () => {
-    const report = buildBalanceReport(Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, i) => design(i)));
+    const report = buildBalanceReport(cycle);
     expect(report.design_errors).toEqual([]);
     expect(report.balance_ok).toBe(true);
     expect(report.chi_square.find((t) => t.factor === "block_order")?.chi_square).toBe(0);
@@ -108,20 +118,6 @@ describe("generateDesign", () => {
   it("flags an unbalanced allocation", () => {
     const report = buildBalanceReport(Array.from({ length: 24 }, () => design(0)));
     expect(report.balance_ok).toBe(false);
-  });
-});
-
-describe("stratified permuted blocks", () => {
-  it("walks a seeded permutation of a block, then generates a new block", () => {
-    const first = Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, k) => stratumSequenceIndex(SEED, "woman|weekly", k));
-    expect([...first].sort((a, b) => a - b)).toEqual(Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, i) => i));
-    expect(stratumSequenceIndex(SEED, "woman|weekly", SEQUENCE_BLOCK_SIZE)).toBeGreaterThanOrEqual(SEQUENCE_BLOCK_SIZE);
-    expect(stratumSequenceIndex(SEED, "woman|weekly", 3)).toBe(first[3]);
-  });
-
-  it("does not give every first participant of each stratum the same sequence", () => {
-    const strata = ["woman|weekly", "man|weekly", "woman|rarely", "man|rarely", "non-binary|monthly", "man|daily"];
-    expect(new Set(strata.map((s) => stratumSequenceIndex(SEED, s, 0))).size).toBeGreaterThan(1);
   });
 });
 
@@ -150,7 +146,7 @@ describe("server-side assignment audit", () => {
     return rows;
   }
 
-  it("writes sequence, orders, target set, colours and seed hash, reproducibly from the seed", () => {
+  it("writes sequence, orders, target set, colours and seed hash, in arrival order", () => {
     const a = assignAll(SEED);
     const b = assignAll(SEED);
     expect(a).toHaveLength(3);
@@ -159,6 +155,6 @@ describe("server-side assignment audit", () => {
     expect(a.map(pick)).toEqual(b.map(pick));
     expect(a[0]?.seed_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(a[0]?.seed_hash).not.toContain(SEED);
-    expect(a[0]?.sequence_index).not.toBe(a[2]?.sequence_index);
+    expect(a.map((row) => row.sequence_index)).toEqual([0, 1, 2]);
   });
 });

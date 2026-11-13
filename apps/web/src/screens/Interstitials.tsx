@@ -62,8 +62,8 @@ export function BlockIntroScreen({
           <span>rate how you feel</span>
         </div>
         <div>
-          <strong>Three searches</strong>
-          <span>up to {3 * SESSION_TIMING.scoredTrialSeconds} s searching</span>
+          <strong>Six searches</strong>
+          <span>up to {6 * SESSION_TIMING.scoredTrialSeconds} s searching</span>
         </div>
         <div>
           <strong>Neutral reset</strong>

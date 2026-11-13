@@ -103,11 +103,10 @@ it('rejects invalid PORT configuration before starting the server', async () => 
  try { await expect(import('../src/config')).rejects.toThrow(); }
  finally { vi.unstubAllEnvs(); vi.resetModules(); }
 });
-it('does not reuse a stratum allocation position after withdrawal', async () => {
- const { stratumSequenceIndex } = await import('../src/design');
- const allocate = () => { const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1'); const design = repo.assignDesign(session.session_id, { gender: 'woman', shopping_freq: 'rarely' }); return { session, design }; };
- const first = allocate(); allocate(); repo.withdrawSession(first.session.session_id);
- expect(allocate().design.sequenceIndex).toBe(stratumSequenceIndex(repo.seed, 'woman|rarely', 2));
+it('allocates the fixed schedule in arrival order and never reuses a position after withdrawal', () => {
+ const allocate = (gender: string) => { const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1'); const design = repo.assignDesign(session.session_id, { gender, shopping_freq: 'rarely' }); return { session, design }; };
+ const first = allocate('woman'); expect(allocate('man').design.sequenceIndex).toBe(1); repo.withdrawSession(first.session.session_id);
+ expect(first.design.sequenceIndex).toBe(0); expect(allocate('woman').design.sequenceIndex).toBe(2);
 });
 it('persists numeric demographic ratings as numbers', () => {
  const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1');

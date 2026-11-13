@@ -92,7 +92,7 @@ it("measures the short pilot from consent to completion across reloads and exclu
     },
     {
       session_id, event_type: "session_end", t_client: 5,
-      meta_json: JSON.stringify({ completed: true, wall_time_ms: session_id === "fast" ? 1_020_000 : 1_960_000 })
+      meta_json: JSON.stringify({ completed: true, wall_time_ms: session_id === "fast" ? 1_020_000 : 2_260_000 })
     }
   ]);
   const repo = {
@@ -100,5 +100,5 @@ it("measures the short pilot from consent to completion across reloads and exclu
     allEvents: () => events, allQuestionnaires: () => []
   } as unknown as Repository;
   const duration = buildGoNoGo(repo).find((item) => item.id === "session_duration");
-  expect(duration).toMatchObject({ status: "fail", value: "16.0 min (1 session)" });
+  expect(duration).toMatchObject({ status: "fail", value: "21.0 min (1 session)" });
 });

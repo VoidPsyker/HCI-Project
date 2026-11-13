@@ -230,7 +230,7 @@ export function QuestionnairesScreen({
           <div className="nasa-page" data-testid="nasa-page">
             <h2>Workload (NASA-TLX)</h2>
             <p className="nasa-intro">
-              &ldquo;The task&rdquo; means the 12 searches as a whole. Move each slider: <strong>left is very low, right is very
+              &ldquo;The task&rdquo; means the 24 searches as a whole. Move each slider: <strong>left is very low, right is very
               high</strong>. The success question is the other way round: <strong>left is perfect, right is failure</strong>.
             </p>
             {NASA_ITEMS.map((item) => (

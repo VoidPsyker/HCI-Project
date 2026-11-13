@@ -79,13 +79,13 @@ export function CheckinScreen({
       ? "How do you feel right now?"
       : phase === "post_induction"
         ? "Check in after the scenario"
-        : "Check in after the three trials";
+        : "Check in after the six searches";
   const subtitle =
     phase === "baseline"
       ? "There are no right answers. This is the baseline before any menu practice."
       : phase === "post_induction"
         ? "We are checking the scenario, not you. Be honest even if the feeling was mild."
-        : "Notice how the last three trials affected you. A neutral reset follows.";
+        : "Notice how the last six searches affected you. A neutral reset follows.";
 
   return (
     <section className="panel wide checkin-panel" data-testid="checkin-screen">

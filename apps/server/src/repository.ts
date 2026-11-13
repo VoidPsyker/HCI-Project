@@ -8,7 +8,7 @@ import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { toCsv } from "./exports";
 import { SCHEMA_SQL } from "./schema";
-import { generateDesign, designSummary, stratumSequenceIndex, type StudyDesign, type StateLabel } from "./design";
+import { generateDesign, designSummary, type StudyDesign, type StateLabel } from "./design";
 
 type Db = InstanceType<typeof Database>;
 
@@ -353,11 +353,10 @@ export class Repository {
           session.participant_id
         );
 
-      // Allocation history must survive deletion of participant records.
-      const allocationKey = `stratum_allocation:${crypto.createHash("sha256").update(stratum).digest("hex")}`;
-      const position = Number(this.getMeta(allocationKey) ?? 0);
-      const assigned = sequenceOverride ?? stratumSequenceIndex(this.seed, stratum, position);
-      this.setMeta(allocationKey, String(position + 1));
+      // Participants take the fixed schedule in arrival order; the count survives deletion of participant records.
+      const position = Number(this.getMeta("allocation_position") ?? 0);
+      const assigned = sequenceOverride ?? position;
+      this.setMeta("allocation_position", String(position + 1));
       const design = generateDesign({
         sessionId,
         participantId: session.participant_id,

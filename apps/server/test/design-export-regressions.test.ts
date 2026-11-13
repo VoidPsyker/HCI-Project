@@ -46,7 +46,7 @@ it("does not pass practice success with five untested menus", () => {
 it("counts missing trials per completed session without borrowing in-progress trials", () => {
   const repo = repository({ listAdminSessions: () => [{ session_id: "done", status: "completed" }],
     allTrials: () => Array.from({ length: 18 }, (_, i) => ({ session_id: "other", trial_id: `${i}`, practice: false, success: false })) });
-  expect(buildQaReport(repo).data_quality.missing_trial_ends).toBe(18);
+  expect(buildQaReport(repo).data_quality.missing_trial_ends).toBe(30);
 });
 it("rejects invalid seed counts before removing existing sessions", () => {
   let read = false;
@@ -75,7 +75,7 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
     seedDatabase(repo, 2);
     const session = repo.listAdminSessions()[0]!;
     const before = buildExportBundle(repo);
-    expect(before.find((file) => file.name === "trials.jsonl")!.rows).toBe(36);
+    expect(before.find((file) => file.name === "trials.jsonl")!.rows).toBe(60);
     expect(before.every((file) => !file.name.includes("gaze"))).toBe(true);
     const trials = before.find((file) => file.name === "trials.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
     expect(trials.every((trial) => trial.synthetic === true)).toBe(true);
@@ -86,7 +86,7 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
       expect(file.content).not.toContain(session.session_id);
       expect(file.content).not.toContain(session.participant_id);
     }
-    expect(after.find((file) => file.name === "trials.jsonl")!.rows).toBe(18);
+    expect(after.find((file) => file.name === "trials.jsonl")!.rows).toBe(30);
   } finally {
     repo.close();
     fs.rmSync(directory, { recursive: true, force: true });

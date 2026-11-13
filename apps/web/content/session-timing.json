@@ -1,6 +1,6 @@
 {
-  "protocolVersion": "short-pilot-v4",
-  "targetSeconds": 900,
+  "protocolVersion": "study-v5",
+  "targetSeconds": 1200,
   "scoredTrialSeconds": 60,
   "practiceTrialSeconds": 45,
   "neutralResetSeconds": 15

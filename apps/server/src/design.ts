@@ -70,30 +70,6 @@ export function sha256(value: string): string {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-export function shuffle<T>(items: T[], rng: () => number): T[] {
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    const a = out[i];
-    const b = out[j];
-    if (a === undefined || b === undefined) continue;
-    out[i] = b;
-    out[j] = a;
-  }
-  return out;
-}
-
 /** Williams balanced Latin square for even n: every item also precedes every other item exactly once. */
 export function balancedLatinSquare(n: number): number[][] {
   const first = Array.from({ length: n }, (_, c) => (c % 2 === 0 ? c / 2 : n - (c + 1) / 2));
@@ -133,77 +109,60 @@ export const COLOUR_PERMUTATIONS = permutations(COLOURS).map(
 );
 
 /**
- * Everyone searches for the plan's 12 tasks (3 easy, 5 medium, 4 hard), grouped into four blocks of
- * three that each mix difficulty: easy+medium+hard three times, then medium+medium+hard.
+ * The 24 scored searches form four groups of six, each with two easy, two medium and two hard
+ * searches (tiers in task-id order), so every emotion gets the same mix of difficulty.
  */
-function scoredTaskGroups(seed: string): Task[][] {
-  const tier = (difficulty: Difficulty) =>
-    shuffle(SCORED_TASKS.filter((t) => t.difficulty === difficulty), mulberry32(Number.parseInt(sha256(`${seed}:scored:${difficulty}`).slice(0, 8), 16)));
+function scoredTaskGroups(): Task[][] {
+  const tier = (difficulty: Difficulty) => SCORED_TASKS.filter((t) => t.difficulty === difficulty);
   const [easy, medium, hard] = [tier("Easy"), tier("Medium"), tier("Hard")];
-  const groups = [[easy[0], medium[0], hard[0]], [easy[1], medium[1], hard[1]], [easy[2], medium[2], hard[2]], [medium[3], medium[4], hard[3]]];
-  if (groups.some((group) => group.some((task) => !task))) throw new Error("scored tasks must be 3 easy, 5 medium and 4 hard");
+  const groups = [0, 1, 2, 3].map((g) => [easy[2 * g], easy[2 * g + 1], medium[2 * g], medium[2 * g + 1], hard[2 * g], hard[2 * g + 1]]);
+  if (groups.some((group) => group.some((task) => !task))) throw new Error("scored tasks must be 8 easy, 8 medium and 8 hard");
   return groups as Task[][];
 }
 
-/** Rotation r moves group g to block (g + r) % 4 and rotates the order inside it. */
-function scoredTasksForBlock(groups: Task[][], rotation: number, block: number): Task[] {
-  const group = groups[(block + 4 - rotation) % 4] ?? [];
-  const shift = (block + rotation) % 3;
-  return [...group.slice(shift), ...group.slice(0, shift)];
-}
-
 /**
- * Which row of each counterbalancing factor a sequence uses. Over every 24 consecutive sequences each
- * block order appears 6 times, each menu row 4 times, each colour mapping once, and each of the four
- * task rotations ("target set") 6 times, meeting every block order; later sequences start a fresh 24-block.
+ * Participant n takes sequence n of a fixed 24-sequence cycle; nothing is drawn at random.
+ * blockOrderRow cycles every person; menuRow advances every four people, so within 24 people each
+ * emotion order meets every menu row once. The task rotation follows the block order, so each emotion
+ * meets each task group equally often.
  */
 export function sequenceFactors(sequenceIndex: number) {
+  const blockOrderRow = sequenceIndex % BLOCK_ORDERS.length;
   return {
-    blockOrderRow: sequenceIndex % BLOCK_ORDERS.length,
+    blockOrderRow,
     menuRow: Math.floor(sequenceIndex / BLOCK_ORDERS.length) % MENU_ROWS.length,
-    targetSet: (sequenceIndex + Math.floor(sequenceIndex / 4)) % 4,
+    targetSet: blockOrderRow,
     colourRow: sequenceIndex % COLOUR_PERMUTATIONS.length
   };
 }
 
-export const SEQUENCE_BLOCK_SIZE = 24;
+export const SEQUENCE_CYCLE = 24;
+
+const menuRow = (row: number): MenuId[] => (MENU_ROWS[row % MENU_ROWS.length] ?? []).map((i) => MENU_IDS[i] as MenuId);
 
 /**
- * Stratified permuted blocks: the k-th participant of a stratum takes the k-th entry of that stratum's
- * seeded shuffle of one 24-sequence block; an exhausted block is followed by a newly generated one.
+ * Block b searches all six menus in Williams row menuRow + b, so across people each menu takes every
+ * position after the scenario equally often in every emotion. The watch searched on menu m is task
+ * (m + menuRow) of the emotion's group: over six rows each task meets each menu once. (No 6 x 6 design
+ * can also give each task every position once; six has no orthogonal Latin squares.)
  */
-export function stratumSequenceIndex(seed: string, stratum: string, k: number): number {
-  const block = Math.floor(k / SEQUENCE_BLOCK_SIZE);
-  const rng = mulberry32(Number.parseInt(sha256(`${seed}:stratum:${stratum}:block:${block}`).slice(0, 8), 16));
-  const order = shuffle(
-    Array.from({ length: SEQUENCE_BLOCK_SIZE }, (_, i) => i),
-    rng
-  );
-  return block * SEQUENCE_BLOCK_SIZE + (order[k % SEQUENCE_BLOCK_SIZE] ?? 0);
+function blockSearches(group: Task[], row: number, block: number): Array<{ menuId: MenuId; task: Task }> {
+  return menuRow(row + block).map((menuId) => ({ menuId, task: group[(MENU_IDS.indexOf(menuId) + row) % 6]! }));
 }
 
-/**
- * Twelve trial menus: blocks 1-2 take one balanced Latin-square row, blocks 3-4 the row three steps on,
- * so each menu appears twice and never twice in a block. The seed only relabels square symbols.
- */
-function menuSchedule(seed: string, menuRow: number): MenuId[] {
-  const symbols = shuffle(MENU_IDS, mulberry32(Number.parseInt(sha256(`${seed}:menu-symbols`).slice(0, 8), 16)));
-  const row = (r: number) => (MENU_ROWS[r % MENU_ROWS.length] ?? []).map((i) => symbols[i] as MenuId);
-  return [...row(menuRow), ...row(menuRow + 3)];
-}
-
-function practiceTrialsFor(sessionId: string, seed: string, sequenceIndex: number): PracticeTrialSpec[] {
-  const rng = mulberry32(Number.parseInt(sha256(`${seed}:practice:${sequenceIndex}`).slice(0, 8), 16));
-  const candidates = shuffle(PRACTICE_TASKS, rng);
-  const menus = shuffle(MENU_IDS, mulberry32(Number.parseInt(sha256(`${seed}:practice-menus:${sequenceIndex}`).slice(0, 8), 16)));
-  return candidates.map((task, i) => ({
-    practiceId: `${sessionId}-P${i + 1}`,
-    menuId: menus[i] ?? "A",
-    taskId: task.id,
-    targetId: task.targetId,
-    taskDescription: task.description,
-    difficulty: task.difficulty
-  }));
+/** Practice uses a menu row the scored blocks skip, so it never previews block 1's order. */
+function practiceTrialsFor(sessionId: string, row: number): PracticeTrialSpec[] {
+  return menuRow(row + 4).map((menuId, i) => {
+    const task = PRACTICE_TASKS[i]!;
+    return {
+      practiceId: `${sessionId}-P${i + 1}`,
+      menuId,
+      taskId: task.id,
+      targetId: task.targetId,
+      taskDescription: task.description,
+      difficulty: task.difficulty
+    };
+  });
 }
 
 export function generateDesign(input: {
@@ -216,10 +175,9 @@ export function generateDesign(input: {
 }): StudyDesign {
   const { sessionId, participantId, sequenceIndex, stratum, seed } = input;
   const factors = sequenceFactors(sequenceIndex);
-  const groups = scoredTaskGroups(seed);
+  const groups = scoredTaskGroups();
   const stateRow = BLOCK_ORDERS[factors.blockOrderRow];
-  if (!stateRow) throw new Error("latin square row missing");
-  const menus = menuSchedule(seed, factors.menuRow);
+  if (!stateRow) throw new Error("block order row missing");
   const colour = COLOUR_PERMUTATIONS[factors.colourRow] ?? DEFAULT_COLOUR_MAPPING;
 
   const blocks: BlockSpec[] = [];
@@ -227,17 +185,12 @@ export function generateDesign(input: {
   for (let b = 0; b < 4; b++) {
     const blockId = `${sessionId}-B${b + 1}`;
     const stateLabel = stateRow[b] ?? "happy";
-    const menuIds = [menus[b * 3], menus[b * 3 + 1], menus[b * 3 + 2]] as MenuId[];
-    const trialIds: string[] = [];
-    const blockTasks = scoredTasksForBlock(groups, factors.targetSet, b);
-    for (let t = 0; t < 3; t++) {
-      const task = blockTasks[t];
-      const menuId = menuIds[t];
-      if (!task || !menuId) throw new Error("trial design missing");
-      const trialId = `${sessionId}-B${b + 1}-T${t + 1}`;
-      trialIds.push(trialId);
+    const group = groups[(STATE_LABELS.indexOf(stateLabel) + factors.targetSet) % 4] ?? [];
+    const searches = blockSearches(group, factors.menuRow, b);
+    const trialIds = searches.map((_, t) => `${sessionId}-B${b + 1}-T${t + 1}`);
+    searches.forEach(({ menuId, task }, t) => {
       trialSpecs.push({
-        trialId,
+        trialId: trialIds[t]!,
         blockId,
         blockIndex: b,
         trialIndex: t,
@@ -249,11 +202,11 @@ export function generateDesign(input: {
         stateLabel,
         condition: "static"
       });
-    }
-    blocks.push({ blockId, blockIndex: b, stateLabel, menuIds, trialIds });
+    });
+    blocks.push({ blockId, blockIndex: b, stateLabel, menuIds: searches.map((s) => s.menuId), trialIds });
   }
 
-  const practiceTrials = practiceTrialsFor(sessionId, seed, sequenceIndex);
+  const practiceTrials = practiceTrialsFor(sessionId, factors.menuRow);
 
   return {
     sessionId,
@@ -267,7 +220,7 @@ export function generateDesign(input: {
     targetSet: factors.targetSet,
     colourMapping: colour,
     blockOrder: [...stateRow],
-    menuOrder: menus,
+    menuOrder: blocks.flatMap((b) => b.menuIds),
     blocks,
     practiceTrials,
     trials: trialSpecs,

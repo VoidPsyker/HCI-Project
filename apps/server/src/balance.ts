@@ -38,16 +38,13 @@ export function uniformChiSquare(factor: string, categories: string[], observed:
 export function designErrors(sessionId: string, design: StudyDesign): string[] {
   const errors: string[] = [];
   if (design.blocks.length !== 4) errors.push(`${sessionId}: expected 4 blocks`);
-  if (design.trials.length !== 12) errors.push(`${sessionId}: expected 12 trials`);
-  const flat = design.blocks.flatMap((b) => b.menuIds);
-  for (const menu of MENU_IDS) {
-    const n = flat.filter((m) => m === menu).length;
-    if (n !== 2) errors.push(`${sessionId}: menu ${menu} appears ${n} times`);
-  }
+  if (design.trials.length !== 24) errors.push(`${sessionId}: expected 24 trials`);
   if (new Set(design.trials.map((t) => t.trialId)).size !== design.trials.length) errors.push(`${sessionId}: duplicate trial IDs`);
   for (const block of design.blocks) {
     const trials = design.trials.filter((t) => t.blockId === block.blockId);
-    if (trials.length !== 3 || block.trialIds.length !== 3 || block.menuIds.length !== 3) errors.push(`${sessionId}: expected 3 trials in ${block.blockId}`);
+    if (trials.length !== 6 || block.trialIds.length !== 6 || [...block.menuIds].sort().join() !== MENU_IDS.join()) {
+      errors.push(`${sessionId}: expected each menu once in ${block.blockId}`);
+    }
     for (const [index, trialId] of block.trialIds.entries()) {
       const trial = trials.find((t) => t.trialId === trialId);
       if (!trial || trial.menuId !== block.menuIds[index] || trial.stateLabel !== block.stateLabel ||
@@ -55,13 +52,12 @@ export function designErrors(sessionId: string, design: StudyDesign): string[] {
         errors.push(`${sessionId}: trial/block mismatch for ${trialId}`);
       }
     }
-    if (new Set(block.menuIds).size !== block.menuIds.length) errors.push(`${sessionId}: repeated menu within ${block.blockId}`);
   }
   if (new Set(design.blocks.map((b) => b.stateLabel)).size !== 4) errors.push(`${sessionId}: states not unique`);
   const states = design.blocks.map((b) => b.stateLabel);
   if (states.indexOf("confused") > states.indexOf("frustrated")) errors.push(`${sessionId}: frustration before confusion`);
   const scored = design.trials.map((t) => t.taskId).sort().join(",");
-  if (scored !== SCORED_TASKS.map((t) => t.id).sort().join(",")) errors.push(`${sessionId}: scored tasks are not the plan's 12`);
+  if (scored !== SCORED_TASKS.map((t) => t.id).sort().join(",")) errors.push(`${sessionId}: scored tasks are not the study's 24`);
   return errors;
 }
 
@@ -71,7 +67,6 @@ export function buildBalanceReport(designs: StudyDesign[]) {
   const tests = [
     uniformChiSquare("block_order", range(4), factors.map((f) => String(f.blockOrderRow))),
     uniformChiSquare("menu_order_row", range(6), factors.map((f) => String(f.menuRow))),
-    uniformChiSquare("target_set", range(4), designs.map((d) => String(d.targetSet))),
     uniformChiSquare("colour_mapping", range(COLOUR_PERMUTATIONS.length), factors.map((f) => String(f.colourRow))),
     uniformChiSquare("first_trial_menu", [...MENU_IDS], designs.map((d) => d.blocks[0]?.menuIds[0] ?? "?"))
   ];
