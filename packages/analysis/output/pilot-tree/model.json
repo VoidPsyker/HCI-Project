@@ -1,0 +1,22 @@
+{
+  "target": "reported_state",
+  "prediction_time": "after_trial",
+  "status": "single_class_baseline",
+  "features": [
+    "elapsed_ms",
+    "clicks",
+    "backtracks",
+    "category_switches",
+    "wrong_department",
+    "wrong_subcategory",
+    "wrong_leaf"
+  ],
+  "classes": [
+    "mixed"
+  ],
+  "scikit_learn_version": "1.9.1",
+  "tree": {
+    "prediction": "mixed",
+    "training_rows": 36
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "total_trials": 135,
+  "eligible_trials": 36,
+  "excluded": {
+    "ambiguous_trial_start": 3,
+    "practice": 96
+  },
+  "participants": 3,
+  "blocks": 8,
+  "label_counts": {
+    "mixed": 36
+  },
+  "participants_per_label": {
+    "mixed": 3
+  },
+  "evaluation": "leave_one_participant_out",
+  "mood_discrimination_evaluable": false,
+  "confusion_matrix_label_order": [
+    "mixed"
+  ],
+  "tree": {
+    "accuracy": 1.0,
+    "balanced_accuracy": null,
+    "macro_f1": null,
+    "confusion_matrix": [
+      [
+        36
+      ]
+    ]
+  },
+  "majority_baseline": {
+    "accuracy": 1.0,
+    "balanced_accuracy": null,
+    "macro_f1": null,
+    "confusion_matrix": [
+      [
+        36
+      ]
+    ]
+  },
+  "folds": [
+    {
+      "test_rows": 9,
+      "test_labels": {
+        "mixed": 9
+      },
+      "labels_missing_from_training": []
+    },
+    {
+      "test_rows": 24,
+      "test_labels": {
+        "mixed": 24
+      },
+      "labels_missing_from_training": []
+    },
+    {
+      "test_rows": 3,
+      "test_labels": {
+        "mixed": 3
+      },
+      "labels_missing_from_training": []
+    }
+  ],
+  "fitted_tree": {
+    "prediction": "mixed",
+    "training_rows": 36
+  }
+}

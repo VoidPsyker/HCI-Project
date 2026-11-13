@@ -60,3 +60,23 @@ gaze gate does not invalidate already observed behavioral outcomes. These report
 do not analyze gaze outcomes. Withdrawn sessions are deleted by the server before
 export; regenerate exports after withdrawal rather than using an older snapshot.
 Neither script can infer withdrawal from a historical trials CSV.
+
+## Shallow emotion classifier
+
+Install scikit-learn in a Python environment and run:
+
+    python packages/analysis/scripts/train_pilot_tree.py train EXPORT_DIR OUTPUT_DIR
+    python packages/analysis/scripts/train_pilot_tree.py predict OUTPUT_DIR/model.json TRIAL_FEATURES.json
+
+The input JSON for prediction maps the feature names listed in the model to numeric trial
+metrics. The classifier predicts reported mood after a search. Training uses exported
+behaviour metrics and checks the label against post-induction reports. It excludes practice,
+synthetic or fast-mode sessions, incomplete trials, and trial IDs with repeated starts.
+Evaluation holds out one participant at a time and compares with a majority-class baseline.
+
+The supplied pilot export has 135 trial rows. Excluding 96 practice rows and three reused
+scored trial IDs leaves 36 scored rows across three participants and eight session/block
+pairs. All 36 have the exported report label mixed. The fitted tree has a single leaf and
+matches the majority baseline on every held-out row. This does not measure mood discrimination.
+Collect clean scored trials with repeated representation of each mood across participants
+before testing whether a tree learns useful splits. No gaze samples were supplied.
