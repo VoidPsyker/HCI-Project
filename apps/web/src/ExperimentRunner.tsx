@@ -1,6 +1,6 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { manipulationCheckPassed, reportedState, type GazeUnavailableReason, type StateLabel } from "@meridian/scoring";
-import type { CalibrationReport, ScreenGeometry } from "@meridian/analysis";
+import type { CalibrationReport, GazeSourceStatus, ScreenGeometry } from "@meridian/analysis";
 import { loadSession, loadSessionStatus, patchSessionState, recordConsent, stopSession, submitDemographics, submitQuestionnaires, withdrawSession } from "./api";
 import { EventLogger } from "./logger";
 import { useRunnerStore } from "./store";
@@ -20,6 +20,7 @@ import { BlockIntroScreen, CompleteScreen, InstructionsScreen, NeutralResetScree
 import { TrialRunner, type TrialInstruction } from "./components/TrialRunner";
 import { GazeController } from "./gaze/GazeController";
 import { gazeApi, resumeGazeFinalization, clearGazeFinalization } from "./gaze/gazeClient";
+import { gazeErrorCode } from "./gaze/startErrors";
 import { WebGazerSource } from "./biometrics/webgazer";
 import { loadBundledWebGazer } from "./biometrics/webgazerLoader";
 import { grantGazeConsent } from "./biometrics/consent";
@@ -184,6 +185,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
     setGazeStarting(true);
     setGazeStartError(null);
     setGazeReport(null);
+    let previousSourceStatus: GazeSourceStatus = "idle";
     const controller: GazeController = gazeRef.current ?? new GazeController({
       participant_id: state.session.participant_id,
       session_id: state.session.session_id,
@@ -196,11 +198,14 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         load: loadBundledWebGazer,
         viewport: () => ({ width_px: window.innerWidth, height_px: window.innerHeight }),
         onStatus: (status) => {
-          if (status !== "error") return;
+          const wasAcquiring = previousSourceStatus === "running" || previousSourceStatus === "paused";
+          previousSourceStatus = status;
+          // A failed start rejects controller.start() with its real cause; handle only sources that ran.
+          if (status !== "error" || !wasAcquiring) return;
           setGazeReady(false);
           if (useRunnerStore.getState().phase === "calibration") {
             void controller.failAcquisition().catch(() => undefined).then(() => {
-              setGazeStartError("The camera stopped producing eye-tracking data. Check camera permission and retry setup.");
+              setGazeStartError("gaze_source_stopped");
             });
           } else {
             markGazeUnavailable("camera_unavailable");
@@ -235,7 +240,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       .catch((startFailure: Error) => {
         if (cancelled || gazeRef.current !== controller) return;
         setGazeReady(false);
-        setGazeStartError(startFailure.message || "The eye tracker could not start.");
+        setGazeStartError(gazeErrorCode(startFailure));
       })
       .finally(() => {
         gazeStartingRef.current = false;

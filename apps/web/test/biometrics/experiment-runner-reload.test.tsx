@@ -249,8 +249,28 @@ describe("ExperimentRunner calibration reload", () => {
     useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true }, gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 } });
     render(<ExperimentRunner sessionId="S-race" />);
     await screen.findByTestId("gaze-calibration-start");
-    act(() => mocks.sourceStatus?.("error"));
+    act(() => {
+      mocks.sourceStatus?.("running");
+      mocks.sourceStatus?.("error");
+    });
     expect(await screen.findByTestId("gaze-calibration-retry")).toBeVisible();
+    expect(screen.getByText(/stopped producing eye-tracking data/)).toBeVisible();
+  });
+
+  it("shows the real reason when the camera cannot start", async () => {
+    mocks.start.mockImplementation(async () => {
+      // The real source reports "error" before its start() rejects.
+      mocks.sourceStatus?.("starting");
+      mocks.sourceStatus?.("error");
+      throw new DOMException("Could not start video source", "NotReadableError");
+    });
+    mocks.stop.mockResolvedValue(undefined);
+    mocks.loadSession.mockResolvedValue({ session: session(), participant: { label: "Participant", consent_version: "v1", consented_at: new Date().toISOString() }, design });
+    useRunnerStore.setState({ sessionId: "S-race", session: session(), phase: "calibration", gazeConsent: { participant_id: "P-race", session_id: "S-race", version: "v1", granted_at: new Date().toISOString(), scope: "eye_tracking_only", camera_used: true, raw_video_retention: false, separate_from_core_consent: true }, gazeViewport: { width_px: 1920, height_px: 1080 }, gazeGeometry: { width_px: 1920, height_px: 1080, width_mm: 530, height_mm: 300, viewing_distance_mm: 600 } });
+    render(<ExperimentRunner sessionId="S-race" />);
+    expect(await screen.findByText(/camera is busy/)).toBeVisible();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByText(/stopped producing/)).toBeNull();
   });
 
   it("keeps a run available after the 15-minute target", async () => {

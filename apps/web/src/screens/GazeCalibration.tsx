@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { GazeFailureScreen } from "./GazeFailure";
 import type { CalibrationReport, CalibrationTarget } from "@meridian/analysis";
 import type { GazeController } from "../gaze/GazeController";
+import { describeGazeStartError } from "../gaze/startErrors";
 
 function formatDegrees(value: number | null): string {
   return value === null || !Number.isFinite(value) ? "not evaluable" : `${value.toFixed(2)}°`;
@@ -118,13 +119,9 @@ export function GazeCalibrationScreen({
             ? "Eye tracking cannot resume in this page. Ask the researcher for a fresh session link."
             : viewportChanged
               ? "The screen size changed while the camera was starting. Eye tracking cannot continue in this page; ask the researcher for a fresh session link."
-              : startError}
+              : describeGazeStartError(startError)}
         </p>
-        <p>
-          {terminal
-            ? "You can continue the study without eye tracking."
-            : "Check the camera connection and browser permission, then retry. You can also continue without eye tracking."}
-        </p>
+        <p>{terminal ? "You can continue the study without eye tracking." : "You can retry, or continue without eye tracking."}</p>
         <div className="panel-actions">
           {!terminal ? (
             <button type="button" className="button secondary" onClick={onRetry} data-testid="gaze-calibration-retry">
