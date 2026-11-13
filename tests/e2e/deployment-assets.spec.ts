@@ -32,13 +32,38 @@ test("@deployment keeps missing model and bundle assets out of the SPA fallback"
   expect(route.headers()["content-type"]).toContain("text/html");
 });
 
+// A header regex cannot prove the model runs: load the real face model under the served policy.
+test("@deployment initializes the local face model under the served security policy", async ({ page }) => {
+  const violations: string[] = [];
+  page.on("console", (message) => {
+    if (/Content Security Policy/i.test(message.text())) violations.push(message.text());
+  });
+  await page.goto("/");
+  await page.addScriptTag({ url: "/vendor/webgazer/mediapipe/face_mesh/face_mesh.js" });
+  const outcome = await page.evaluate(async () => {
+    type FaceMeshSolution = { initialize(): Promise<void>; close(): Promise<void> };
+    const FaceMesh = (window as unknown as { FaceMesh: new (config: { locateFile: (file: string) => string }) => FaceMeshSolution }).FaceMesh;
+    const mesh = new FaceMesh({ locateFile: (file) => `/vendor/webgazer/mediapipe/face_mesh/${file}` });
+    const timeout = new Promise<string>((resolve) => setTimeout(() => resolve("timed out"), 30_000));
+    try {
+      return await Promise.race([mesh.initialize().then(() => "initialized"), timeout]);
+    } catch (error) {
+      return String(error);
+    } finally {
+      await mesh.close().catch(() => undefined);
+    }
+  });
+  expect(outcome).toBe("initialized");
+  expect(violations).toEqual([]);
+});
+
 test("@deployment permits same-origin camera and local WebAssembly on participant pages", async ({ request }) => {
   const response = await request.get("/");
   expect(response.headers()["permissions-policy"]).toMatch(/camera=\(self\)/);
   const csp = response.headers()["content-security-policy"];
   expect(csp).toBeTruthy();
   expect(csp).toMatch(/script-src[^;]*'self'/);
-  expect(csp).toMatch(/script-src[^;]*'(?:wasm-)?unsafe-eval'/);
+  expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
   expect(csp).toMatch(/connect-src[^;]*'self'/);
   expect(csp).toMatch(/worker-src[^;]*blob:/);
   const health = await request.get("/api/health");

@@ -87,7 +87,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
 
   app.addHook("onSend", async (request, reply, payload) => {
     reply.header("permissions-policy", "camera=(self), microphone=(), geolocation=()");
-    reply.header("content-security-policy", "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
+    // MediaPipe's Emscripten glue builds functions with `new Function`, so the face model needs 'unsafe-eval'.
+    reply.header("content-security-policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
     if (request.url.startsWith("/api/")) reply.header("cache-control", "private, no-store");
     return payload;
   });

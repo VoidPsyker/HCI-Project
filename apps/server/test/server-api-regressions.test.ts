@@ -77,7 +77,7 @@ it('serves SPA routes but returns 404 for missing runtime assets with camera pol
  for (const url of ['/vendor/missing.wasm', '/assets/missing.js', '/missing.css']) expect((await app.inject({ url })).statusCode).toBe(404);
  const page = await app.inject({ url: '/run/session' }); expect(page.statusCode).toBe(200);
  expect(page.headers['permissions-policy']).toContain('camera=(self)');
- expect(page.headers['content-security-policy']).toContain("'wasm-unsafe-eval'");
+ expect(page.headers['content-security-policy']).toMatch(/script-src[^;]*'unsafe-eval'/);
  } finally { await app.close(); }
 });
 it('never exposes archive filesystem errors as participant input failures', async () => {

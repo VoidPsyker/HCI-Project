@@ -19,7 +19,7 @@ Keep `VITE_API_BASE` empty when building so browser requests stay on the partici
 
 ## Camera and model delivery
 
-The participant URL must use HTTPS. Preserve the backend's `Permissions-Policy: camera=(self)` and Content-Security-Policy through the proxy. The CSP must allow same-origin scripts/connections and WebAssembly compilation (`'wasm-unsafe-eval'`); MediaPipe also needs its local scripts and blob workers. Do not add a CDN dependency or allow arbitrary remote model downloads.
+The participant URL must use HTTPS. Preserve the backend's `Permissions-Policy: camera=(self)` and Content-Security-Policy through the proxy. The CSP must allow same-origin scripts/connections and `'unsafe-eval'`: MediaPipe's WebAssembly glue builds functions with `new Function`, and `'wasm-unsafe-eval'` alone blocks the face model so the camera never starts. MediaPipe also needs its local scripts and blob workers. Do not add a CDN dependency or allow arbitrary remote model downloads.
 
 WebGazer 3.5.3 is bundled by Vite. `apps/web/scripts/copy-webgazer-assets.mjs` runs before the web build and copies the installed package's MediaPipe graph, loader, binary data and SIMD/non-SIMD WASM files to `apps/web/public/vendor/webgazer/mediapipe/face_mesh/`. Vite copies these into `apps/web/dist/vendor/`; Docker copies that built directory into the runtime image. No separate TensorFlow CDN assets are needed by the configured MediaPipe runtime. The current single-threaded runtime does not require SharedArrayBuffer or COOP/COEP; do not enable cross-origin isolation without verifying a change to the runtime.
 
