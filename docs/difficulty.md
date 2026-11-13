@@ -4,11 +4,13 @@ Plan §5.2 defines difficulty by three properties. `packages/taxonomy/scripts/ge
 computes them for every generated target and writes the tier into `tasks.json`. This file
 describes that code; it does not replace it.
 
-## The 12 canonical tasks
+## The 24 scored tasks
 
-T01–T12 keep the tier printed in plan Table 5.1 (3 easy, 5 medium, 4 hard) and are the only
-scored searches. Their wording is the plan's, except T04, T05, T08 and T10, reworded so no task
-names a different watch in its own collection.
+T01–T12 keep the tier printed in plan Table 5.1 (3 easy, 5 medium, 4 hard). Their wording is the
+plan's, except T04, T05, T08 and T10, reworded so no task names a different watch in its own
+collection. S01–S12 (`added-tasks.json`, 5 easy, 3 medium, 4 hard) are written in the same style
+and tiered by hand: easy names the collection and watch, medium uses synonyms, hard leaves the
+collection to inference. Together they are 8 / 8 / 8.
 
 ## The 60 generated tasks
 

@@ -30,7 +30,7 @@ pixel ratio; that warning is never shown to the participant.
 1. In **New participant**, enter a pseudonymous label (e.g. `P03`) and press **Create session
    link**. Never enter a name or email.
 2. Open the link on the participant machine. The server assigns the sequence (block order,
-   menu order, task rotation, colour mapping) after demographics and writes it to
+   menu order, task rotation, colour mapping) from a fixed schedule in arrival order after demographics and writes it to
    `assignments_audit`; the participant's browser never chooses a condition.
 3. Ask the participant to keep the browser window the same size from calibration onwards;
    screen geometry is estimated automatically when the camera starts.
@@ -39,7 +39,7 @@ pixel ratio; that warning is never shown to the participant.
 
 The participant works through: consent → eye-tracking consent →
 demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
-blocks (scenario → check-in → three trials → check-in with fatigue → 15-s neutral reset) →
+blocks (scenario → check-in → six searches, one per menu → check-in with fatigue → 15-s neutral reset) →
 questionnaires → debrief. Eye-tracking calibration runs before the first induction;
 gaze is recorded whatever the calibration error, and the session manifest stores that error
 for choosing a cutoff at analysis. Participants can continue the full study without gaze if

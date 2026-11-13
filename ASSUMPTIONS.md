@@ -38,21 +38,25 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 - **Counterbalancing.** Block orders depart from the plan's cyclic 4 × 4 square: confusion
   always precedes frustration so lingering frustration cannot colour the confusion block.
   The four orders keep happy and bored in every position once; confusion is never last and
-  frustration never first. Trial menus use a 6 × 6
-  Williams square: blocks 1–2 take row r, blocks 3–4 take row r + 3, so each menu appears twice
-  and never twice in a block. The seed relabels square symbols. Within every 24 sequences each
-  block order appears 6×, each menu row 4×, each colour mapping once, and each
-  (target set, block order) pair once.
-- **Stratification.** Stratum = gender × shopping frequency. Each stratum draws from its own
-  seeded shuffle of a 24-sequence block; an exhausted block is followed by a newly generated
-  one. With N = 8–10 most strata hold one person, so overall balance is approximate;
-  `npm run audit:balance` reports it.
+  frustration never first. Every block searches all six menus once (24 scored searches), in a
+  row of a 6 × 6 Williams square: block b takes row r + b.
+- **Fixed schedule, no randomness.** Participants take a 24-sequence cycle in arrival order
+  (participant n gets sequence n mod 24). The block order changes every person and the menu row
+  r every four people, so per 24 people every block order meets every menu row once, and in every
+  emotion each menu sits in each position after the scenario equally often. Colour mappings
+  cycle too. Gender × shopping frequency is still recorded as the stratum but no longer steers
+  allocation. A withdrawn participant's position is not reused. `npm run audit:balance` reports
+  balance.
 - **Task bank.** 72 tasks, one per product. T01–T12 are the plan's Table 5.1 tasks on their
   listed products; the other 60 are generated. "Matched variants" are not generated.
-- **Scored searches are the plan's 12 for everyone** (3 easy / 5 medium / 4 hard). The 60
-  generated tasks describe hidden details (size, price) that the menu names cannot lead to, so
-  pilot participants could not find them. The 12 form four mixed-difficulty groups of three;
-  four task rotations ("target set") move each group through every block. T04, T05, T08 and T10
+- **Scored searches: the plan's 12 plus 12 added, for everyone** (8 easy / 8 medium / 8 hard,
+  six per department). The 60 generated tasks describe hidden details (size, price) that the menu
+  names cannot lead to, so pilot participants could not find them; S01–S12 in `added-tasks.json`
+  are written in the plan's style instead. The 24 form four groups of six (two per tier); the
+  task rotation ("target set", equal to the block-order row) gives each emotion every group
+  equally often. Within a block, the watch for menu m is task (m + r) of the group, so each
+  task meets each menu equally often. No 6 × 6 design can also give each task every position
+  (six has no orthogonal Latin squares), so tasks spread unevenly over positions. T04, T05, T08 and T10
   are reworded so no task names a different watch in its own collection (e.g. "Rose-gold" when
   "Rose Gold" sits beside the answer). Practice uses six plan-style tasks in `practice.json`,
   on watches that are never scored.

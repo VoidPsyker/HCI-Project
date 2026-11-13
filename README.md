@@ -47,8 +47,9 @@ and data pipeline, not human gaze accuracy.
 
 ## Short pilot timing
 
-The short pilot targets about 15 minutes including setup, with time to finish if needed.
-It keeps four emotion blocks, six practice searches and twelve scored searches. Practice
+The session targets about 20 minutes including setup, with time to finish if needed.
+It has four emotion blocks, six practice searches and 24 scored searches (all six menus in
+every emotion). Practice
 allows 45 seconds per search and scored trials allow 60 seconds. The final questionnaire
 includes the full usability scale for the last menu used, plus workload and credibility ratings.
 
