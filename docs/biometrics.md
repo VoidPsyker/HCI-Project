@@ -370,8 +370,9 @@ compatibility.
 - Resizing after capture starts now stops capture and invalidates calibration,
   even if the viewport is restored. The interrupted trial is excluded.
 - Camera-start failures can retry in the same page using the existing consent
-  token. Reloading loses that in-memory token and requires a new researcher link;
-  gaze capture is not resumable across reload. Authorization is not weakened.
+  token. A reload before any gaze samples are uploaded re-registers consent and
+  receives a new token; once samples exist the token is required, so a reload
+  during trials still needs a new researcher link.
 - No ethics approval or approved consent wording; do not claim either.
 - No lab tracker, native bridge, or hardware validation.
 - Server-side restricted storage and consent/session/trial UI are implemented;

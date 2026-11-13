@@ -153,7 +153,7 @@ describe("Biometric Gaze Server Integration", () => {
       expect(row!.token_hash).not.toBe(data.token);
     });
 
-    it("rejects unauthorized re-consent attempts without the existing token", async () => {
+    it("rejects re-consent without the existing token once samples exist", async () => {
       const { sessionId } = setupParticipantAndSession();
       repo.recordConsent(sessionId, "core-1.0");
 
@@ -171,6 +171,13 @@ describe("Biometric Gaze Server Integration", () => {
         }
       });
       expect(res1.statusCode).toBe(200);
+      const batch = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${sessionId}/batches`,
+        headers: { "x-gaze-token": res1.json().token },
+        payload: { batch_id: "6a1f3c52-0d0e-4b8e-9a51-1d5f5f3a2b10", samples: [{ seq: 1, t_ms: 10, x_px: 100, y_px: 200, valid: true }] }
+      });
+      expect(batch.statusCode).toBe(200);
 
       // Attempt second consent without token
       const res2 = await app.inject({

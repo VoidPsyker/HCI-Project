@@ -284,13 +284,43 @@ describe("Server Biometric Acceptance Tests", () => {
       expect(resBadToken.statusCode).toBe(401);
     });
 
-    it("blocks unauthorized re-consent without valid token (401)", async () => {
+    it("re-issues a token without the old one before any samples exist, so a reloaded page can calibrate", async () => {
       const { session } = await createTestSession(true);
-      await app.inject({
+      const first = await app.inject({
         method: "POST",
         url: `/api/gaze/sessions/${session.session_id}/consent`,
         payload: sampleConsentPayload()
       });
+      const reloaded = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${session.session_id}/consent`,
+        payload: sampleConsentPayload()
+      });
+      expect(reloaded.statusCode).toBe(200);
+      expect(reloaded.json().token).not.toBe(first.json().token);
+      const oldToken = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${session.session_id}/batches`,
+        headers: { "x-gaze-token": first.json().token },
+        payload: sampleBatchPayload(crypto.randomUUID(), 1, 3)
+      });
+      expect(oldToken.statusCode).toBe(401);
+    });
+
+    it("blocks re-consent without a valid token once gaze samples exist (401)", async () => {
+      const { session } = await createTestSession(true);
+      const first = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${session.session_id}/consent`,
+        payload: sampleConsentPayload()
+      });
+      const batch = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${session.session_id}/batches`,
+        headers: { "x-gaze-token": first.json().token },
+        payload: sampleBatchPayload(crypto.randomUUID(), 1, 3)
+      });
+      expect(batch.statusCode).toBe(200);
 
       // Attempt to re-consent without token header
       const noTokenRes = await app.inject({

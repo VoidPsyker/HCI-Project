@@ -935,13 +935,12 @@ export class Repository {
     const existing = this.getGazeSession(sessionId);
     if (existing?.status === "completed") throw new Error("gaze_session_completed");
     if (existing?.status === "withdrawn") throw new Error("gaze_session_withdrawn");
-    if (existing) {
+    // Before any samples exist there is nothing to protect, so a reloaded page may re-register
+    // (rotating the token); the session link already authorizes everything else in the session.
+    if (existing && existing.sample_count > 0) {
       if (!existingToken || !this.tokenMatches(existingToken, existing.token_hash)) {
         throw new Error("gaze_unauthorized");
       }
-    }
-
-    if (existing && existing.sample_count > 0) {
       if (existing.synthetic !== (input.synthetic ? 1 : 0)) {
         throw new Error("gaze_consent_synthetic_mismatch");
       }

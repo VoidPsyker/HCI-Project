@@ -79,12 +79,12 @@ test("camera denial can retry without requesting replacement consent", async ({ 
   await expect(page.getByTestId("start-trial")).toHaveCount(0);
 });
 
-test("reload after gaze consent stops at authorization recovery without camera access", async ({ page, request }) => {
+test("reload before any gaze samples re-registers eye tracking instead of needing a new link", async ({ page, request }) => {
   await calibrationFixture(page, request);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Ask for a new session link" })).toBeVisible();
-  await expect(page.getByTestId("gaze-calibration-retry")).toHaveCount(0);
-  expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(0);
+  await expect(page.getByTestId("gaze-calibration-retry")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ask for a new session link" })).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).__cameraAttempts)).toBe(1);
 });
 
 test("reload at debrief finalizes the camera-denied outcome without reopening the camera", async ({ page, request }) => {
