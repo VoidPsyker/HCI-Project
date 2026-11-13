@@ -1,0 +1,170 @@
+{
+  "version": "1.0.0",
+  "tasks": [
+    {
+      "id": "S01",
+      "targetId": "sport.aqua.regatta-white",
+      "description": "Aqua racer chrono, Regatta White dial",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.aqua",
+        "dial": "white"
+      }
+    },
+    {
+      "id": "S02",
+      "targetId": "sport.prodiver.ocean-green",
+      "description": "Pro Diver 300m, Ocean Green dial, 44 mm",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.prodiver",
+        "caseSize": 44,
+        "dial": "green"
+      }
+    },
+    {
+      "id": "S03",
+      "targetId": "sport.trail.ember-red",
+      "description": "Outdoor automatic watch, 38 mm, orange dial, 300 m",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "sport",
+        "subcategoryId": "sport.trail",
+        "movement": "automatic",
+        "caseSize": 38,
+        "dial": "orange",
+        "water": 300
+      }
+    },
+    {
+      "id": "S04",
+      "targetId": "dress.midnight.black-tie",
+      "description": "Black Tie dress watch, black dial, leather strap",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.midnight",
+        "dial": "black",
+        "strap": "leather"
+      }
+    },
+    {
+      "id": "S05",
+      "targetId": "dress.heritage.moon-silver",
+      "description": "Self-winding dress watch, silver dial, 38 mm",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.heritage",
+        "movement": "automatic",
+        "dial": "silver",
+        "caseSize": 38
+      }
+    },
+    {
+      "id": "S06",
+      "targetId": "dress.moonphase.starlight",
+      "description": "Dress watch, orange dial, leather strap, 50 m",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "dress",
+        "subcategoryId": "dress.moonphase",
+        "dial": "orange",
+        "strap": "leather",
+        "water": 50
+      }
+    },
+    {
+      "id": "S07",
+      "targetId": "everyday.weekender.moss",
+      "description": "Weekender moss watch, green dial, fabric strap",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.weekender",
+        "dial": "green",
+        "strap": "fabric"
+      }
+    },
+    {
+      "id": "S08",
+      "targetId": "everyday.urban.deep-teal",
+      "description": "Self-winding everyday watch, 42 mm, blue dial, fabric strap",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.urban",
+        "movement": "automatic",
+        "caseSize": 42,
+        "dial": "blue",
+        "strap": "fabric"
+      }
+    },
+    {
+      "id": "S09",
+      "targetId": "everyday.field.navy-weave",
+      "description": "Textile-strap everyday watch, 40 mm, blue dial, 100 m",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "everyday",
+        "subcategoryId": "everyday.field",
+        "caseSize": 40,
+        "dial": "blue",
+        "strap": "fabric",
+        "water": 100
+      }
+    },
+    {
+      "id": "S10",
+      "targetId": "smart.smartone.silver",
+      "description": "Smart One hybrid, silver dial, steel strap",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.smartone",
+        "dial": "silver",
+        "strap": "steel"
+      }
+    },
+    {
+      "id": "S11",
+      "targetId": "smart.hybridactive.green-sport",
+      "description": "Rubber-strap smartwatch, 44 mm, green dial",
+      "difficulty": "Medium",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.hybridactive",
+        "strap": "rubber",
+        "caseSize": 44,
+        "dial": "green"
+      }
+    },
+    {
+      "id": "S12",
+      "targetId": "smart.connected.heritage-brown",
+      "description": "Hybrid leather watch, 44 mm, brown dial",
+      "difficulty": "Hard",
+      "canonical": false,
+      "criteria": {
+        "departmentId": "smart",
+        "subcategoryId": "smart.connected",
+        "strap": "leather",
+        "caseSize": 44,
+        "dial": "brown"
+      }
+    }
+  ]
+}

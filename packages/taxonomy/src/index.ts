@@ -2,6 +2,7 @@ import taxonomyJson from "../taxonomy.json";
 import productsJson from "../products.json";
 import tasksJson from "../tasks.json";
 import practiceJson from "../practice.json";
+import addedJson from "../added-tasks.json";
 
 export type Level = 1 | 2 | 3;
 export type MenuId = "A" | "B" | "C" | "D" | "E" | "F";
@@ -91,13 +92,15 @@ export const tasksData = tasksJson as TasksData;
 export const nodes: TaxonomyNode[] = taxonomy.nodes;
 export const products: Product[] = productsData.products;
 export const tasks: Task[] = tasksData.tasks;
-/** Every participant's 12 scored searches: the plan's Table 5.1 tasks (3 easy, 5 medium, 4 hard). */
-export const SCORED_TASKS: Task[] = tasks.filter((task) => task.canonical);
+/** Twelve plan-style searches added so each emotion block covers all six menus. */
+export const ADDED_TASKS = (addedJson as TasksData).tasks;
+/** Every participant's 24 scored searches: the plan's Table 5.1 tasks plus the added ones (8 easy, 8 medium, 8 hard). */
+export const SCORED_TASKS: Task[] = [...tasks.filter((task) => task.canonical), ...ADDED_TASKS];
 /** Six plan-style practice searches, one per menu, on targets that are never scored. */
 export const PRACTICE_TASKS = (practiceJson as TasksData).tasks;
-const practiceTargets = new Set(PRACTICE_TASKS.map((task) => task.targetId));
+const reservedTargets = new Set([...SCORED_TASKS, ...PRACTICE_TASKS].map((task) => task.targetId));
 /** Script-written tasks whose details the menus hide; used only by the frustration scenario. */
-export const SCENARIO_TASKS: Task[] = tasks.filter((task) => !task.canonical && !practiceTargets.has(task.targetId));
+export const SCENARIO_TASKS: Task[] = tasks.filter((task) => !reservedTargets.has(task.targetId));
 
 export const MENU_IDS: MenuId[] = ["A", "B", "C", "D", "E", "F"];
 export const DEPARTMENTS = nodes.filter((n) => n.level === 1);
@@ -105,7 +108,7 @@ export const SUBCATEGORIES = nodes.filter((n) => n.level === 2);
 export const LEAVES = nodes.filter((n) => n.level === 3);
 export const PRODUCT_BY_ID = new Map(products.map((p) => [p.id, p]));
 export const NODE_BY_ID = new Map(nodes.map((n) => [n.id, n]));
-export const TASK_BY_ID = new Map(tasks.map((t) => [t.id, t]));
+export const TASK_BY_ID = new Map([...tasks, ...ADDED_TASKS].map((t) => [t.id, t]));
 
 export const PALETTE: Record<DepartmentColour, { bg: string; fg: string; soft: string; border: string }> = {
   teal: { bg: "#0f766e", fg: "#ffffff", soft: "#ccfbf1", border: "#0f766e" },
@@ -287,12 +290,14 @@ export function validateTaxonomy(): ValidationReport {
   for (const id of ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12"]) {
     if (!taskIds.has(id)) errors.push(`missing canonical task ${id}`);
   }
-  const scoredTargets = new Set(SCORED_TASKS.map((task) => task.targetId));
   if (PRACTICE_TASKS.length !== 6) errors.push(`expected 6 practice tasks, got ${PRACTICE_TASKS.length}`);
-  for (const task of PRACTICE_TASKS) {
+  if (SCORED_TASKS.length !== 24) errors.push(`expected 24 scored tasks, got ${SCORED_TASKS.length}`);
+  const studyTargets = new Set<string>();
+  for (const task of [...SCORED_TASKS, ...PRACTICE_TASKS]) {
     const matches = resolveTask(task);
-    if (matches.length !== 1 || matches[0]?.id !== task.targetId) errors.push(`practice task ${task.id} does not resolve to its target`);
-    if (scoredTargets.has(task.targetId)) errors.push(`practice task ${task.id} targets a scored watch`);
+    if (matches.length !== 1 || matches[0]?.id !== task.targetId) errors.push(`study task ${task.id} does not resolve to its target`);
+    if (studyTargets.has(task.targetId)) errors.push(`study task ${task.id} reuses a target`);
+    studyTargets.add(task.targetId);
   }
 
   const difficultyCounts: Record<Difficulty, number> = { Easy: 0, Medium: 0, Hard: 0 };

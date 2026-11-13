@@ -93,10 +93,21 @@ describe("scored and practice tasks", () => {
       .map((leaf) => leaf.label);
   };
 
-  it("scores the plan's 12 tasks: 3 easy, 5 medium, 4 hard", () => {
-    expect(SCORED_TASKS.map((task) => task.id)).toEqual(["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12"]);
-    const tiers = SCORED_TASKS.reduce<Record<string, number>>((acc, task) => ({ ...acc, [task.difficulty]: (acc[task.difficulty] ?? 0) + 1 }), {});
-    expect(tiers).toEqual({ Easy: 3, Medium: 5, Hard: 4 });
+  it("scores the plan's 12 tasks plus 12 added ones: 8 easy, 8 medium, 8 hard, 6 per department", () => {
+    expect(SCORED_TASKS.map((task) => task.id)).toEqual([
+      "T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12",
+      "S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12"
+    ]);
+    const count = (key: (task: (typeof SCORED_TASKS)[number]) => string) =>
+      SCORED_TASKS.reduce<Record<string, number>>((acc, task) => ({ ...acc, [key(task)]: (acc[key(task)] ?? 0) + 1 }), {});
+    expect(count((task) => task.difficulty)).toEqual({ Easy: 8, Medium: 8, Hard: 8 });
+    expect(count((task) => task.criteria.departmentId ?? "")).toEqual({ sport: 6, dress: 6, everyday: 6, smart: 6 });
+  });
+
+  it("resolves every scored task to its own target, never shared with another study task", () => {
+    const study = [...SCORED_TASKS, ...PRACTICE_TASKS];
+    for (const task of study) expect(resolveTask(task).map((product) => product.id), task.id).toEqual([task.targetId]);
+    expect(new Set(study.map((task) => task.targetId)).size).toBe(study.length);
   });
 
   it("never names a different watch from the target's own collection", () => {
