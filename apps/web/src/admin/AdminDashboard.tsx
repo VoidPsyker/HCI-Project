@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AdminSession, QaCriterion, QaReport, SessionInfo } from "../types";
 import {
+  adminLogin,
   adminRequest,
   abortAdminSession,
   addAdminNote,
@@ -14,7 +15,7 @@ import {
   getQa
 } from "../api";
 
-const STORAGE_KEY = "meridian.admin.password";
+const STORAGE_KEY = "meridian.admin.sign-in";
 const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "demographics.jsonl", "demographics.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "tasks.csv", "manifest"];
 
 const STATUS_LABEL: Record<string, string> = {
@@ -44,7 +45,7 @@ function download(blob: Blob, name: string) {
   URL.revokeObjectURL(url);
 }
 
-function GazeExports({ sessionId, password, onAuthError }: { sessionId: string; password: string; onAuthError: (failure: Error) => void }) {
+function GazeExports({ sessionId, token, onAuthError }: { sessionId: string; token: string; onAuthError: (failure: Error) => void }) {
   const [summary, setSummary] = useState<Awaited<ReturnType<typeof getGazeSummary>>["gaze"]>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +55,7 @@ function GazeExports({ sessionId, password, onAuthError }: { sessionId: string; 
     let cancelled = false;
     const refresh = async () => {
       try {
-        const { gaze } = await getGazeSummary(password, sessionId);
+        const { gaze } = await getGazeSummary(token, sessionId);
         if (cancelled) return;
         setSummary(gaze);
         setError(null);
@@ -74,13 +75,13 @@ function GazeExports({ sessionId, password, onAuthError }: { sessionId: string; 
       cancelled = true;
       clearInterval(timer);
     };
-  }, [password, sessionId, onAuthError]);
+  }, [token, sessionId, onAuthError]);
 
   const save = async (filename: string) => {
     setDownloading(filename);
     setError(null);
     try {
-      const { blob } = await downloadGazeExport(password, sessionId, filename);
+      const { blob } = await downloadGazeExport(token, sessionId, filename);
       download(blob, sessionId + "-" + filename);
     } catch (failure) {
       setError((failure as Error).message);
@@ -110,18 +111,39 @@ function GazeExports({ sessionId, password, onAuthError }: { sessionId: string; 
   );
 }
 
+interface SignIn {
+  token: string;
+  expires_at: string;
+}
+
+function storedSignIn(): SignIn | null {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as SignIn | null;
+    if (stored?.token && Date.parse(stored.expires_at) > Date.now()) return stored;
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Storage can be unavailable or hold an unreadable value; ask for the password again.
+  }
+  return null;
+}
+
 export function AdminDashboard() {
-  const [password, setPassword] = useState(() => sessionStorage.getItem(STORAGE_KEY) ?? "");
+  const [signIn, setSignIn] = useState<SignIn | null>(storedSignIn);
   const [passwordDraft, setPasswordDraft] = useState("");
+  const [signingIn, setSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signOut = useCallback((message: string | null = null) => {
-    sessionStorage.removeItem(STORAGE_KEY);
-    setPassword("");
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Nothing stored to remove.
+    }
+    setSignIn(null);
     setPasswordDraft("");
     setError(message);
   }, []);
 
-  if (!password) {
+  if (!signIn) {
     return (
       <div className="admin-gate">
         <div className="panel narrow">
@@ -133,14 +155,27 @@ export function AdminDashboard() {
             </div>
           </div>
           <h1>Admin sign-in</h1>
-          <p className="lede">Enter the researcher password configured for this study.</p>
+          <p className="lede">Enter the researcher password configured for this study. You stay signed in on this browser for 3 days.</p>
           <form
             className="login-form"
             onSubmit={(event) => {
               event.preventDefault();
-              sessionStorage.setItem(STORAGE_KEY, passwordDraft);
-              setPassword(passwordDraft);
+              setSigningIn(true);
               setError(null);
+              adminLogin(passwordDraft)
+                .then((result) => {
+                  try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+                  } catch {
+                    // Without storage the sign-in lasts until this tab closes.
+                  }
+                  setSignIn(result);
+                  setPasswordDraft("");
+                })
+                .catch((failure: Error) => {
+                  setError(failure.message === "admin_password_required" ? "That password was not accepted." : failure.message);
+                })
+                .finally(() => setSigningIn(false));
             }}
           >
             <label className="field">
@@ -154,8 +189,8 @@ export function AdminDashboard() {
               />
             </label>
             {error ? <div className="banner error" role="alert">{error}</div> : null}
-            <button type="submit" className="button primary">
-              Open dashboard
+            <button type="submit" className="button primary" disabled={signingIn}>
+              {signingIn ? "Signing in…" : "Open dashboard"}
             </button>
           </form>
           <p className="small-note">
@@ -166,10 +201,10 @@ export function AdminDashboard() {
     );
   }
 
-  return <AuthenticatedDashboard key={password} password={password} signOut={signOut} />;
+  return <AuthenticatedDashboard key={signIn.token} token={signIn.token} expiresAt={signIn.expires_at} signOut={signOut} />;
 }
 
-function AuthenticatedDashboard({ password, signOut }: { password: string; signOut: (message?: string | null) => void }) {
+function AuthenticatedDashboard({ token, expiresAt, signOut }: { token: string; expiresAt: string; signOut: (message?: string | null) => void }) {
   const [sessions, setSessions] = useState<AdminSession[]>([]);
   const [qa, setQa] = useState<QaReport | null>(null);
   const [goNoGo, setGoNoGo] = useState<QaCriterion[]>([]);
@@ -194,7 +229,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
   const handleError = useCallback((failure: Error) => {
     if (!mounted.current) return;
     if (failure.message === "admin_password_required" || failure.message === "Export failed: HTTP 401") {
-      signOut("That password was not accepted.");
+      signOut("Your sign-in has expired or the password changed. Sign in again.");
     } else {
       setError(failure.message);
     }
@@ -203,7 +238,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
   const load = useCallback(async () => {
     const version = ++requestVersion.current;
     const responses = await Promise.allSettled([
-      getAdminSessions(password), getQa(password), getGoNoGo(password)
+      getAdminSessions(token), getQa(token), getGoNoGo(token)
     ]);
     if (version !== requestVersion.current) return;
     const [sessionResponse, qaResponse, goResponse] = responses;
@@ -214,7 +249,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
     const failure = failures.find((response) => response.reason?.message === "admin_password_required") ?? failures[0];
     if (failure) handleError(failure.reason as Error);
     else setError(null);
-  }, [password, handleError]);
+  }, [token, handleError]);
 
   useEffect(() => {
     setBusy("refresh");
@@ -230,11 +265,11 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
     setDetail(null);
     if (!selected) return;
     let cancelled = false;
-    void adminRequest<NonNullable<typeof detail>>(`/api/admin/sessions/${encodeURIComponent(selected.session_id)}`, password)
+    void adminRequest<NonNullable<typeof detail>>(`/api/admin/sessions/${encodeURIComponent(selected.session_id)}`, token)
       .then((response) => { if (!cancelled) setDetail(response); })
       .catch((failure: Error) => { if (!cancelled) handleError(failure); });
     return () => { cancelled = true; };
-  }, [selected, password, handleError]);
+  }, [selected, token, handleError]);
 
   useEffect(() => {
     if (abortTarget && !sessions.some((session) => session.session_id === abortTarget.session_id && !["completed", "aborted", "withdrawn"].includes(session.status))) {
@@ -262,6 +297,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
           <button type="button" className="button secondary" onClick={refresh} disabled={busy !== null}>
             {busy === "refresh" ? "Refreshing…" : "Refresh"}
           </button>
+          <span className="small-note" data-testid="signed-in-until">Signed in until {formatTime(expiresAt)}</span>
           <button
             type="button"
             className="button quiet"
@@ -322,7 +358,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
             event.preventDefault();
             setBusy("create");
             setCreatedUrl(null);
-            void createAdminSession(password, label.trim() || undefined)
+            void createAdminSession(token, label.trim() || undefined)
               .then((response) => {
                 setCreatedUrl(`${window.location.origin}${response.participant_url}`);
                 setLabel("");
@@ -452,7 +488,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
                         onClick={() => {
                           if (!window.confirm(`Delete all data for ${session.label}? This cannot be undone.`)) return;
                           setBusy("delete");
-                          void deleteAdminSession(password, session.session_id)
+                          void deleteAdminSession(token, session.session_id)
                             .then(() => {
                               if (selected?.session_id === session.session_id) setSelectedId(null);
                               return refresh();
@@ -606,7 +642,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
               onClick={() => {
                 setBusy(`export-${kind}`);
                 setExportStatus(null);
-                void downloadExport(password, kind)
+                void downloadExport(token, kind)
                   .then((file) => {
                     download(file.blob, kind === "manifest" ? "manifest.json" : kind);
                     setExportStatus(`${kind}: ${file.rows || "?"} rows · SHA-256 ${file.checksum.slice(0, 16)}…`);
@@ -670,7 +706,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
               <strong>{selected.viewport_warning ?? "No viewport warning reported"}</strong>
             </div>
           </div>
-          <GazeExports key={selected.session_id} sessionId={selected.session_id} password={password} onAuthError={handleError} />
+          <GazeExports key={selected.session_id} sessionId={selected.session_id} token={token} onAuthError={handleError} />
           {detail?.notes.map((entry) => <p key={entry.note_id}><time>{formatTime(entry.created_at)}</time> · {entry.note}</p>)}
           <label className="field">
             <span>Researcher note</span>
@@ -688,7 +724,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
             disabled={!note.trim() || busy !== null}
             onClick={() => {
               setBusy("note");
-              void addAdminNote(password, selected.session_id, note.trim())
+              void addAdminNote(token, selected.session_id, note.trim())
                 .then(() => {
                   setNote("");
                   return refresh();
@@ -723,7 +759,7 @@ function AuthenticatedDashboard({ password, signOut }: { password: string; signO
                 onClick={() => {
                   const target = abortTarget;
                   setBusy("abort");
-                  void abortAdminSession(password, target.session_id, abortReason.trim())
+                  void abortAdminSession(token, target.session_id, abortReason.trim())
                     .then(() => { setAbortTarget(null); return refresh(); })
                     .catch(handleError)
                     .finally(() => setBusy(null));

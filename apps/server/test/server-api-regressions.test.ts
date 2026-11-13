@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Repository } from '../src/repository';
 import { createServer } from '../src/server';
+import { ADMIN_SIGN_IN_MS, adminTokenValid, issueAdminToken } from '../src/adminAuth';
 import type { EventInput } from '@meridian/scoring';
 let repo: Repository;
 let dir: string;
@@ -112,4 +113,31 @@ it('persists numeric demographic ratings as numbers', () => {
  const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1');
  repo.assignDesign(session.session_id, { gender: 'woman', shopping_freq: 'rarely', watch_expertise: 4, tech_savvy: 5 });
  expect(repo.getParticipant(session.participant_id)).toMatchObject({ watch_expertise: 4, tech_savvy: 5 });
+});
+it('keeps a researcher signed in for 3 days with a signed token, never the stored password', async () => {
+ const app = await createServer(repo, { adminPassword: 'researcher-pw' });
+ try {
+  const wrong = await app.inject({ method: 'POST', url: '/api/admin/login', payload: { password: 'nope' } });
+  expect(wrong.statusCode).toBe(401);
+  const login = await app.inject({ method: 'POST', url: '/api/admin/login', payload: { password: 'researcher-pw' } });
+  expect(login.statusCode).toBe(200);
+  const { token, expires_at } = login.json() as { token: string; expires_at: string };
+  expect(token).not.toContain('researcher-pw');
+  expect(Date.parse(expires_at) - Date.now()).toBeGreaterThan(ADMIN_SIGN_IN_MS - 60_000);
+  expect(ADMIN_SIGN_IN_MS).toBe(3 * 24 * 60 * 60 * 1000);
+  const list = (headers: Record<string, string>) => app.inject({ url: '/api/admin/sessions', headers });
+  expect((await list({ 'x-admin-token': token })).statusCode).toBe(200);
+  expect((await list({ 'x-admin-token': token.replace(/.$/, (c) => (c === 'a' ? 'b' : 'a')) })).statusCode).toBe(401);
+  const stale = issueAdminToken('researcher-pw', Date.now() - ADMIN_SIGN_IN_MS - 1000).token;
+  expect((await list({ 'x-admin-token': stale })).statusCode).toBe(401);
+  expect((await list({ 'x-admin-token': issueAdminToken('old-password').token })).statusCode).toBe(401);
+  expect((await list({ 'x-admin-password': 'researcher-pw' })).statusCode).toBe(200);
+ } finally { await app.close(); }
+});
+it('expires an admin token exactly at its expiry time', () => {
+ const issued = issueAdminToken('pw', 1_000);
+ expect(adminTokenValid('pw', issued.token, 1_000 + ADMIN_SIGN_IN_MS - 1)).toBe(true);
+ expect(adminTokenValid('pw', issued.token, 1_000 + ADMIN_SIGN_IN_MS)).toBe(false);
+ expect(adminTokenValid('pw', undefined)).toBe(false);
+ expect(adminTokenValid('pw', 'not-a-token')).toBe(false);
 });

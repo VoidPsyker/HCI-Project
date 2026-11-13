@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
@@ -22,6 +21,7 @@ import {
 } from "./validation";
 import { buildExportBundle, exportFile } from "./exports";
 import { buildGoNoGo, buildQaReport } from "./qa";
+import { adminTokenValid, issueAdminToken, passwordMatches } from "./adminAuth";
 
 export interface ServerOptions {
   adminPassword?: string;
@@ -101,19 +101,28 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     }
   });
 
+  const header = (request: FastifyRequest, name: string) => {
+    const raw = request.headers[name];
+    return Array.isArray(raw) ? raw[0] : raw;
+  };
+
+  // The dashboard sends a 3-day sign-in token; scripts and tests may still send the password.
   const requireAdmin = async (request: FastifyRequest, reply: FastifyReply) => {
-    const raw = request.headers["x-admin-password"];
-    const provided = Array.isArray(raw) ? raw[0] : raw;
-    const expected = adminPassword;
-    const a = Buffer.from(provided ?? "");
-    const b = Buffer.from(expected);
-    const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+    const ok = adminTokenValid(adminPassword, header(request, "x-admin-token")) ||
+      passwordMatches(adminPassword, header(request, "x-admin-password"));
     if (!ok) {
       reply.code(401).send({ error: "admin_password_required" });
       return;
     }
     (request as AdminRequest).admin = true;
   };
+
+  app.post("/api/admin/login", async (request, reply) => {
+    const body = parseBody(z.object({ password: z.string().min(1).max(500) }), request.body, reply);
+    if (!body) return;
+    if (!passwordMatches(adminPassword, body.password)) return reply.code(401).send({ error: "admin_password_required" });
+    return issueAdminToken(adminPassword);
+  });
 
   app.get("/api/health", async () => ({
     ok: true,

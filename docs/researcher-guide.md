@@ -20,7 +20,8 @@ npm start
 ```
 
 Open `http://127.0.0.1:8787/admin` and sign in with `ADMIN_PASSWORD` (set it in a git-ignored
-`.env`; see `.env.example`). Use Chrome or Edge in full screen on a 1920 × 1080 display at
+`.env`; see `.env.example`). The browser stays signed in for 3 days; it stores a signed token,
+never the password, and changing `ADMIN_PASSWORD` signs every researcher out. Use Chrome or Edge in full screen on a 1920 × 1080 display at
 100 % zoom. The admin row shows a warning if a session reports any other viewport or device
 pixel ratio; that warning is never shown to the participant.
 
@@ -114,8 +115,8 @@ and close when the session is deleted or withdrawn. **Abort & debrief** is avail
 before a session ends; it retains study data. **Delete** permanently removes the session
 and its data after confirmation. A failed stop keeps the reason open for retry.
 
-Refresh and background polling failures appear in the dashboard error banner. A rejected
-admin password returns to sign-in and clears the dashboard; signing out also clears its
+Refresh and background polling failures appear in the dashboard error banner. An expired or
+rejected sign-in returns to sign-in and clears the dashboard; signing out also clears its
 participant links, selection and draft notes. If clipboard access fails, copy the displayed
 participant link manually.
 

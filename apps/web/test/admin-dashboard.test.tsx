@@ -7,13 +7,15 @@ import type { AdminSession, QaReport } from "../src/types";
 vi.mock("../src/api", () => ({
   getAdminSessions: vi.fn(), getQa: vi.fn(), getGoNoGo: vi.fn(), getGazeSummary: vi.fn(),
   abortAdminSession: vi.fn(), addAdminNote: vi.fn(), createAdminSession: vi.fn(),
-  deleteAdminSession: vi.fn(), downloadExport: vi.fn(), downloadGazeExport: vi.fn(), adminRequest: vi.fn()
+  deleteAdminSession: vi.fn(), downloadExport: vi.fn(), downloadGazeExport: vi.fn(), adminRequest: vi.fn(), adminLogin: vi.fn()
 }));
+const SIGN_IN_KEY = "meridian.admin.sign-in";
+const signIn = (token: string, msFromNow: number) => ({ token, expires_at: new Date(Date.now() + msFromNow).toISOString() });
 const session = { session_id: "s1", label: "P01", status: "in_progress", phase: "trial", checkin_distress: null } as AdminSession;
 const qa = { sessions: { total: 1, completed: 0, in_progress: 1, aborted: 0 }, counts: {}, criteria: [], data_quality: {}, calibration: { by_task: [], by_menu: [] }, overall: "pass" } as unknown as QaReport;
 beforeEach(() => {
   vi.resetAllMocks();
-  sessionStorage.setItem("meridian.admin.password", "test-password");
+  localStorage.setItem(SIGN_IN_KEY, JSON.stringify(signIn("test-token", 60_000)));
   vi.mocked(api.getAdminSessions).mockResolvedValue({ sessions: [session] });
   vi.mocked(api.getQa).mockResolvedValue(qa);
   vi.mocked(api.getGoNoGo).mockResolvedValue({ criteria: [], generated_at: "" });
@@ -43,18 +45,41 @@ describe("researcher dashboard", () => {
     expect(await screen.findByText("researcher_stop")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Abort & debrief" })).toBeDisabled();
   });
-  it("clears private state on sign out and handles a rejected refreshed password", async () => {
+  it("clears private state on sign out and handles a rejected refreshed sign-in", async () => {
     render(<AdminDashboard />);
     await openDetail();
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    vi.mocked(api.adminLogin).mockResolvedValue(signIn("next-token", 3 * 24 * 60 * 60 * 1000));
     fireEvent.change(screen.getByLabelText("Admin password"), { target: { value: "next-password" } });
     fireEvent.click(screen.getByRole("button", { name: "Open dashboard" }));
     await screen.findByText("P01");
+    expect(api.adminLogin).toHaveBeenCalledWith("next-password");
+    expect(localStorage.getItem(SIGN_IN_KEY)).toContain("next-token");
+    expect(localStorage.getItem(SIGN_IN_KEY)).not.toContain("next-password");
     expect(screen.queryByTestId("session-detail")).not.toBeInTheDocument();
     vi.mocked(api.getAdminSessions).mockRejectedValue(new Error("admin_password_required"));
     fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
     expect(await screen.findByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
-    expect(sessionStorage.getItem("meridian.admin.password")).toBeNull();
+    expect(localStorage.getItem(SIGN_IN_KEY)).toBeNull();
+  });
+  it("stays signed in across a reload until the 3-day sign-in expires", async () => {
+    const { unmount } = render(<AdminDashboard />);
+    await screen.findByText("P01");
+    expect(api.getAdminSessions).toHaveBeenCalledWith("test-token");
+    unmount();
+    localStorage.setItem(SIGN_IN_KEY, JSON.stringify(signIn("old-token", -1)));
+    render(<AdminDashboard />);
+    expect(screen.getByRole("heading", { name: "Admin sign-in" })).toBeInTheDocument();
+    expect(localStorage.getItem(SIGN_IN_KEY)).toBeNull();
+  });
+  it("rejects a wrong password at sign-in without storing anything", async () => {
+    localStorage.removeItem(SIGN_IN_KEY);
+    vi.mocked(api.adminLogin).mockRejectedValue(new Error("admin_password_required"));
+    render(<AdminDashboard />);
+    fireEvent.change(screen.getByLabelText("Admin password"), { target: { value: "wrong" } });
+    fireEvent.click(screen.getByRole("button", { name: "Open dashboard" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("That password was not accepted.");
+    expect(localStorage.getItem(SIGN_IN_KEY)).toBeNull();
   });
   it("surfaces background polling errors", async () => {
     const interval = vi.spyOn(globalThis, "setInterval");
@@ -139,7 +164,7 @@ describe("researcher dashboard", () => {
     confirm.mockReturnValue(true);
     vi.mocked(api.getAdminSessions).mockResolvedValue({ sessions: [] });
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Delete" })); });
-    expect(api.deleteAdminSession).toHaveBeenCalledWith("test-password", "s1");
+    expect(api.deleteAdminSession).toHaveBeenCalledWith("test-token", "s1");
     expect(screen.queryByTestId("session-detail")).not.toBeInTheDocument();
   });
 
