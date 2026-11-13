@@ -11,6 +11,10 @@ const TABS = [
   { id: "credibility", label: "Credibility", kind: "credibility" as const, menu: null }
 ];
 
+function menuGlimpse(menu: MenuId): string {
+  return `/assets/menus/menu-${menu.toLowerCase()}.jpg`;
+}
+
 function Likert5({ value, onChange, label }: { value: number | undefined; onChange: (value: number) => void; label: string }) {
   return (
     <div className="likert" role="radiogroup" aria-label={label}>
@@ -178,17 +182,16 @@ export function QuestionnairesScreen({
       </nav>
       <div className="q-body">
         {current.kind === "sus" ? (
+          <>
           <div className="sus-page" data-testid={`sus-${usabilityMenu}`}>
-            <h2>Menu {usabilityMenu} · System Usability Scale</h2>
-            <label className="field">
-              <span>{MENU_PREFERENCE.label}</span>
-              <select value={preferredMenu} onChange={(event) => setPreferredMenu(event.target.value)} data-testid="preferred-menu">
-                <option value="" disabled>{MENU_PREFERENCE.placeholder}</option>
-                {MENU_IDS.map((menu) => <option key={menu} value={menu}>{MENU_NAMES[menu]}</option>)}
-                <option value="none">{MENU_PREFERENCE.no_preference}</option>
-              </select>
-            </label>
-            <p className="small-note">Rate Menu {usabilityMenu} below. 1 = strongly disagree, 5 = strongly agree.</p>
+            <div className="rated-menu" data-testid="rated-menu">
+              <img src={menuGlimpse(usabilityMenu)} alt={`The ${MENU_NAMES[usabilityMenu]} menu`} />
+              <div>
+                <div className="eyebrow">You are rating the menu from your last search</div>
+                <h2>{MENU_NAMES[usabilityMenu]}</h2>
+                <p>Every statement below is about this menu. 1 = strongly disagree, 5 = strongly agree.</p>
+              </div>
+            </div>
             {SUS_ITEMS.map((item, index) => (
               <div key={index} className="sus-row">
                 <span className="sus-number">{index + 1}</span>
@@ -201,6 +204,26 @@ export function QuestionnairesScreen({
               </div>
             ))}
           </div>
+          <section className="menu-choice">
+            <h2 id="menu-choice-label">{MENU_PREFERENCE.label}</h2>
+            <div className="menu-choice-grid" role="radiogroup" aria-labelledby="menu-choice-label">
+              {[...MENU_IDS, "none" as const].map((menu) => (
+                <button
+                  key={menu}
+                  type="button"
+                  role="radio"
+                  aria-checked={preferredMenu === menu}
+                  className={preferredMenu === menu ? "menu-choice-card selected" : "menu-choice-card"}
+                  onClick={() => setPreferredMenu(menu)}
+                  data-testid={`preferred-menu-${menu}`}
+                >
+                  {menu === "none" ? null : <img src={menuGlimpse(menu)} alt="" />}
+                  <span>{menu === "none" ? MENU_PREFERENCE.no_preference : MENU_NAMES[menu]}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+          </>
         ) : null}
 
         {current.kind === "nasa" ? (

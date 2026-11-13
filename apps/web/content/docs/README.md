@@ -7,3 +7,6 @@
   Files must be local; the instrument makes no external requests.
 
 - Short pilot timing: `session-timing.json` controls trial limits and resets; induction durations are in `inductions.json`. These shorter activities need pilot validation with the existing mood check-ins. The 15-minute total is a target including setup, not an enforced consent or calibration deadline.
+- Menu glimpses in the final questionnaire are `apps/web/public/assets/menus/menu-<id>.jpg`. After
+  changing a menu's look, run `npm run dev` and `node apps/web/scripts/capture-menu-glimpses.mjs`.
+  They use the default colour mapping, so colours may differ from a participant's session.

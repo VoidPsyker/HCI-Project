@@ -93,6 +93,19 @@ describe("participant screen regressions", () => {
     expect(screen.getByTestId("confirm-withdraw")).toBeEnabled();
   });
 
+  it("names and pictures the menu being rated, and pictures every menu in the preference choice", () => {
+    render(<QuestionnairesScreen sessionId="s" usabilityMenu="C" logger={logger} fastMode={false} busy={false} onSubmit={pending} />);
+    const rated = screen.getByTestId("rated-menu");
+    expect(within(rated).getByRole("heading", { name: "Mega menu" })).toBeInTheDocument();
+    expect(within(rated).getByRole("img")).toHaveAttribute("src", "/assets/menus/menu-c.jpg");
+    const group = screen.getByRole("radiogroup", { name: "Which menu would you choose for another search?" });
+    const choices = within(group);
+    expect(group.querySelectorAll("img")).toHaveLength(6);
+    expect(choices.getByRole("radio", { name: /Radial lattice/ })).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(screen.getByTestId("preferred-menu-F"));
+    expect(choices.getByRole("radio", { name: /Radial lattice/ })).toHaveAttribute("aria-checked", "true");
+  });
+
   it("asks NASA-TLX in NASA's own plain questions with both slider ends labelled", () => {
     render(<QuestionnairesScreen sessionId="s" usabilityMenu="A" logger={logger} fastMode={false} busy={false} onSubmit={pending} />);
     fireEvent.click(screen.getByText("Workload", { selector: "button" }));

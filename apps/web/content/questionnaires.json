@@ -27,7 +27,6 @@
   "menu_preference": {
     "id": "preferred_menu",
     "label": "Which menu would you choose for another search?",
-    "placeholder": "Choose a menu",
     "no_preference": "No preference"
   },
   "credibility": [

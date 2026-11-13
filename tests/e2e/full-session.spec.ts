@@ -163,7 +163,7 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   await expect(page.getByTestId("sus-" + finalMenu).getByRole("radiogroup")).toHaveCount(10);
   await page.getByTestId("fill-neutral").click();
   await page.getByRole("button", { name: "Menu usability", exact: true }).click();
-  await page.getByTestId("preferred-menu").selectOption("B");
+  await page.getByTestId("preferred-menu-B").click();
   await page.getByRole("button", { name: "Credibility", exact: true }).click();
   await page.getByTestId("submit-questionnaires").click();
   await page.getByTestId("finish-session").click();
