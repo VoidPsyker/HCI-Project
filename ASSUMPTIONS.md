@@ -25,8 +25,10 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 - **Measures per block.** Plan §11.2 puts NASA-TLX, UMUX-Lite and disorientation after every
   block in Study 1. The pilot follows plan §7.3: SUS per menu and NASA-TLX once at the end,
   plus a check-in and fatigue rating after each block.
-- **NASA-TLX.** All six subscales are collected for comparability. Plan §11.1 requires any
-  workload composite to exclude the frustration subscale; no composite is computed yet.
+- **NASA-TLX.** All six subscales are collected for comparability, each asked with NASA's own
+  question wording and labelled slider ends, because the bare subscale names confused pilot
+  participants. Plan §11.1 requires any workload composite to exclude the frustration
+  subscale; no composite is computed yet.
 - **Database.** SQLite (better-sqlite3) behind `Repository`, not PostgreSQL: Docker is optional
   on the lab machine. Event metadata is JSON text; raw events are also appended to
   `data/raw/<session_id>.jsonl`.

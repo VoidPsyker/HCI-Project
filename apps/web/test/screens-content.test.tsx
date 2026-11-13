@@ -93,9 +93,20 @@ describe("participant screen regressions", () => {
     expect(screen.getByTestId("confirm-withdraw")).toBeEnabled();
   });
 
+  it("asks NASA-TLX in NASA's own plain questions with both slider ends labelled", () => {
+    render(<QuestionnairesScreen sessionId="s" usabilityMenu="A" logger={logger} fastMode={false} busy={false} onSubmit={pending} />);
+    fireEvent.click(screen.getByText("Workload", { selector: "button" }));
+    const page = screen.getByTestId("nasa-page");
+    expect(within(page).getByText("How mentally demanding was the task?")).toBeInTheDocument();
+    expect(within(page).getByText("How successful were you in accomplishing what you were asked to do?")).toBeInTheDocument();
+    expect(within(page).getAllByText("Very low")).toHaveLength(5);
+    expect(within(page).getByText("Perfect")).toBeInTheDocument();
+    expect(within(page).getByText("Failure")).toBeInTheDocument();
+  });
+
   it("requires explicit NASA answers including a deliberate midpoint", () => {
     render(<QuestionnairesScreen sessionId="s" usabilityMenu="A" logger={logger} fastMode={false} busy={false} onSubmit={pending} />);
-    fireEvent.click(screen.getByText("NASA-TLX", { selector: "button" }));
+    fireEvent.click(screen.getByText("Workload", { selector: "button" }));
     expect(screen.getByText("Next section →")).toBeDisabled();
     const page = screen.getByTestId("nasa-page");
     for (const slider of within(page).getAllByRole("slider")) fireEvent.change(slider, { target: { value: "55" } });

@@ -6,7 +6,7 @@ import { CREDIBILITY_ITEMS, MENU_PREFERENCE, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITE
 
 const TABS = [
   { id: "sus", label: "Menu usability", kind: "sus" as const },
-  { id: "nasa", label: "NASA-TLX", kind: "nasa" as const, menu: null },
+  { id: "nasa", label: "Workload", kind: "nasa" as const, menu: null },
   { id: "open", label: "Open questions", kind: "open" as const, menu: null },
   { id: "credibility", label: "Credibility", kind: "credibility" as const, menu: null }
 ];
@@ -205,11 +205,17 @@ export function QuestionnairesScreen({
 
         {current.kind === "nasa" ? (
           <div className="nasa-page" data-testid="nasa-page">
-            <h2>NASA-TLX</h2>
-            <p className="small-note">Rate every item using its labelled endpoints. Move the slider or confirm the midpoint.</p>
+            <h2>Workload (NASA-TLX)</h2>
+            <p className="nasa-intro">
+              &ldquo;The task&rdquo; means the 12 searches as a whole. Move each slider: <strong>left is very low, right is very
+              high</strong>. The success question is the other way round: <strong>left is perfect, right is failure</strong>.
+            </p>
             {NASA_ITEMS.map((item) => (
               <div key={item.id} className="nasa-row">
-                <span>{item.label}</span>
+                <span className="nasa-question">
+                  <small>{item.label}</small>
+                  {item.question}
+                </span>
                 <input
                   aria-label={item.label}
                   type="range"
@@ -220,14 +226,15 @@ export function QuestionnairesScreen({
                   onChange={(event) => setNasa((currentNasa) => ({ ...currentNasa, [item.id]: Number(event.target.value) }))}
                 />
                 <strong>{nasa[item.id] ?? "Not answered"}</strong>
+                <span className="nasa-ends" aria-hidden="true">
+                  <span>{item.low}</span>
+                  <span>{item.high}</span>
+                </span>
                 {nasa[item.id] === undefined ? (
-                  <button type="button" className="button secondary" onClick={() => setNasa((currentNasa) => ({ ...currentNasa, [item.id]: 50 }))}>
-                    Use midpoint (50) for {item.label}
+                  <button type="button" className="button secondary nasa-midpoint" onClick={() => setNasa((currentNasa) => ({ ...currentNasa, [item.id]: 50 }))}>
+                    Answer the middle (50)
                   </button>
                 ) : null}
-                <small>
-                  {item.low} — {item.high}
-                </small>
               </div>
             ))}
           </div>
