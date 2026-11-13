@@ -35,7 +35,10 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 
 ## Design choices
 
-- **Counterbalancing.** Block orders are the plan's cyclic 4 × 4 square. Trial menus use a 6 × 6
+- **Counterbalancing.** Block orders depart from the plan's cyclic 4 × 4 square: confusion
+  always precedes frustration so lingering frustration cannot colour the confusion block.
+  The four orders keep happy and bored in every position once; confusion is never last and
+  frustration never first. Trial menus use a 6 × 6
   Williams square: blocks 1–2 take row r, blocks 3–4 take row r + 3, so each menu appears twice
   and never twice in a block. The seed relabels square symbols. Within every 24 sequences each
   block order appears 6×, each menu row 4×, each colour mapping once, and each

@@ -93,18 +93,23 @@ export function shuffle<T>(items: T[], rng: () => number): T[] {
   return out;
 }
 
-/** Cyclic Latin square: row r is the base order rotated left by r (plan §6.3: ABCD, BCDA, CDAB, DABC). */
-export function latinSquare(n: number): number[][] {
-  return Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => (r + c) % n));
-}
-
 /** Williams balanced Latin square for even n: every item also precedes every other item exactly once. */
 export function balancedLatinSquare(n: number): number[][] {
   const first = Array.from({ length: n }, (_, c) => (c % 2 === 0 ? c / 2 : n - (c + 1) / 2));
   return Array.from({ length: n }, (_, r) => first.map((v) => (v + r) % n));
 }
 
-const BLOCK_ORDERS: StateLabel[][] = latinSquare(4).map((row) => row.map((i) => STATE_LABELS[i] as StateLabel));
+/**
+ * Confusion always comes before frustration, so lingering frustration cannot colour the
+ * confusion block. Happy and bored still take every position once; confusion is never last
+ * and frustration never first, so their position is only partly balanced.
+ */
+export const BLOCK_ORDERS: StateLabel[][] = [
+  ["confused", "frustrated", "happy", "bored"],
+  ["happy", "confused", "bored", "frustrated"],
+  ["bored", "happy", "confused", "frustrated"],
+  ["confused", "bored", "frustrated", "happy"]
+];
 const MENU_ROWS = balancedLatinSquare(6);
 
 const COLOURS: DepartmentColour[] = ["teal", "amber", "olive", "indigo"];

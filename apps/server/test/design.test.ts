@@ -5,11 +5,12 @@ import { afterEach, describe, expect, it } from "vitest";
 import { buildBalanceReport, designErrors } from "../src/balance";
 import {
   balancedLatinSquare,
+  BLOCK_ORDERS,
   generateDesign,
-  latinSquare,
   SEQUENCE_BLOCK_SIZE,
   sequenceFactors,
-  stratumSequenceIndex
+  stratumSequenceIndex,
+  type StateLabel
 } from "../src/design";
 import { Repository } from "../src/repository";
 
@@ -17,11 +18,20 @@ const SEED = "design-test-seed";
 const design = (sequenceIndex: number, seed = SEED) =>
   generateDesign({ sessionId: `S${sequenceIndex}`, participantId: `P${sequenceIndex}`, sequenceIndex, stratum: "x", seed, now: "2026-10-24T00:00:00.000Z" });
 
-describe("Latin squares", () => {
-  it("builds the plan's cyclic 4 x 4 block orders", () => {
-    expect(latinSquare(4)).toEqual([[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]]);
+describe("Block orders", () => {
+  it("always puts confusion before frustration", () => {
+    for (const order of BLOCK_ORDERS) expect(order.indexOf("confused")).toBeLessThan(order.indexOf("frustrated"));
   });
 
+  it("uses every state once per order and puts happy and bored in every position once", () => {
+    for (const order of BLOCK_ORDERS) expect(new Set(order).size).toBe(4);
+    for (const state of ["happy", "bored"] as const) {
+      expect(BLOCK_ORDERS.map((order) => order.indexOf(state)).sort()).toEqual([0, 1, 2, 3]);
+    }
+  });
+});
+
+describe("Latin squares", () => {
   it("builds a 6 x 6 Williams square: Latin, and every ordered pair adjacent exactly once", () => {
     const square = balancedLatinSquare(6);
     for (const row of square) expect(new Set(row).size).toBe(6);
@@ -57,6 +67,16 @@ describe("generateDesign", () => {
     expect(report.design_errors).toEqual([]);
     expect(report.balance_ok).toBe(true);
     expect(report.chi_square.find((t) => t.factor === "block_order")?.chi_square).toBe(0);
+  });
+
+  it("flags an assignment that puts frustration before confusion", () => {
+    const base = design(0);
+    const states = base.blocks.map((b) => b.stateLabel);
+    const swap = (state: StateLabel): StateLabel => (state === "confused" ? "frustrated" : state === "frustrated" ? "confused" : state);
+    const swapped = base.blocks.map((b) => ({ ...b, stateLabel: swap(b.stateLabel) }));
+    expect(states.indexOf("confused")).toBeLessThan(states.indexOf("frustrated"));
+    const trials = base.trials.map((t) => ({ ...t, stateLabel: swapped[t.blockIndex]!.stateLabel }));
+    expect(designErrors("S0", { ...base, blocks: swapped, trials })).toContain("S0: frustration before confusion");
   });
 
   it("flags an unbalanced allocation", () => {

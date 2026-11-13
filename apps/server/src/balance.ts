@@ -58,6 +58,8 @@ export function designErrors(sessionId: string, design: StudyDesign): string[] {
     if (new Set(block.menuIds).size !== block.menuIds.length) errors.push(`${sessionId}: repeated menu within ${block.blockId}`);
   }
   if (new Set(design.blocks.map((b) => b.stateLabel)).size !== 4) errors.push(`${sessionId}: states not unique`);
+  const states = design.blocks.map((b) => b.stateLabel);
+  if (states.indexOf("confused") > states.indexOf("frustrated")) errors.push(`${sessionId}: frustration before confusion`);
   for (const difficulty of ["Easy", "Medium", "Hard"]) {
     const n = design.trials.filter((t) => t.difficulty === difficulty).length;
     if (n !== 4) errors.push(`${sessionId}: ${difficulty} count is ${n}`);
