@@ -15,27 +15,21 @@
       "blockDebrief": "The clip was there to set a mood, not to evaluate you."
     },
     "frustrated": {
-      "title": "The search that will not cooperate",
-      "intro": "The site's search is being tested and may be unreliable; please try up to three times. It is fine to stop early.",
-      "task": "Search for: a 42 mm automatic dive watch with a blue dial and a titanium strap.",
+      "title": "Three quick searches",
+      "intro": "Find each watch in this shop. You have 15 seconds per search, so be quick.",
       "durationSeconds": 45,
-      "maxAttempts": 3,
-      "noResults": "No results.",
-      "afterLastAttempt": "That was the last attempt. You can wait for the timer.",
-      "blockDebrief": "The search was designed to fail; it was not your fault. Take a break if you would like one."
+      "searchSeconds": 15,
+      "searches": 3,
+      "blockDebrief": "The searches were too short and too hard to finish on purpose; it was not your fault. Take a break if you would like one."
     },
     "confused": {
-      "title": "Which category is right?",
-      "intro": "We're checking how people categorise a new product; there is no right answer. The labels below overlap and none of them clearly matches the target.",
-      "task": "Target: a watch that is formal enough for a dinner, but rugged enough for a hike.",
+      "title": "Find this watch",
+      "intro": "Use the shop's categories to find the watch described below.",
+      "task": "Find a 44 mm automatic dress watch with a green dial.",
+      "criteria": { "departmentId": "dress", "caseSize": 44, "movement": "automatic", "dial": "green" },
       "durationSeconds": 45,
-      "categories": [
-        { "id": "formal", "label": "Formal / evening", "detail": "Dress watches with leather straps" },
-        { "id": "outdoor", "label": "Outdoor / active", "detail": "Rugged watches for trail and water" },
-        { "id": "everyday", "label": "Everyday / smart", "detail": "Versatile watches for work and weekends" },
-        { "id": "gift", "label": "Gift / statement", "detail": "Distinctive watches for special occasions" }
-      ],
-      "blockDebrief": "The categories were deliberately ambiguous; there was no correct answer. Take a break if you would like one."
+      "searchSeconds": 45,
+      "blockDebrief": "That watch was not in the shop, so there was no right answer. Take a break if you would like one."
     },
     "bored": {
       "title": "The very repetitive catalogue check",

@@ -135,14 +135,10 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
   for (const block of design.blocks) {
     await page.getByTestId("start-induction").click();
     await expect(page.getByTestId("induction-screen")).toHaveAttribute("data-state", block.stateLabel);
-    if (block.stateLabel === "frustrated") {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        await page.getByTestId("induction-filter").selectOption("42 mm");
-        await page.getByTestId("induction-search").click();
-        await expect(page.getByTestId("induction-filter")).toHaveValue("Any");
-      }
-      await expect(page.getByTestId("induction-search-result")).toContainText("No results.");
-      await expect(page.getByTestId("induction-search")).toBeDisabled();
+    if (block.stateLabel === "frustrated" || block.stateLabel === "confused") {
+      // Shop searches time out on their own (1 s each in test mode), then unlock the check-in.
+      await expect(page.getByTestId("store-search")).toBeVisible();
+      await expect(page.getByTestId("store-search")).toContainText("The searches are over");
     }
     if (block.stateLabel === "bored") {
       await page.getByTestId("induction-early-exit").click();

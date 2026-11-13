@@ -1,9 +1,16 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { NODE_BY_ID, SCENARIO_TASKS, products, semanticPath } from "@meridian/taxonomy";
 import type { EventLogger } from "../src/logger";
+import { INDUCTIONS } from "../src/content";
 import { InductionScreen } from "../src/screens/Induction";
 
-function setup(state: "frustrated" | "bored") {
+afterEach(() => vi.useRealTimers());
+
+const outcomes = (log: ReturnType<typeof vi.fn>) =>
+  log.mock.calls.map(([event]) => event).filter((event) => event.event_type === "search_attempt").map((event) => event.meta);
+
+function setup(state: "frustrated" | "confused" | "bored") {
   const log = vi.fn();
   const onComplete = vi.fn();
   const onDistressStop = vi.fn();
@@ -29,16 +36,57 @@ describe("InductionScreen", () => {
     expect(ends()).toHaveLength(0);
   });
 
-  it("caps the frustrating search at three attempts and resets the filter each time", () => {
-    const { log } = setup("frustrated");
-    for (let attempt = 0; attempt < 3; attempt++) {
-      fireEvent.change(screen.getByTestId("induction-filter"), { target: { value: "42 mm" } });
-      fireEvent.click(screen.getByTestId("induction-search"));
-      expect(screen.getByTestId("induction-filter")).toHaveValue("Any");
+  it("frustrates with three 15-second searches for script-written watches, then unlocks the check-in", () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "setTimeout", "clearTimeout", "performance", "Date"] });
+    const { log, ends } = setup("frustrated");
+    const store = () => screen.getByTestId("store-search");
+    const seen = new Set<string>();
+    for (let search = 1; search <= 3; search++) {
+      expect(store()).toHaveTextContent(`Search ${search} of 3`);
+      const taskId = store().getAttribute("data-task-id")!;
+      expect(SCENARIO_TASKS.some((task) => task.id === taskId)).toBe(true);
+      seen.add(taskId);
+      expect(screen.getByTestId("induction-continue")).toBeDisabled();
+      act(() => vi.advanceTimersByTime(15_200));
     }
-    expect(screen.getByTestId("induction-search")).toBeDisabled();
-    expect(screen.getByTestId("induction-search-result")).toHaveTextContent("No results.");
-    expect(log.mock.calls.filter(([event]) => event.event_type === "search_attempt")).toHaveLength(3);
+    expect(seen.size).toBe(3);
+    expect(outcomes(log).map((meta) => meta.outcome)).toEqual(["timeout", "timeout", "timeout"]);
+    expect(screen.getByTestId("induction-continue")).toBeEnabled();
+    expect(ends()).toHaveLength(1);
+  });
+
+  it("ends a frustration search early when the shopper finds the watch", () => {
+    const { log } = setup("frustrated");
+    const store = within(screen.getByTestId("store-search"));
+    const task = SCENARIO_TASKS.find((candidate) => candidate.id === screen.getByTestId("store-search").getAttribute("data-task-id"))!;
+    for (const node of semanticPath(task.targetId)) fireEvent.click(store.getByRole("button", { name: node.label }));
+    fireEvent.click(screen.getByRole("button", { name: "Next search" }));
+    expect(screen.getByTestId("store-search")).toHaveTextContent("Search 2 of 3");
+    expect(outcomes(log)[0]).toMatchObject({ induction: "frustrated", search: 1, task_id: task.id, outcome: "found" });
+  });
+
+  it("confuses with one search for a watch the shop does not stock", () => {
+    const criteria = INDUCTIONS.confused.criteria;
+    expect(products.filter((p) => p.departmentId === criteria.departmentId && p.attributes.caseSize === criteria.caseSize &&
+      p.attributes.movement === criteria.movement && p.attributes.dial === criteria.dial)).toEqual([]);
+    const { log } = setup("confused");
+    expect(screen.getByTestId("store-search")).toHaveTextContent(INDUCTIONS.confused.task);
+    const store = within(screen.getByTestId("store-search"));
+    const dress = NODE_BY_ID.get("dress")!;
+    fireEvent.click(store.getByRole("button", { name: dress.label }));
+    fireEvent.click(store.getByRole("button", { name: "Midnight Dress" }));
+    fireEvent.click(store.getByRole("button", { name: "Pearl White" }));
+    expect(screen.getByTestId("product-detail")).toHaveTextContent("This is not the target product");
+    expect(screen.getByTestId("induction-continue")).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "I can’t find it" }));
+    expect(outcomes(log)).toEqual([expect.objectContaining({ induction: "confused", outcome: "gave_up", products_opened: 1 })]);
+    expect(screen.getByTestId("induction-continue")).toBeEnabled();
+  });
+
+  it("uses a plain shop list, not one of the six study menus", () => {
+    setup("frustrated");
+    expect(screen.queryByTestId(/^menu-[a-f]$/)).toBeNull();
+    expect(within(screen.getByTestId("store-search")).getAllByRole("button", { name: /Sport & Dive|Dress & Formal|Everyday & Casual|Smart & Hybrid/ })).toHaveLength(4);
   });
 
   it("lets the bored participant leave early and logs it once", () => {

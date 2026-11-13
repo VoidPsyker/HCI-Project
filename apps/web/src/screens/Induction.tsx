@@ -2,8 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import type { EventLogger } from "../logger";
 import { INDUCTIONS, MEDIA, STATE_COPY, type InductionState } from "../content";
 import { LocalClip } from "../components/LocalClip";
+import { StoreSearches, frustrationTasks, type StoreSearchTask } from "./StoreSearch";
 
-const FILTER_SIZES = ["Any", "38 mm", "40 mm", "42 mm", "44 mm"];
+/** Frustration and confusion run real searches in a plain shop; happy and bored stay timed. */
+function storeSearchesFor(state: InductionState, blockId: string): StoreSearchTask[] | null {
+  if (state === "frustrated") return frustrationTasks(blockId, INDUCTIONS.frustrated.searches);
+  if (state === "confused") return [{ id: "confused-absent-watch", description: INDUCTIONS.confused.task, targetId: null }];
+  return null;
+}
 
 export function InductionScreen({
   state,
@@ -22,12 +28,10 @@ export function InductionScreen({
 }) {
   const definition = INDUCTIONS[state];
   const duration = fastMode ? 1_000 : definition.durationSeconds * 1000;
+  const [searches] = useState(() => storeSearchesFor(state, blockId));
+  const searchMs = fastMode ? 1_000 : (state === "confused" ? INDUCTIONS.confused.searchSeconds : INDUCTIONS.frustrated.searchSeconds) * 1000;
   const [remaining, setRemaining] = useState(duration);
   const [done, setDone] = useState(false);
-  const [query, setQuery] = useState("");
-  const [sizeFilter, setSizeFilter] = useState(FILTER_SIZES[0]!);
-  const [attempts, setAttempts] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [confirmedRows, setConfirmedRows] = useState<Set<number>>(new Set());
   const startedRef = useRef(0);
   const advancedRef = useRef(false);
@@ -42,9 +46,16 @@ export function InductionScreen({
         event_type: "induction_start",
         block_id: blockId,
         state_label: state,
-        meta: { script: state, max_seconds: definition.durationSeconds, fast_mode: fastMode }
+        meta: {
+          script: state,
+          max_seconds: definition.durationSeconds,
+          fast_mode: fastMode,
+          ...(searches ? { search_task_ids: searches.map((task) => task.id) } : {})
+        }
       });
     }
+    // Shop searches keep their own per-search countdown and end the scenario themselves.
+    if (searches) return;
     const interval = setInterval(() => {
       const elapsed = performance.now() - startedRef.current;
       const left = Math.max(0, duration - elapsed);
@@ -52,7 +63,7 @@ export function InductionScreen({
       if (left <= 0) setDone(true);
     }, 200);
     return () => clearInterval(interval);
-  }, [blockId, definition.durationSeconds, duration, fastMode, logger, state]);
+  }, [blockId, definition.durationSeconds, duration, fastMode, logger, searches, state]);
 
   /** Logs the induction_end for a timed or early finish; a stop is logged by the runner, which owns every stop path. */
   const end = (meta: { completed: boolean; distress_stop: false; early_exit?: boolean }) => {
@@ -86,9 +97,6 @@ export function InductionScreen({
     onComplete(Math.round(performance.now() - startedRef.current));
   };
 
-  const frustrated = INDUCTIONS.frustrated;
-  const searchesLeft = attempts < frustrated.maxAttempts;
-
   const seconds = Math.ceil(remaining / 1000);
   const progress = 1 - remaining / duration;
   const colour = STATE_COPY[state].colour;
@@ -103,109 +111,27 @@ export function InductionScreen({
           <h1>{definition.title}</h1>
           <p>{definition.intro}</p>
         </div>
-        <div className="induction-timer" aria-live="polite">
-          <span className="timer-value">{seconds}</span>
-          <span className="timer-label">seconds</span>
+        {searches ? null : (
+          <div className="induction-timer" aria-live="polite">
+            <span className="timer-value">{seconds}</span>
+            <span className="timer-label">seconds</span>
+          </div>
+        )}
+      </div>
+      {searches ? null : (
+        <div className="induction-progress" aria-hidden="true">
+          <div className="induction-progress-fill" style={{ width: `${Math.min(100, progress * 100)}%`, background: colour }} />
         </div>
-      </div>
-      <div className="induction-progress" aria-hidden="true">
-        <div className="induction-progress-fill" style={{ width: `${Math.min(100, progress * 100)}%`, background: colour }} />
-      </div>
+      )}
 
       <div className="induction-task" style={{ borderColor: colour }}>
-        <div className="task-banner">{definition.task}</div>
+        {"task" in definition && !searches ? <div className="task-banner">{definition.task}</div> : null}
+        {searches ? (
+          <StoreSearches state={state} blockId={blockId} tasks={searches} searchMs={searchMs} logger={logger} onFinished={() => setDone(true)} />
+        ) : null}
         {state === "happy" ? (
           <div className="happy-media">
             <LocalClip slot={MEDIA.happy_clip} testId="happy-clip" />
-          </div>
-        ) : null}
-
-        {state === "frustrated" ? (
-          <div className="frustration-task">
-            <label className="field">
-              <span>Search the catalogue</span>
-              <div className="search-row">
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="e.g. 42 mm automatic dive watch blue dial titanium"
-                  autoComplete="off"
-                  maxLength={120}
-                />
-                <select
-                  aria-label="Case size filter"
-                  value={sizeFilter}
-                  onChange={(event) => setSizeFilter(event.target.value)}
-                  data-testid="induction-filter"
-                >
-                  {FILTER_SIZES.map((size) => (
-                    <option key={size}>{size}</option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="button primary"
-                  disabled={!searchesLeft}
-                  data-testid="induction-search"
-                  onClick={() => {
-                    const next = attempts + 1;
-                    setAttempts(next);
-                    logger.log({
-                      event_type: "search_attempt",
-                      block_id: blockId,
-                      state_label: state,
-                      meta: { induction: "frustrated", attempt: next, query_length: query.length, filter: sizeFilter, results: 0, filter_reset: true }
-                    });
-                    setSizeFilter(FILTER_SIZES[0]!);
-                  }}
-                >
-                  Search
-                </button>
-              </div>
-            </label>
-            {attempts > 0 ? (
-              <div className="search-result" role="status" data-testid="induction-search-result">
-                <strong>{frustrated.noResults}</strong>
-                {!searchesLeft ? <p>{frustrated.afterLastAttempt}</p> : null}
-              </div>
-            ) : null}
-            <p className="small-note">
-              Attempts: {attempts}/{frustrated.maxAttempts}.
-            </p>
-          </div>
-        ) : null}
-
-        {state === "confused" ? (
-          <div className="confusion-task">
-            <p className="task-copy">Which single category is closest to the target?</p>
-            <div className="confusion-grid">
-              {INDUCTIONS.confused.categories.map(({ id, label, detail }) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={selectedCategory === id ? "confusion-card selected" : "confusion-card"}
-                  onClick={() => {
-                    setSelectedCategory(id);
-                    logger.log({
-                      event_type: "node_click",
-                      block_id: blockId,
-                      state_label: state,
-                      level: 0,
-                      element_id: `induction:confused:${id}`,
-                      element_label: label,
-                      meta: { induction: "confused" }
-                    });
-                  }}
-                >
-                  <span>{label}</span>
-                  <small>{detail}</small>
-                </button>
-              ))}
-            </div>
-            <p className="small-note">
-              {selectedCategory ? "Selection recorded. No feedback is given in this pilot; you may change your mind." : "No option is clearly correct. That is part of the task."}
-            </p>
           </div>
         ) : null}
 
@@ -248,7 +174,9 @@ export function InductionScreen({
           I feel uncomfortable — stop and debrief
         </button>
         <div className="induction-actions-right">
-          <span className="small-note">{done ? "The scenario is over. Continue when ready." : "Continue unlocks when the timer ends."}</span>
+          <span className="small-note">
+            {done ? "The scenario is over. Continue when ready." : searches ? "Continue unlocks when the searches end." : "Continue unlocks when the timer ends."}
+          </span>
           {state === "bored" && !done ? (
             <button type="button" className="button secondary" onClick={() => continueAfter(true)} data-testid="induction-early-exit">
               {INDUCTIONS.bored.earlyExit}

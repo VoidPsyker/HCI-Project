@@ -781,64 +781,73 @@ code,
   margin: 0 auto 16px;
 }
 
-.frustration-task {
-  max-width: 980px;
+.store-search {
+  max-width: 1100px;
 }
 
-.search-row {
+.store-head {
   display: flex;
-  gap: 10px;
-}
-
-.search-row input {
-  flex: 1;
-}
-
-.search-result {
-  margin-top: 14px;
-  border: 1px solid #fedf89;
-  background: #fffaeb;
-  padding: 14px 16px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
   font-size: 14px;
-}
-
-.search-result p {
-  margin: 8px 0 0;
-  font-size: 12px;
-}
-
-.confusion-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin: 18px 0;
-}
-
-.confusion-card {
-  min-height: 160px;
-  border: 1px solid var(--line);
-  background: var(--paper-2);
-  padding: 20px;
-  text-align: left;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.confusion-card span {
-  font-size: 17px;
   font-weight: 700;
 }
 
-.confusion-card small {
-  color: var(--muted);
-  line-height: 1.45;
+.store-timer {
+  font-size: 22px;
+  color: var(--navy);
 }
 
-.confusion-card.selected {
+.store-crumbs {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.store-crumbs button,
+.store-list button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.store-crumbs button {
+  border: 0;
+  background: none;
+  color: var(--teal);
+  text-decoration: underline;
+  padding: 0;
+}
+
+.store-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-width: 520px;
+}
+
+.store-list button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  font-size: 15px;
+}
+
+.store-list button:hover {
   border-color: var(--teal);
-  background: #f0fdfa;
+}
+
+.store-actions {
+  margin-top: 14px;
+}
+
+.store-done {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 20px 0;
 }
 
 .task-copy {

@@ -63,8 +63,13 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   reproduced faithfully on screen without licensed plates.
 - **Prior menu experience** (plan §7.3) is stored in the `demographics` event metadata rather
   than a new participant column.
-- **Inductions.** Frustrated: a case-size filter resets after each search and search disables
-  after 3 attempts. Bored: an early-exit button, logged as `induction_end` with
+- **Inductions.** Frustrated and confused run real searches in a plain shop list (not one of
+  the six study menus) with the catalogue's real names, because pilot participants found the
+  searches themselves frustrating and confusing. Frustrated: three 15-second searches for
+  script-written watches whose details the menus hide (chosen from the block id). Confused: one
+  45-second search for a watch the shop does not stock ("44 mm automatic dress watch with a
+  green dial"); the debrief says so. Outcomes are `search_attempt` events with no trial id.
+  Bored: an early-exit button, logged as `induction_end` with
   `early_exit: true`. Each block's neutral reset opens with that induction's debrief line.
   Credibility is one 7-point item per induction.
 - **Session order.** Gaze consent comes straight after core consent.

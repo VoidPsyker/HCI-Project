@@ -95,6 +95,9 @@ export const tasks: Task[] = tasksData.tasks;
 export const SCORED_TASKS: Task[] = tasks.filter((task) => task.canonical);
 /** Six plan-style practice searches, one per menu, on targets that are never scored. */
 export const PRACTICE_TASKS = (practiceJson as TasksData).tasks;
+const practiceTargets = new Set(PRACTICE_TASKS.map((task) => task.targetId));
+/** Script-written tasks whose details the menus hide; used only by the frustration scenario. */
+export const SCENARIO_TASKS: Task[] = tasks.filter((task) => !task.canonical && !practiceTargets.has(task.targetId));
 
 export const MENU_IDS: MenuId[] = ["A", "B", "C", "D", "E", "F"];
 export const DEPARTMENTS = nodes.filter((n) => n.level === 1);
