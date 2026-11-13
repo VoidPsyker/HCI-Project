@@ -1,6 +1,7 @@
 import taxonomyJson from "../taxonomy.json";
 import productsJson from "../products.json";
 import tasksJson from "../tasks.json";
+import practiceJson from "../practice.json";
 
 export type Level = 1 | 2 | 3;
 export type MenuId = "A" | "B" | "C" | "D" | "E" | "F";
@@ -90,6 +91,10 @@ export const tasksData = tasksJson as TasksData;
 export const nodes: TaxonomyNode[] = taxonomy.nodes;
 export const products: Product[] = productsData.products;
 export const tasks: Task[] = tasksData.tasks;
+/** Every participant's 12 scored searches: the plan's Table 5.1 tasks (3 easy, 5 medium, 4 hard). */
+export const SCORED_TASKS: Task[] = tasks.filter((task) => task.canonical);
+/** Six plan-style practice searches, one per menu, on targets that are never scored. */
+export const PRACTICE_TASKS = (practiceJson as TasksData).tasks;
 
 export const MENU_IDS: MenuId[] = ["A", "B", "C", "D", "E", "F"];
 export const DEPARTMENTS = nodes.filter((n) => n.level === 1);
@@ -278,6 +283,13 @@ export function validateTaxonomy(): ValidationReport {
   for (const leaf of LEAVES) if (!targetIds.has(leaf.id)) errors.push(`no task for leaf ${leaf.id}`);
   for (const id of ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12"]) {
     if (!taskIds.has(id)) errors.push(`missing canonical task ${id}`);
+  }
+  const scoredTargets = new Set(SCORED_TASKS.map((task) => task.targetId));
+  if (PRACTICE_TASKS.length !== 6) errors.push(`expected 6 practice tasks, got ${PRACTICE_TASKS.length}`);
+  for (const task of PRACTICE_TASKS) {
+    const matches = resolveTask(task);
+    if (matches.length !== 1 || matches[0]?.id !== task.targetId) errors.push(`practice task ${task.id} does not resolve to its target`);
+    if (scoredTargets.has(task.targetId)) errors.push(`practice task ${task.id} targets a scored watch`);
   }
 
   const difficultyCounts: Record<Difficulty, number> = { Easy: 0, Medium: 0, Hard: 0 };

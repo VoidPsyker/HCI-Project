@@ -1,5 +1,5 @@
 import { chiSquaredDistributionTable } from "simple-statistics";
-import { MENU_IDS } from "@meridian/taxonomy";
+import { MENU_IDS, SCORED_TASKS } from "@meridian/taxonomy";
 import { COLOUR_PERMUTATIONS, sequenceFactors, type StudyDesign } from "./design";
 
 export interface ChiSquareResult {
@@ -60,10 +60,8 @@ export function designErrors(sessionId: string, design: StudyDesign): string[] {
   if (new Set(design.blocks.map((b) => b.stateLabel)).size !== 4) errors.push(`${sessionId}: states not unique`);
   const states = design.blocks.map((b) => b.stateLabel);
   if (states.indexOf("confused") > states.indexOf("frustrated")) errors.push(`${sessionId}: frustration before confusion`);
-  for (const difficulty of ["Easy", "Medium", "Hard"]) {
-    const n = design.trials.filter((t) => t.difficulty === difficulty).length;
-    if (n !== 4) errors.push(`${sessionId}: ${difficulty} count is ${n}`);
-  }
+  const scored = design.trials.map((t) => t.taskId).sort().join(",");
+  if (scored !== SCORED_TASKS.map((t) => t.id).sort().join(",")) errors.push(`${sessionId}: scored tasks are not the plan's 12`);
   return errors;
 }
 
@@ -73,7 +71,7 @@ export function buildBalanceReport(designs: StudyDesign[]) {
   const tests = [
     uniformChiSquare("block_order", range(4), factors.map((f) => String(f.blockOrderRow))),
     uniformChiSquare("menu_order_row", range(6), factors.map((f) => String(f.menuRow))),
-    uniformChiSquare("target_set", range(6), designs.map((d) => String(d.targetSet))),
+    uniformChiSquare("target_set", range(4), designs.map((d) => String(d.targetSet))),
     uniformChiSquare("colour_mapping", range(COLOUR_PERMUTATIONS.length), factors.map((f) => String(f.colourRow))),
     uniformChiSquare("first_trial_menu", [...MENU_IDS], designs.map((d) => d.blocks[0]?.menuIds[0] ?? "?"))
   ];

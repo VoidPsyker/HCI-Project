@@ -48,9 +48,14 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   one. With N = 8–10 most strata hold one person, so overall balance is approximate;
   `npm run audit:balance` reports it.
 - **Task bank.** 72 tasks, one per product. T01–T12 are the plan's Table 5.1 tasks on their
-  listed products; the other 60 are generated. "Matched variants" are not generated. Six target
-  sets of 12 (4 easy / 4 medium / 4 hard). Practice uses easy targets not in the participant's
-  main set.
+  listed products; the other 60 are generated. "Matched variants" are not generated.
+- **Scored searches are the plan's 12 for everyone** (3 easy / 5 medium / 4 hard). The 60
+  generated tasks describe hidden details (size, price) that the menu names cannot lead to, so
+  pilot participants could not find them. The 12 form four mixed-difficulty groups of three;
+  four task rotations ("target set") move each group through every block. T04, T05, T08 and T10
+  are reworded so no task names a different watch in its own collection (e.g. "Rose-gold" when
+  "Rose Gold" sits beside the answer). Practice uses six plan-style tasks in `practice.json`,
+  on watches that are never scored.
 - **Difficulty weights** (0.35 position / 0.40 semantic / 0.25 distractors) are my choice; see
   `docs/difficulty.md`. Rewording the generated tasks renumbered six task ids within their
   tier; no task changed tier, target or attributes.

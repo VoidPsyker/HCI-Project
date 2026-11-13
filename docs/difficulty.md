@@ -6,11 +6,13 @@ describes that code; it does not replace it.
 
 ## The 12 canonical tasks
 
-T01–T12 keep the tier printed in plan Table 5.1 (4 easy, 4 medium, 4 hard). Their wording is
-the plan's wording.
+T01–T12 keep the tier printed in plan Table 5.1 (3 easy, 5 medium, 4 hard) and are the only
+scored searches. Their wording is the plan's, except T04, T05, T08 and T10, reworded so no task
+names a different watch in its own collection.
 
 ## The 60 generated tasks
 
+These stay in the bank but are not scored: their wording relies on details the menus hide.
 Each target gets a score in [0, 1]. Higher means harder:
 
 ```

@@ -39,11 +39,11 @@ const canonical: Record<string, CanonicalSpec> = {
     attributes: { caseSize: 42, strap: "fabric", movement: "automatic", water: 200, dial: "green", priceBand: "£240–£420" }
   },
   "dress.heritage.ivory-dial": {
-    id: "T04", description: "Rose-gold dress watch, ivory dial, leather strap", difficulty: "Easy",
+    id: "T04", description: "Classic dress watch, ivory dial, leather strap", difficulty: "Easy",
     attributes: { caseSize: 38, strap: "leather", movement: "quartz", water: 50, dial: "white", priceBand: "£420–£900" }
   },
   "dress.midnight.deep-navy": {
-    id: "T05", description: "Black-tie watch, deep navy dial, 40 mm", difficulty: "Medium",
+    id: "T05", description: "Evening dress watch, deep navy dial, 40 mm", difficulty: "Medium",
     attributes: { caseSize: 40, strap: "leather", movement: "automatic", water: 50, dial: "blue", priceBand: "£240–£420" }
   },
   "dress.moonphase.celestial-blue": {
@@ -55,7 +55,7 @@ const canonical: Record<string, CanonicalSpec> = {
     attributes: { caseSize: 38, strap: "fabric", movement: "automatic", water: 100, dial: "brown", priceBand: "£180–£240" }
   },
   "everyday.urban.matte-white": {
-    id: "T08", description: "Minimalist watch, matte white dial, steel mesh strap", difficulty: "Medium",
+    id: "T08", description: "Minimalist watch, matte white dial, mesh strap", difficulty: "Medium",
     attributes: { caseSize: 40, strap: "mesh", movement: "quartz", water: 50, dial: "white", priceBand: "£240–£420" }
   },
   "everyday.weekender.sunset-clay": {
@@ -63,7 +63,7 @@ const canonical: Record<string, CanonicalSpec> = {
     attributes: { caseSize: 42, strap: "rubber", movement: "quartz", water: 100, dial: "orange", priceBand: "£180–£240" }
   },
   "smart.smartone.graphite": {
-    id: "T10", description: "Graphite smartwatch, titanium case, 44 mm", difficulty: "Medium",
+    id: "T10", description: "Graphite smartwatch, 44 mm case", difficulty: "Medium",
     attributes: { caseSize: 44, strap: "titanium", movement: "hybrid", water: 50, dial: "grey", priceBand: "£420–£900" }
   },
   "smart.hybridactive.orange-sport": {

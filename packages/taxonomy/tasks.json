@@ -47,7 +47,7 @@
     {
       "id": "T04",
       "targetId": "dress.heritage.ivory-dial",
-      "description": "Rose-gold dress watch, ivory dial, leather strap",
+      "description": "Classic dress watch, ivory dial, leather strap",
       "difficulty": "Easy",
       "canonical": true,
       "criteria": {
@@ -60,7 +60,7 @@
     {
       "id": "T05",
       "targetId": "dress.midnight.deep-navy",
-      "description": "Black-tie watch, deep navy dial, 40 mm",
+      "description": "Evening dress watch, deep navy dial, 40 mm",
       "difficulty": "Medium",
       "canonical": true,
       "criteria": {
@@ -99,7 +99,7 @@
     {
       "id": "T08",
       "targetId": "everyday.urban.matte-white",
-      "description": "Minimalist watch, matte white dial, steel mesh strap",
+      "description": "Minimalist watch, matte white dial, mesh strap",
       "difficulty": "Medium",
       "canonical": true,
       "criteria": {
@@ -125,7 +125,7 @@
     {
       "id": "T10",
       "targetId": "smart.smartone.graphite",
-      "description": "Graphite smartwatch, titanium case, 44 mm",
+      "description": "Graphite smartwatch, 44 mm case",
       "difficulty": "Medium",
       "canonical": true,
       "criteria": {

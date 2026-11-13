@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "tasks": [
+    {
+      "id": "P1",
+      "targetId": "sport.aqua.gulf-blue",
+      "description": "Chronograph racing watch, gulf blue dial",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "sport", "subcategoryId": "sport.aqua", "dial": "blue" }
+    },
+    {
+      "id": "P2",
+      "targetId": "sport.trail.summit-blue",
+      "description": "Trail GMT watch, summit blue dial",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "sport", "subcategoryId": "sport.trail", "dial": "blue" }
+    },
+    {
+      "id": "P3",
+      "targetId": "dress.moonphase.copper-brown",
+      "description": "Moonphase dress watch, copper brown dial",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "dress", "subcategoryId": "dress.moonphase", "dial": "brown" }
+    },
+    {
+      "id": "P4",
+      "targetId": "everyday.field.olive",
+      "description": "Field watch, olive green dial, fabric strap",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "everyday", "subcategoryId": "everyday.field", "dial": "green" }
+    },
+    {
+      "id": "P5",
+      "targetId": "everyday.urban.ink-black",
+      "description": "Minimalist watch, ink black dial, fabric strap",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "everyday", "subcategoryId": "everyday.urban", "dial": "black" }
+    },
+    {
+      "id": "P6",
+      "targetId": "smart.smartone.forest",
+      "description": "Smartwatch, forest green dial",
+      "difficulty": "Easy",
+      "canonical": false,
+      "criteria": { "departmentId": "smart", "subcategoryId": "smart.smartone", "dial": "green" }
+    }
+  ]
+}

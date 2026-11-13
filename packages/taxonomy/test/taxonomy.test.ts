@@ -3,6 +3,8 @@ import {
   DEPARTMENTS,
   LEAVES,
   MENU_IDS,
+  PRACTICE_TASKS,
+  SCORED_TASKS,
   SUBCATEGORIES,
   allSemanticPaths,
   products,
@@ -54,18 +56,18 @@ describe("taxonomy and task bank", () => {
     }
   });
 
-  it("keeps canonical descriptions exactly as specified", () => {
+  it("keeps the plan wording, except four tasks reworded so they name no neighbouring watch", () => {
     const expected: Record<string, string> = {
       T01: "Titanium dive watch, 300 m, deep blue dial",
       T02: "Lightweight titanium dive watch, 300 m, black dial",
       T03: "42 mm automatic trail watch, green dial, fabric strap",
-      T04: "Rose-gold dress watch, ivory dial, leather strap",
-      T05: "Black-tie watch, deep navy dial, 40 mm",
+      T04: "Classic dress watch, ivory dial, leather strap",
+      T05: "Evening dress watch, deep navy dial, 40 mm",
       T06: "Moonphase complication, celestial blue dial",
       T07: "38 mm field watch, khaki canvas strap, automatic",
-      T08: "Minimalist watch, matte white dial, steel mesh strap",
+      T08: "Minimalist watch, matte white dial, mesh strap",
       T09: "Weekend watch, sunset clay dial, rubber strap",
-      T10: "Graphite smartwatch, titanium case, 44 mm",
+      T10: "Graphite smartwatch, 44 mm case",
       T11: "Hybrid sport watch, orange accent, rubber strap",
       T12: "Connected classic, burgundy leather strap, 42 mm"
     };
@@ -79,5 +81,35 @@ describe("taxonomy and task bank", () => {
     for (const node of [...SUBCATEGORIES, ...LEAVES]) {
       expect(ids.has(node.parentId ?? "")).toBe(true);
     }
+  });
+});
+
+describe("scored and practice tasks", () => {
+  const phrase = (text: string) => ` ${text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+  const namesAnotherWatchInItsCollection = (task: { targetId: string; description: string }) => {
+    const target = LEAVES.find((leaf) => leaf.id === task.targetId)!;
+    return LEAVES.filter((leaf) => leaf.parentId === target.parentId && leaf.id !== target.id)
+      .filter((leaf) => phrase(task.description).includes(phrase(leaf.label)))
+      .map((leaf) => leaf.label);
+  };
+
+  it("scores the plan's 12 tasks: 3 easy, 5 medium, 4 hard", () => {
+    expect(SCORED_TASKS.map((task) => task.id)).toEqual(["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12"]);
+    const tiers = SCORED_TASKS.reduce<Record<string, number>>((acc, task) => ({ ...acc, [task.difficulty]: (acc[task.difficulty] ?? 0) + 1 }), {});
+    expect(tiers).toEqual({ Easy: 3, Medium: 5, Hard: 4 });
+  });
+
+  it("never names a different watch from the target's own collection", () => {
+    for (const task of [...SCORED_TASKS, ...PRACTICE_TASKS]) expect(namesAnotherWatchInItsCollection(task), task.id).toEqual([]);
+  });
+
+  it("has six practice tasks that each resolve to their own target, away from the scored targets", () => {
+    expect(PRACTICE_TASKS).toHaveLength(6);
+    const scoredTargets = new Set(SCORED_TASKS.map((task) => task.targetId));
+    for (const task of PRACTICE_TASKS) {
+      expect(resolveTask(task).map((product) => product.id), task.id).toEqual([task.targetId]);
+      expect(scoredTargets.has(task.targetId), task.id).toBe(false);
+    }
+    expect(new Set(PRACTICE_TASKS.map((task) => task.targetId)).size).toBe(6);
   });
 });

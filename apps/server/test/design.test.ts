@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { PRACTICE_TASKS, SCORED_TASKS } from "@meridian/taxonomy";
 import { buildBalanceReport, designErrors } from "../src/balance";
 import {
   balancedLatinSquare,
@@ -57,9 +58,34 @@ describe("generateDesign", () => {
       Object.values(factors.reduce<Record<number, number>>((acc, f) => ({ ...acc, [f[key]]: (acc[f[key]] ?? 0) + 1 }), {}));
     expect(tally("blockOrderRow")).toEqual([6, 6, 6, 6]);
     expect(tally("menuRow")).toEqual([4, 4, 4, 4, 4, 4]);
-    expect(tally("targetSet")).toEqual([4, 4, 4, 4, 4, 4]);
+    expect(tally("targetSet")).toEqual([6, 6, 6, 6]);
     expect(new Set(factors.map((f) => f.colourRow)).size).toBe(24);
-    expect(new Set(factors.map((f) => `${f.targetSet}:${f.blockOrderRow}`)).size).toBe(24);
+    expect(new Set(factors.map((f) => `${f.targetSet}:${f.blockOrderRow}`)).size).toBe(16);
+  });
+
+  it("gives every participant the plan's 12 tasks once, mixing difficulty within each block", () => {
+    for (let i = 0; i < SEQUENCE_BLOCK_SIZE; i++) {
+      const d = design(i);
+      expect(d.trials.map((t) => t.taskId).sort()).toEqual(SCORED_TASKS.map((t) => t.id).sort());
+      for (const block of d.blocks) {
+        const tiers = new Set(d.trials.filter((t) => t.blockId === block.blockId).map((t) => t.difficulty));
+        expect(tiers.size).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
+
+  it("moves each scored task through every block across the four task rotations", () => {
+    const blocksByTask = new Map<string, Set<number>>();
+    for (let i = 0; i < 4; i++) {
+      for (const trial of design(i).trials) blocksByTask.set(trial.taskId, (blocksByTask.get(trial.taskId) ?? new Set()).add(trial.blockIndex));
+    }
+    for (const blocks of blocksByTask.values()) expect([...blocks].sort()).toEqual([0, 1, 2, 3]);
+  });
+
+  it("practises the six plan-style practice tasks, one per menu", () => {
+    const practice = design(3).practiceTrials;
+    expect(practice.map((p) => p.taskId).sort()).toEqual(PRACTICE_TASKS.map((t) => t.id).sort());
+    expect(new Set(practice.map((p) => p.menuId)).size).toBe(6);
   });
 
   it("reports a balanced chi-square audit for a complete block", () => {
