@@ -16,7 +16,7 @@ import {
 } from "../api";
 
 const STORAGE_KEY = "meridian.admin.sign-in";
-const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "demographics.jsonl", "demographics.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "tasks.csv", "gaze_samples.csv", "manifest"];
+const EXPORTS = ["events.jsonl", "events.csv", "trials.jsonl", "trials.csv", "checkins.jsonl", "checkins.csv", "demographics.jsonl", "demographics.csv", "questionnaires.jsonl", "questionnaires.csv", "assignments.csv", "combinations.csv", "coverage.csv", "tasks.csv", "gaze_samples.csv", "manifest"];
 
 const STATUS_LABEL: Record<string, string> = {
   created: "Created",

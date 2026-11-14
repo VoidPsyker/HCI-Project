@@ -30,6 +30,7 @@ test("@deployment keeps missing model and bundle assets out of the SPA fallback"
   const route = await request.get("/run/deployment-route-check");
   expect(route.status()).toBe(200);
   expect(route.headers()["content-type"]).toContain("text/html");
+  expect(route.headers()["cache-control"]).toBe("no-cache");
 });
 
 // A header regex cannot prove the model runs: load the real face model under the served policy.

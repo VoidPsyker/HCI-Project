@@ -103,10 +103,15 @@ it('rejects invalid PORT configuration before starting the server', async () => 
  try { await expect(import('../src/config')).rejects.toThrow(); }
  finally { vi.unstubAllEnvs(); vi.resetModules(); }
 });
-it('allocates the fixed schedule in arrival order and never reuses a position after withdrawal', () => {
+it('fills the schedule in order, covers every menu x emotion pair every two people, and refills a withdrawn slot', async () => {
+ const { designCells } = await import('../src/design');
  const allocate = (gender: string) => { const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1'); const design = repo.assignDesign(session.session_id, { gender, shopping_freq: 'rarely' }); return { session, design }; };
- const first = allocate('woman'); expect(allocate('man').design.sequenceIndex).toBe(1); repo.withdrawSession(first.session.session_id);
- expect(first.design.sequenceIndex).toBe(0); expect(allocate('woman').design.sequenceIndex).toBe(2);
+ const first = allocate('woman'); const second = allocate('man');
+ expect([first.design.sequenceIndex, second.design.sequenceIndex]).toEqual([0, 1]);
+ expect(new Set([...designCells(first.design), ...designCells(second.design)]).size).toBe(24);
+ repo.withdrawSession(first.session.session_id);
+ expect(allocate('woman').design.sequenceIndex).toBe(0);
+ expect(allocate('woman').design.sequenceIndex).toBe(2);
 });
 it('persists numeric demographic ratings as numbers', () => {
  const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1');
@@ -140,7 +145,7 @@ it('expires an admin token exactly at its expiry time', () => {
  expect(adminTokenValid('pw', undefined)).toBe(false);
  expect(adminTokenValid('pw', 'not-a-token')).toBe(false);
 });
-it('moves a session onto the current searches only until its first scored search starts', () => {
+it('moves a session onto the current searches only until its first scored search starts, keeping its emotion order', () => {
  const begin = () => { const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1'); repo.assignDesign(session.session_id, { gender: 'woman', shopping_freq: 'rarely' }); return session; };
  const outdate = (sessionId: string) => {
   const design = repo.getDesign(sessionId)!;
@@ -149,9 +154,11 @@ it('moves a session onto the current searches only until its first scored search
   return design;
  };
  const fresh = begin(); const expected = outdate(fresh.session_id);
- expect(repo.refreshOutdatedDesign(fresh.session_id)).toEqual(expected);
- expect(repo.getDesign(fresh.session_id)).toEqual(expected);
- expect(JSON.parse(repo.allAssignments().find((row) => row.session_id === fresh.session_id)!.design_json as string)).toEqual(expected);
+ const reissued = repo.refreshOutdatedDesign(fresh.session_id)!;
+ expect(reissued.blockOrder).toEqual(expected.blockOrder);
+ expect(reissued.trials.map((t) => t.taskId).sort()).toEqual(expected.trials.map((t) => t.taskId).sort());
+ expect(repo.getDesign(fresh.session_id)).toEqual(reissued);
+ expect(JSON.parse(repo.allAssignments().find((row) => row.session_id === fresh.session_id)!.design_json as string)).toEqual(reissued);
 
  const searching = begin(); const current = outdate(searching.session_id); const stored = repo.getDesign(searching.session_id)!;
  repo.db.prepare(`INSERT INTO events (event_id, participant_id, session_id, study, trial_id, state_label, condition, event_type, t_client, t_server, input_type, meta_json)

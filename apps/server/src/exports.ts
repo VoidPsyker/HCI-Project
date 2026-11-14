@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { tasks } from "@meridian/taxonomy";
+import { MENU_IDS, PRACTICE_TASKS, TASK_BY_ID } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, manipulationCheckPassed, reportedState, type AffectRatings, type GazeUnavailableReason } from "@meridian/scoring";
+import { STATE_LABELS, type StudyDesign } from "./design";
 import type { Repository } from "./repository";
 
 export interface ExportFile {
@@ -227,7 +228,52 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     "assigned_at",
     "design_json"
   ];
-  const taskRows = tasks.map((t) => ({
+  // Every planned search of every assigned session, so the menu x emotion pairs each person met are on record.
+  const searchedTrials = new Map(repo.allTrials().filter((t) => !t.practice).map((t) => [t.trial_id, t]));
+  const sessionStatus = new Map(repo.listAdminSessions().map((s) => [s.session_id, s.status]));
+  const combinations = assignments.flatMap((row) => {
+    const design = JSON.parse(String(row.design_json ?? "{}")) as Partial<StudyDesign>;
+    return (design.trials ?? []).map((trial) => {
+      const searched = searchedTrials.get(trial.trialId);
+      return {
+        session_id: String(row.session_id),
+        participant_id: String(row.participant_id),
+        synthetic: synthetic(String(row.session_id)),
+        session_status: sessionStatus.get(String(row.session_id)) ?? null,
+        sequence_index: row.sequence_index ?? null,
+        block_index: trial.blockIndex,
+        block_id: trial.blockId,
+        state_label: trial.stateLabel,
+        menu_id: trial.menuId,
+        trial_index: trial.trialIndex,
+        trial_id: trial.trialId,
+        task_id: trial.taskId,
+        target_id: trial.targetId,
+        difficulty: trial.difficulty,
+        searched: Boolean(searched),
+        success: searched ? Boolean(searched.success) : null
+      };
+    });
+  });
+  const combinationColumns = Object.keys(combinations[0] ?? { session_id: null, participant_id: null, synthetic: null, session_status: null,
+    sequence_index: null, block_index: null, block_id: null, state_label: null, menu_id: null, trial_index: null, trial_id: null,
+    task_id: null, target_id: null, difficulty: null, searched: null, success: null });
+  // Per menu x emotion pair across real (non-synthetic) sessions still in the study.
+  const real = combinations.filter((c) => c.synthetic !== true && !["aborted", "withdrawn"].includes(String(c.session_status)));
+  const coverage = STATE_LABELS.flatMap((state) => MENU_IDS.map((menu) => {
+    const cell = real.filter((c) => c.state_label === state && c.menu_id === menu);
+    return {
+      state_label: state,
+      menu_id: menu,
+      planned_searches: cell.length,
+      sessions: new Set(cell.map((c) => c.session_id)).size,
+      searched: cell.filter((c) => c.searched).length,
+      succeeded: cell.filter((c) => c.success).length
+    };
+  }));
+  const coverageColumns = ["state_label", "menu_id", "planned_searches", "sessions", "searched", "succeeded"];
+  const allTasks = [...new Map([...TASK_BY_ID.values(), ...PRACTICE_TASKS].map((t) => [t.id, t])).values()];
+  const taskRows = allTasks.map((t) => ({
     id: t.id,
     target_id: t.targetId,
     description: t.description,
@@ -256,6 +302,10 @@ export function buildExportBundle(repo: Repository): ExportFile[] {
     file("questionnaires.csv", toCsv(questionnaires, questionColumns), questionnaires.length),
     file("assignments.jsonl", toJsonl(assignments, assignmentColumns), assignments.length),
     file("assignments.csv", toCsv(assignments, assignmentColumns), assignments.length),
+    file("combinations.jsonl", toJsonl(combinations, combinationColumns), combinations.length),
+    file("combinations.csv", toCsv(combinations, combinationColumns), combinations.length),
+    file("coverage.jsonl", toJsonl(coverage, coverageColumns), coverage.length),
+    file("coverage.csv", toCsv(coverage, coverageColumns), coverage.length),
     file("tasks.jsonl", toJsonl(taskRows, taskColumns), taskRows.length),
     file("tasks.csv", toCsv(taskRows, taskColumns), taskRows.length)
   ];

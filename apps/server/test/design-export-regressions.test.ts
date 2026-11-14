@@ -77,6 +77,14 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
     const before = buildExportBundle(repo);
     expect(before.find((file) => file.name === "trials.jsonl")!.rows).toBe(36);
     expect(before.every((file) => !file.name.includes("gaze"))).toBe(true);
+    const combinations = before.find((file) => file.name === "combinations.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
+    expect(combinations).toHaveLength(24);
+    expect(combinations.filter((row) => row.session_id === session.session_id)).toHaveLength(12);
+    expect(combinations.every((row) => row.searched === true)).toBe(true);
+    const coverage = before.find((file) => file.name === "coverage.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
+    expect(coverage).toHaveLength(24);
+    const tasks = before.find((file) => file.name === "tasks.jsonl")!.content;
+    for (const id of ["Q01", "Q12", "P1", "S01", "T01"]) expect(tasks).toContain(`"id":"${id}"`);
     const trials = before.find((file) => file.name === "trials.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
     expect(trials.every((trial) => trial.synthetic === true)).toBe(true);
     expect(trials.every((trial) => !("gaze_x" in trial) && !("affect_prediction" in trial))).toBe(true);

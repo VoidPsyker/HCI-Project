@@ -230,6 +230,17 @@ export function generateDesign(input: {
   };
 }
 
+/** The menu x emotion pairs a design searches, one entry per scored search ("frustrated:C"). */
+export function designCells(design: Pick<StudyDesign, "trials">): string[] {
+  return design.trials.map((trial) => `${trial.stateLabel}:${trial.menuId}`);
+}
+
+/** Whether a design uses the current scored searches (earlier designs used other task sets). */
+export function usesCurrentSearches(design: Pick<StudyDesign, "trials">): boolean {
+  const ids = (list: string[]) => [...list].sort().join();
+  return ids(design.trials.map((t) => t.taskId)) === ids(SCORED_TASKS.map((t) => t.id));
+}
+
 export function designSummary(design: StudyDesign) {
   return {
     sessionId: design.sessionId,

@@ -75,6 +75,11 @@ All other participant wording (consent, scripts, items, debrief) is in `apps/web
 
 - **Exports** in the admin console provides events, trials, mood check-ins, demographics,
   questionnaires, and assignment files. Downloads carry SHA-256 checksums.
+- **combinations.csv** lists every planned scored search per session: emotion, menu, task, and
+  whether it was searched and found. **coverage.csv** counts, for each of the 24 menu × emotion
+  pairs, the planned searches, sessions, searches done and successes across real sessions (synthetic,
+  aborted and withdrawn sessions excluded). Each person covers 12 pairs; the schedule covers all 24
+  every two people and refills slots left by aborted sessions.
 - **gaze_samples.csv** in the same panel downloads saved eye-tracking samples across
   sessions. Use `session_id` and `trial_id` to join samples to behavioral exports.
   `finalized` is 1 when the gaze bundle is complete and 0 for partial data.

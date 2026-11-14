@@ -90,6 +90,8 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     // MediaPipe's Emscripten glue builds functions with `new Function`, so the face model needs 'unsafe-eval'.
     reply.header("content-security-policy", "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
     if (request.url.startsWith("/api/")) reply.header("cache-control", "private, no-store");
+    // Participant links must always load the current build, so the app shell is revalidated every visit.
+    else if (String(reply.getHeader("content-type") ?? "").startsWith("text/html")) reply.header("cache-control", "no-cache");
     return payload;
   });
   await app.register(cors, { origin: true });

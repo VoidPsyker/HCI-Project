@@ -41,12 +41,16 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   frustration never first. Each block has three searches on three different menus (12 scored
   searches): blocks 1–2 split Williams row r, blocks 3–4 split row r + 3, so each menu is searched
   twice and per 24 people each menu meets each emotion, and each task each menu, equally often.
-- **Fixed schedule, no randomness.** Participants take a 24-sequence cycle in arrival order
-  (participant n gets sequence n mod 24). The block order changes every person and the menu row
+- **Fixed schedule, no randomness.** Participants fill a 24-sequence cycle: each new person takes
+  the slot least used by sessions still in the study on the current searches (so an aborted or
+  withdrawn person's slot is filled again), breaking ties by the slot whose menu × emotion pairs
+  are least planned so far, then the lowest slot. With no dropouts this is arrival order, and
+  every two consecutive people cover all 24 pairs. The block order changes every person and the menu row
   r every four people, so per 24 people every block order meets every menu row once. Colour mappings
   cycle too. Gender × shopping frequency is still recorded as the stratum but no longer steers
-  allocation. A withdrawn participant's position is not reused. `npm run audit:balance` reports
-  balance.
+  allocation. `npm run audit:balance` reports balance; the `combinations` export lists every
+  planned search per session (emotion, menu, task, whether searched) and `coverage` counts each
+  menu × emotion pair across real sessions.
 - **Task bank.** 72 tasks, one per product. T01–T12 are the plan's Table 5.1 tasks on their
   listed products; the other 60 are generated. "Matched variants" are not generated.
 - **Scored searches: 12 path-named searches, easy or medium only** (`scored-tasks.json`, Q01–Q12,
@@ -59,8 +63,9 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   The plan's T01–T12 and the 24-search design's S01–S12 stay in the bank so earlier sessions
   still resolve their tasks.
 - **Sessions assigned an earlier design.** When a session's page loads and it has not started a
-  scored search, the server reissues its design from the current searches with the same
-  sequence (same block order and block ids), and records `design_reissued:<session>` in meta.
+  scored search, the server reissues its design from the current searches through the same slot
+  allocation, keeping its block order and block ids, and records `design_reissued:<session>` in
+  meta.
   Sessions already in their scored searches keep their design. The quality report counts each
   session against its own design.
 - **Difficulty weights** (0.35 position / 0.40 semantic / 0.25 distractors) are my choice; see

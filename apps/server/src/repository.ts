@@ -4,11 +4,11 @@ import crypto from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import Database from "better-sqlite3";
 import { DEFAULT_CALIBRATION_ERROR_DEG } from "@meridian/analysis";
-import { SCORED_TASKS, TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
+import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { toCsv } from "./exports";
 import { SCHEMA_SQL } from "./schema";
-import { generateDesign, designSummary, type StudyDesign, type StateLabel } from "./design";
+import { BLOCK_ORDERS, SEQUENCE_CYCLE, designCells, generateDesign, designSummary, sequenceFactors, usesCurrentSearches, type StudyDesign, type StateLabel } from "./design";
 
 type Db = InstanceType<typeof Database>;
 
@@ -317,29 +317,62 @@ export class Repository {
     const session = this.getSession(sessionId);
     const design = this.getDesign(sessionId);
     if (!session || !design || ["aborted", "completed", "withdrawn"].includes(session.status)) return design;
-    const ids = (tasks: Array<{ taskId?: string; id?: string }>) => tasks.map((t) => t.taskId ?? t.id).sort().join();
-    if (ids(design.trials) === ids(SCORED_TASKS)) return design;
+    if (usesCurrentSearches(design)) return design;
     const started = this.db
       .prepare("SELECT 1 FROM events WHERE session_id = ? AND event_type = 'trial_start' AND trial_id LIKE ? LIMIT 1")
       .get(sessionId, `${sessionId}-B%`);
     if (started) return design;
-    const fresh = generateDesign({
-      sessionId,
-      participantId: design.participantId,
-      sequenceIndex: design.sequenceIndex,
-      stratum: design.stratum,
-      seed: this.seed,
-      now: design.createdAt
-    });
-    const json = JSON.stringify(fresh);
+    const blockOrderRow = BLOCK_ORDERS.findIndex((order) => order.join() === design.blockOrder.join());
+    let fresh = design;
     this.db.transaction(() => {
-      this.db.prepare("UPDATE sessions SET design_json = ?, target_set = ? WHERE session_id = ?").run(json, fresh.targetSet, sessionId);
+      fresh = generateDesign({
+        sessionId,
+        participantId: design.participantId,
+        sequenceIndex: this.allocateSequence(blockOrderRow < 0 ? undefined : blockOrderRow, sessionId),
+        stratum: design.stratum,
+        seed: this.seed,
+        now: design.createdAt
+      });
+      const json = JSON.stringify(fresh);
       this.db
-        .prepare("UPDATE assignments_audit SET menu_orders = ?, target_set = ?, design_json = ? WHERE session_id = ?")
-        .run(JSON.stringify(fresh.blocks.map((b) => b.menuIds)), fresh.targetSet, json, sessionId);
+        .prepare("UPDATE sessions SET design_json = ?, sequence_index = ?, sequence_id = ?, target_set = ? WHERE session_id = ?")
+        .run(json, fresh.sequenceIndex, fresh.sequenceId, fresh.targetSet, sessionId);
+      this.db
+        .prepare("UPDATE assignments_audit SET sequence_index = ?, sequence_id = ?, menu_orders = ?, target_set = ?, design_json = ? WHERE session_id = ?")
+        .run(fresh.sequenceIndex, fresh.sequenceId, JSON.stringify(fresh.blocks.map((b) => b.menuIds)), fresh.targetSet, json, sessionId);
       this.setMeta(`design_reissued:${sessionId}`, nowIso());
-    })();
+    }).immediate();
     return fresh;
+  }
+
+  /**
+   * Picks a sequence of the fixed 24-sequence cycle: the slot least used by sessions still in the study
+   * on the current searches, so a dropout's or withdrawal's slot is filled again. Among equally used
+   * slots it takes the one whose menu x emotion pairs are least planned across all sessions (any
+   * design), so all 24 pairs fill as early as possible; then the lowest slot. `blockOrderRow` keeps a
+   * reissued session's emotion order. Callers hold a write transaction.
+   */
+  private allocateSequence(blockOrderRow?: number, excludeSessionId?: string): number {
+    const rows = this.db
+      .prepare("SELECT session_id, sequence_index, status, design_json FROM sessions WHERE design_json IS NOT NULL")
+      .all() as Array<{ session_id: string; sequence_index: number | null; status: string; design_json: string }>;
+    const slotUse = new Array<number>(SEQUENCE_CYCLE).fill(0);
+    const cellUse = new Map<string, number>();
+    for (const row of rows) {
+      if (row.session_id === excludeSessionId || ["aborted", "withdrawn"].includes(row.status)) continue;
+      const design = JSON.parse(row.design_json) as StudyDesign;
+      for (const cell of designCells(design)) cellUse.set(cell, (cellUse.get(cell) ?? 0) + 1);
+      if (usesCurrentSearches(design) && row.sequence_index !== null) slotUse[row.sequence_index % SEQUENCE_CYCLE]! += 1;
+    }
+    let best: { slot: number; score: [number, number] } | null = null;
+    for (let slot = 0; slot < SEQUENCE_CYCLE; slot++) {
+      if (blockOrderRow !== undefined && sequenceFactors(slot).blockOrderRow !== blockOrderRow) continue;
+      const cells = designCells(generateDesign({ sessionId: "slot", participantId: "slot", sequenceIndex: slot, stratum: "", seed: this.seed }));
+      const score: [number, number] = [slotUse[slot]!, cells.reduce((sum, cell) => sum + (cellUse.get(cell) ?? 0), 0)];
+      if (!best || score[0] < best.score[0] || (score[0] === best.score[0] && score[1] < best.score[1])) best = { slot, score };
+    }
+    const slot = best!.slot;
+    return slot + SEQUENCE_CYCLE * slotUse[slot]!;
   }
 
   recordConsent(sessionId: string, version: string): SessionRow {
@@ -389,10 +422,7 @@ export class Repository {
           session.participant_id
         );
 
-      // Participants take the fixed schedule in arrival order; the count survives deletion of participant records.
-      const position = Number(this.getMeta("allocation_position") ?? 0);
-      const assigned = sequenceOverride ?? position;
-      this.setMeta("allocation_position", String(position + 1));
+      const assigned = sequenceOverride ?? this.allocateSequence();
       const design = generateDesign({
         sessionId,
         participantId: session.participant_id,
