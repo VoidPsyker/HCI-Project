@@ -20,7 +20,7 @@ export const GAZE_CONSENT_PARAGRAPHS = consent.gaze.paragraphs;
 
 export const DEMOGRAPHICS = demographics;
 
-// State colours are presentation, not wording, so they stay in code.
+// State colours are presentation, not wording, so they stay in code. ibad wrote this
 const STATE_COLOURS: Record<StateLabel, string> = {
   happy: "#0f766e",
   frustrated: "#b45309",
