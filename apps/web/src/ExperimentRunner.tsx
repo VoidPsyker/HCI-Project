@@ -360,10 +360,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
   const handleBaseline = async (payload: CheckinPayload) => {
     if (!logger) return;
     logger.log({ event_type: "checkin", state_label: "mixed", meta: { ...payload } });
-    if (payload.distress > 6) {
-      await stopForDistress("distress_at_baseline");
-      return;
-    }
     state.setCheckinPhase("baseline");
     state.setPhase("instructions");
   };
@@ -410,10 +406,6 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         manipulation_check_passed: manipulationCheckPassed(block?.stateLabel ?? "mixed", payload)
       }
     });
-    if (payload.distress > 6) {
-      await stopForDistress("distress_gt_6");
-      return;
-    }
     if (payload.phase === "baseline") {
       state.setPhase("instructions");
       return;
@@ -593,7 +585,8 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         taskDescription: practice.taskDescription,
         stateLabel: "mixed",
         practice: true,
-        trialIndex: state.practiceIndex
+        trialIndex: state.practiceIndex,
+        trialCount: design?.practiceTrials.length ?? 0
       }
     : null;
   const mainSpec: TrialInstruction | null = mainTrial
@@ -606,7 +599,8 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
         taskDescription: mainTrial.taskDescription,
         stateLabel: mainTrial.stateLabel,
         practice: false,
-        trialIndex: mainTrial.trialIndex
+        trialIndex: mainTrial.trialIndex,
+        trialCount: block?.trialIds.length ?? 0
       }
     : null;
 
@@ -752,6 +746,7 @@ export function ExperimentRunner({ sessionId }: { sessionId: string }) {
       phase={state.phase}
       blockIndex={state.blockIndex}
       trialIndex={state.trialIndex}
+      trialCount={state.design?.blocks[state.blockIndex]?.trialIds.length ?? 0}
       fastMode={fastMode}
       onStop={handleStop}
     >

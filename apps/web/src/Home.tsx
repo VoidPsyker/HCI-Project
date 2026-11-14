@@ -109,7 +109,7 @@ export function Home() {
             <li>Server-assigned sequences recorded in <code>assignments_audit</code>.</li>
             <li>Every raw event appended to <code>data/raw/&lt;session_id&gt;.jsonl</code>.</li>
             <li>Trials are recomputed from events, so a browser crash does not lose the path.</li>
-            <li>Reduced-motion support, visible Stop control, and a distress threshold that stops the induction.</li>
+            <li>Reduced-motion support, and a visible Stop control.</li>
             <li>Eye tracking is optional. The study can continue after failed calibration. Gaze data are stored separately with restricted access.</li>
             <li>No external requests: all fonts, icons, illustrations, WebGazer assets, and data are local.</li>
           </ul>

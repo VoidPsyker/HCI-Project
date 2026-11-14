@@ -73,7 +73,6 @@ export function CheckinScreen({
   const stateValues = STATE_ITEMS.map((item) => states[item.id]);
   const dominant = reportedState({ ...states, valence, arousal });
   const intensity = Math.max(...stateValues);
-  const distressHigh = distress > 6;
   const title =
     phase === "baseline"
       ? "How do you feel right now?"
@@ -144,12 +143,6 @@ export function CheckinScreen({
             high="Exhausted"
             testId="fatigue"
           />
-          {distressHigh ? (
-            <div className="warning-box" role="alert" data-testid="distress-warning">
-              <strong>Distress above 6/10.</strong> The session will stop immediately and go to the debrief. The
-              researcher will check on you.
-            </div>
-          ) : null}
         </div>
       </div>
       {error ? <p role="alert">Your check-in could not be saved. Please try again.</p> : null}
@@ -157,7 +150,7 @@ export function CheckinScreen({
         <span className="small-note">Your answer is logged with the check-in time and block.</span>
         <button
           type="button"
-          className={distressHigh ? "button danger" : "button primary"}
+          className="button primary"
           disabled={busy || saving}
           onClick={() => {
             if (busy || submitting.current) return;
@@ -185,7 +178,7 @@ export function CheckinScreen({
           }}
           data-testid="checkin-continue"
         >
-          {distressHigh ? "Stop and go to debrief" : phase === "post_induction" ? "Continue to trials" : "Continue"}
+          {phase === "post_induction" ? "Continue to trials" : "Continue"}
         </button>
       </div>
     </section>

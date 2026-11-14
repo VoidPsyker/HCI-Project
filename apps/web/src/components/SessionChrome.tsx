@@ -35,6 +35,7 @@ export function SessionChrome({
   phase,
   blockIndex,
   trialIndex,
+  trialCount,
   fastMode,
   onStop,
   children
@@ -43,6 +44,7 @@ export function SessionChrome({
   phase: RunnerPhase;
   blockIndex: number;
   trialIndex: number;
+  trialCount: number;
   fastMode: boolean;
   onStop: (reason: string) => void;
   children: ReactNode;
@@ -68,7 +70,7 @@ export function SessionChrome({
           <span className="phase-pill">{PHASE_LABEL[phase]}</span>
           <span className="progress-text">
             {phase === "block_intro" || phase === "induction" || phase === "checkin" || phase === "trial_intro" || phase === "trial"
-              ? `Block ${blockIndex + 1} of 4 · Trial ${trialIndex + 1} of 3`
+              ? `Block ${blockIndex + 1} of 4 · Trial ${trialIndex + 1} of ${trialCount}`
               : `Session ${session.session_id.slice(-6)}`}
           </span>
         </div>

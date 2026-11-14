@@ -33,7 +33,8 @@ function baseSpec(targetId: string): TrialInstruction {
     taskDescription: "A steel watch for everyday wear",
     stateLabel: "mixed",
     practice: false,
-    trialIndex: 0
+    trialIndex: 0,
+    trialCount: 3
   };
 }
 
@@ -68,6 +69,12 @@ function renderTrial(targetId: string) {
 }
 
 describe("TrialRunner", () => {
+  it("numbers a search out of its own block's size", () => {
+    render(<TrialRunner spec={{ ...baseSpec(LEAVES[0]!.productId!), trialIndex: 5, trialCount: 6 }} colourMapping={DEFAULT_COLOUR_MAPPING}
+      logger={fakeLogger().logger} fastMode={false} onComplete={vi.fn()} />);
+    expect(screen.getByTestId("trial-intro")).toHaveTextContent("Trial 6 of 6");
+  });
+
   it.each([{ practice: false, seconds: 60 }, { practice: true, seconds: 45 }])(
     "records a real timeout at the $seconds-second limit (practice=$practice)",
     ({ practice, seconds }) => {

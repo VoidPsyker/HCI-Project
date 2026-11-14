@@ -26,6 +26,8 @@ export interface TrialInstruction {
   stateLabel: StateLabel;
   practice: boolean;
   trialIndex: number;
+  /** Searches in this block, from the session's own design. */
+  trialCount: number;
 }
 
 type Step = "instruction" | "menu" | "product" | "wrong_product" | "failed" | "timeout";
@@ -294,7 +296,7 @@ export function TrialRunner({
     return (
       <section className="trial-intro" data-testid="trial-intro">
         <div className="intro-card">
-          <div className="eyebrow">{spec.practice ? "Practice trial" : `Trial ${spec.trialIndex + 1} of 3`} · Menu {spec.menuId}</div>
+          <div className="eyebrow">{spec.practice ? "Practice trial" : `Trial ${spec.trialIndex + 1} of ${spec.trialCount}`} · Menu {spec.menuId}</div>
           <h2>{spec.practice ? "Try the menu once" : "Find this watch"}</h2>
           <p className="task-text">{spec.taskDescription}</p>
           <div className="intro-meta">
