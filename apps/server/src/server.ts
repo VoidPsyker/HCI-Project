@@ -142,7 +142,7 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       participant: participant
         ? { label: participant.label, consent_version: participant.consent_version, consented_at: participant.consented_at }
         : null,
-      design: publicDesign(repo.getDesign(sessionId))
+      design: publicDesign(repo.refreshOutdatedDesign(sessionId))
     };
   });
 

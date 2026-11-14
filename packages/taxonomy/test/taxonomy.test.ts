@@ -93,15 +93,22 @@ describe("scored and practice tasks", () => {
       .map((leaf) => leaf.label);
   };
 
-  it("scores the plan's 12 tasks plus 12 added ones: 8 easy, 8 medium, 8 hard, 6 per department", () => {
-    expect(SCORED_TASKS.map((task) => task.id)).toEqual([
-      "T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12",
-      "S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12"
-    ]);
+  it("scores 12 easy or medium searches, one per collection, each naming its full menu path", () => {
+    expect(SCORED_TASKS.map((task) => task.id)).toEqual(["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10", "Q11", "Q12"]);
     const count = (key: (task: (typeof SCORED_TASKS)[number]) => string) =>
       SCORED_TASKS.reduce<Record<string, number>>((acc, task) => ({ ...acc, [key(task)]: (acc[key(task)] ?? 0) + 1 }), {});
-    expect(count((task) => task.difficulty)).toEqual({ Easy: 8, Medium: 8, Hard: 8 });
-    expect(count((task) => task.criteria.departmentId ?? "")).toEqual({ sport: 6, dress: 6, everyday: 6, smart: 6 });
+    expect(count((task) => task.difficulty)).toEqual({ Easy: 8, Medium: 4 });
+    expect(new Set(SCORED_TASKS.map((task) => task.criteria.subcategoryId)).size).toBe(12);
+    for (const task of [...SCORED_TASKS, ...PRACTICE_TASKS]) {
+      const [department, collection, watch] = semanticPath(task.targetId);
+      expect(task.description, task.id).toContain(`In ${department!.label} › ${collection!.label}, find `);
+      if (task.difficulty === "Easy") expect(task.description, task.id).toContain(`the ${watch!.label} watch`);
+      else {
+        expect(task.description, task.id).toContain(`the watch with a ${task.criteria.dial} dial`);
+        const sameDial = products.filter((p) => p.subcategoryId === collection!.id && p.attributes.dial === task.criteria.dial);
+        expect(sameDial.map((p) => p.id), task.id).toEqual([task.targetId]);
+      }
+    }
   });
 
   it("resolves every scored task to its own target, never shared with another study task", () => {

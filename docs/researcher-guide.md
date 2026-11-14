@@ -39,7 +39,7 @@ pixel ratio; that warning is never shown to the participant.
 
 The participant works through: consent → eye-tracking consent →
 demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
-blocks (scenario → check-in → six searches, one per menu → check-in with fatigue → 15-s neutral reset) →
+blocks (scenario → check-in → three searches → check-in with fatigue → 15-s neutral reset) →
 questionnaires → debrief. Eye-tracking calibration runs before the first induction;
 gaze is recorded whatever the calibration error, and the session manifest stores that error
 for choosing a cutoff at analysis. Participants can continue the full study without gaze if

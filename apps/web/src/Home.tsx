@@ -38,7 +38,7 @@ export function Home() {
             <h1>Six menus. Four moods. One searching study.</h1>
             <p className="home-lede">
               A complete, local-first pilot instrument for the Meridian Timepieces study. It runs consent, emotion
-              scenarios, 24 scored searches, questionnaires, logging, and the researcher dashboard without any
+              scenarios, twelve scored searches, questionnaires, logging, and the researcher dashboard without any
               external network requests during trials.
             </p>
             <div className="home-actions">
@@ -55,7 +55,7 @@ export function Home() {
               ) : null}
             </div>
             <div className="home-facts">
-              <span>24 scored searches</span>
+              <span>12 scored searches</span>
               <span>6 balanced menus</span>
               <span>≤ 100 minutes</span>
               <span>Webcam eye tracking · separate consent</span>
@@ -75,7 +75,7 @@ export function Home() {
             <h2>Participant run</h2>
             <p>
               Consent, separate gaze consent, calibration, demographics, baseline affect, six
-              practice trials, four counterbalanced scenarios, 24 scored searches, check-ins, neutral resets,
+              practice trials, four counterbalanced scenarios, twelve scored searches, check-ins, neutral resets,
               questionnaires, and debrief.
             </p>
             <a href="/admin">Create a link →</a>

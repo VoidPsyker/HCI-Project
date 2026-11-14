@@ -180,10 +180,10 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
     .split("\n")
     .map((line) => JSON.parse(line) as Record<string, unknown>)
     .filter((row) => row.session_id === sessionId);
-  expect(mine).toHaveLength(30);
+  expect(mine).toHaveLength(18);
   const main = mine.filter((row) => !row.practice);
-  expect(main).toHaveLength(24);
-  expect(main.filter((row) => row.success)).toHaveLength(23);
+  expect(main).toHaveLength(12);
+  expect(main.filter((row) => row.success)).toHaveLength(11);
   expect(main.filter((row) => row.gave_up)).toHaveLength(1);
   expect(main.some((row) => Number(row.wrong_department) > 0 && row.success)).toBe(true);
   expect(main.every((row) => row.condition === "static")).toBe(true);

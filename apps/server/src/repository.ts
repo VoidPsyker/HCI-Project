@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import Database from "better-sqlite3";
 import { DEFAULT_CALIBRATION_ERROR_DEG } from "@meridian/analysis";
-import { TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
+import { SCORED_TASKS, TASK_BY_ID, type MenuId, type Task } from "@meridian/taxonomy";
 import { isGazeUnavailableReason, scoreTrial, type EventInput, type ResearchEvent } from "@meridian/scoring";
 import { toCsv } from "./exports";
 import { SCHEMA_SQL } from "./schema";
@@ -194,6 +194,8 @@ export interface AdminSession {
   sequence_id: string | null;
   stratum: string | null;
   target_set: number | null;
+  /** Practice plus scored searches in the design this session was assigned (null before assignment). */
+  expected_trials: number | null;
   created_at: string;
   started_at: string | null;
   ended_at: string | null;
@@ -304,6 +306,40 @@ export class Repository {
     const row = this.getSession(sessionId);
     if (!row?.design_json) return null;
     return JSON.parse(row.design_json) as StudyDesign;
+  }
+
+  /**
+   * Reissues an active session's design from the current task set when it was assigned an older one
+   * and has not started a scored search, keeping its sequence (so block order and ids stay the same).
+   * Sessions already in their scored searches keep their design so their data stays consistent.
+   */
+  refreshOutdatedDesign(sessionId: string): StudyDesign | null {
+    const session = this.getSession(sessionId);
+    const design = this.getDesign(sessionId);
+    if (!session || !design || ["aborted", "completed", "withdrawn"].includes(session.status)) return design;
+    const ids = (tasks: Array<{ taskId?: string; id?: string }>) => tasks.map((t) => t.taskId ?? t.id).sort().join();
+    if (ids(design.trials) === ids(SCORED_TASKS)) return design;
+    const started = this.db
+      .prepare("SELECT 1 FROM events WHERE session_id = ? AND event_type = 'trial_start' AND trial_id LIKE ? LIMIT 1")
+      .get(sessionId, `${sessionId}-B%`);
+    if (started) return design;
+    const fresh = generateDesign({
+      sessionId,
+      participantId: design.participantId,
+      sequenceIndex: design.sequenceIndex,
+      stratum: design.stratum,
+      seed: this.seed,
+      now: design.createdAt
+    });
+    const json = JSON.stringify(fresh);
+    this.db.transaction(() => {
+      this.db.prepare("UPDATE sessions SET design_json = ?, target_set = ? WHERE session_id = ?").run(json, fresh.targetSet, sessionId);
+      this.db
+        .prepare("UPDATE assignments_audit SET menu_orders = ?, target_set = ?, design_json = ? WHERE session_id = ?")
+        .run(JSON.stringify(fresh.blocks.map((b) => b.menuIds)), fresh.targetSet, json, sessionId);
+      this.setMeta(`design_reissued:${sessionId}`, nowIso());
+    })();
+    return fresh;
   }
 
   recordConsent(sessionId: string, version: string): SessionRow {
@@ -792,6 +828,9 @@ export class Repository {
         sequence_id: row.sequence_id,
         stratum: row.stratum,
         target_set: row.target_set,
+        expected_trials: row.design_json
+          ? ((design: StudyDesign) => design.trials.length + design.practiceTrials.length)(JSON.parse(row.design_json) as StudyDesign)
+          : null,
         created_at: row.created_at,
         started_at: row.started_at,
         ended_at: row.ended_at,

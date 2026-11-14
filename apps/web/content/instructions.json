@@ -1,7 +1,7 @@
 {
   "eyebrow": "How the session works",
-  "title": "Four short scenarios, 24 searches",
-  "lede": "You will practice all six menu layouts once, then complete four blocks. Each block starts with a short scenario, a check-in, and six searches, one on each menu. We are testing the website, not you, so please say candidly what you notice.",
+  "title": "Four short scenarios, twelve searches",
+  "lede": "You will practice all six menu layouts once, then complete four blocks. Each block starts with a short scenario, a check-in, and three searches on three different menus. Every menu appears twice. Each search tells you the department and collection to open, then which watch to find. We are testing the website, not you, so please say candidly what you notice.",
   "cards": [
     {
       "title": "Think aloud",
@@ -24,10 +24,10 @@
     "Consent and setup",
     "Practice ×6",
     "Eye-tracking calibration",
-    "4 × (scenario → check-in → 6 searches → check-in → reset)",
+    "4 × (scenario → check-in → 3 searches → check-in → reset)",
     "Questionnaires",
     "Debrief"
   ],
-  "estimate": "The study is designed to take about 20 minutes. You can continue through all activities if you need longer.",
+  "estimate": "The study is designed to take about 15 minutes. You can continue through all activities if you need longer.",
   "start": "Start the six practice trials"
 }

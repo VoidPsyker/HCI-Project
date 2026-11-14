@@ -3,6 +3,7 @@ import productsJson from "../products.json";
 import tasksJson from "../tasks.json";
 import practiceJson from "../practice.json";
 import addedJson from "../added-tasks.json";
+import scoredJson from "../scored-tasks.json";
 
 export type Level = 1 | 2 | 3;
 export type MenuId = "A" | "B" | "C" | "D" | "E" | "F";
@@ -92,15 +93,18 @@ export const tasksData = tasksJson as TasksData;
 export const nodes: TaxonomyNode[] = taxonomy.nodes;
 export const products: Product[] = productsData.products;
 export const tasks: Task[] = tasksData.tasks;
-/** Twelve plan-style searches added so each emotion block covers all six menus. */
-export const ADDED_TASKS = (addedJson as TasksData).tasks;
-/** Every participant's 24 scored searches: the plan's Table 5.1 tasks plus the added ones (8 easy, 8 medium, 8 hard). */
-export const SCORED_TASKS: Task[] = [...tasks.filter((task) => task.canonical), ...ADDED_TASKS];
+/** S01–S12 from the 24-search design; kept so sessions assigned that design still resolve their tasks. */
+export const RETIRED_TASKS = (addedJson as TasksData).tasks;
+/**
+ * Every participant's 12 scored searches (8 easy, 4 medium), one per collection. Each names the
+ * department and collection, then the watch by name (easy) or by its only dial of that colour (medium).
+ */
+export const SCORED_TASKS: Task[] = (scoredJson as TasksData).tasks;
 /** Six plan-style practice searches, one per menu, on targets that are never scored. */
 export const PRACTICE_TASKS = (practiceJson as TasksData).tasks;
 const reservedTargets = new Set([...SCORED_TASKS, ...PRACTICE_TASKS].map((task) => task.targetId));
 /** Script-written tasks whose details the menus hide; used only by the frustration scenario. */
-export const SCENARIO_TASKS: Task[] = tasks.filter((task) => !reservedTargets.has(task.targetId));
+export const SCENARIO_TASKS: Task[] = tasks.filter((task) => !task.canonical && !reservedTargets.has(task.targetId));
 
 export const MENU_IDS: MenuId[] = ["A", "B", "C", "D", "E", "F"];
 export const DEPARTMENTS = nodes.filter((n) => n.level === 1);
@@ -108,7 +112,7 @@ export const SUBCATEGORIES = nodes.filter((n) => n.level === 2);
 export const LEAVES = nodes.filter((n) => n.level === 3);
 export const PRODUCT_BY_ID = new Map(products.map((p) => [p.id, p]));
 export const NODE_BY_ID = new Map(nodes.map((n) => [n.id, n]));
-export const TASK_BY_ID = new Map([...tasks, ...ADDED_TASKS].map((t) => [t.id, t]));
+export const TASK_BY_ID = new Map([...tasks, ...RETIRED_TASKS, ...SCORED_TASKS].map((t) => [t.id, t]));
 
 export const PALETTE: Record<DepartmentColour, { bg: string; fg: string; soft: string; border: string }> = {
   teal: { bg: "#0f766e", fg: "#ffffff", soft: "#ccfbf1", border: "#0f766e" },
@@ -291,7 +295,8 @@ export function validateTaxonomy(): ValidationReport {
     if (!taskIds.has(id)) errors.push(`missing canonical task ${id}`);
   }
   if (PRACTICE_TASKS.length !== 6) errors.push(`expected 6 practice tasks, got ${PRACTICE_TASKS.length}`);
-  if (SCORED_TASKS.length !== 24) errors.push(`expected 24 scored tasks, got ${SCORED_TASKS.length}`);
+  if (SCORED_TASKS.length !== 12) errors.push(`expected 12 scored tasks, got ${SCORED_TASKS.length}`);
+  if (SCORED_TASKS.some((task) => task.difficulty === "Hard")) errors.push("scored tasks must be easy or medium");
   const studyTargets = new Set<string>();
   for (const task of [...SCORED_TASKS, ...PRACTICE_TASKS]) {
     const matches = resolveTask(task);

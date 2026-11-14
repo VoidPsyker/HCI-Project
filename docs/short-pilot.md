@@ -1,8 +1,9 @@
-# Session timing: approximately 20 minutes of activities
+# Session timing: approximately 15 minutes of activities
 
 This revision supersedes timing in the supplied planning PDFs for the executable pilot only.
-Each participant searches all six menus in every state: 24 scored searches covering all
-24 menu × state cells.
+Each participant makes 12 scored searches, three per state, using each menu twice. Each
+person covers 12 of the 24 menu × state cells; the fixed schedule covers all 24 equally across
+every 24 participants.
 
 ## Timing estimate
 
@@ -11,15 +12,15 @@ Each participant searches all six menus in every state: 24 scored searches cover
 | Consent, setup, calibration and debrief | 2:00 |
 | Six practice searches, averaging 10 seconds | 1:00 |
 | Four mood activities | 3:15 |
-| 24 scored searches, averaging 25 seconds | 10:00 |
+| Twelve scored searches, averaging 25 seconds | 5:00 |
 | Four neutral resets | 1:00 |
 | Check-ins, instructions and transitions | 1:30 |
 | End questionnaires | 1:15 |
-| Total | 20:00 |
+| Total | 15:00 |
 
 The estimates assume the participant
 finishes most searches well before the individual limit. The longer plan expects a typical
-scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes 24 minutes.
+scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes 17 minutes.
 Measure the full session in a rehearsal and allow people enough time to read consent, calibrate,
 and answer. A 45-second practice or 60-second scored timeout ends that search only. The app
 records it separately from voluntary give-up and successful completion.
@@ -56,7 +57,7 @@ Rehearse with 6-8 people. Measure consent-to-debrief duration, completion of all
 per-state induction success, per-menu practice and scored success, total activity duration, and missing
 records. Retain the existing intended-state success target of at least 60% for every state,
 practice success of at least 80% for every menu and less than 5% missing expected records.
-Also report incomplete-run rate and how many completed activity sequences exceed 20 minutes.
+Also report incomplete-run rate and how many completed activity sequences exceed 15 minutes.
 These are pilot decision criteria, not guaranteed outcomes or a power analysis.
 
 ## Storage and verification
@@ -66,7 +67,7 @@ persistent data and must not collect research sessions. Keep the data directory 
 volume; back up the database and restricted gaze store together. Never retain webcam video.
 
 After a rehearsal, export CSV/JSONL with the checksum manifest. Verify six practice results,
-24 main trials, four induction pairs, nine check-ins (baseline plus two per block), one complete 10-item SUS and the other
+twelve main trials, four induction pairs, nine check-ins (baseline plus two per block), one complete 10-item SUS and the other
 questionnaire answers, assignment metadata and gaze quality records for a completed run.
 For a participant-stopped run, verify its stop reason and only the records actually collected; do not fill
 missing observations. Reopen the server and export again to check persistence across restart.

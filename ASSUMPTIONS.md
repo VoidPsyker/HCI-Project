@@ -38,28 +38,31 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
 - **Counterbalancing.** Block orders depart from the plan's cyclic 4 × 4 square: confusion
   always precedes frustration so lingering frustration cannot colour the confusion block.
   The four orders keep happy and bored in every position once; confusion is never last and
-  frustration never first. Every block searches all six menus once (24 scored searches), in a
-  row of a 6 × 6 Williams square: block b takes row r + b.
+  frustration never first. Each block has three searches on three different menus (12 scored
+  searches): blocks 1–2 split Williams row r, blocks 3–4 split row r + 3, so each menu is searched
+  twice and per 24 people each menu meets each emotion, and each task each menu, equally often.
 - **Fixed schedule, no randomness.** Participants take a 24-sequence cycle in arrival order
   (participant n gets sequence n mod 24). The block order changes every person and the menu row
-  r every four people, so per 24 people every block order meets every menu row once, and in every
-  emotion each menu sits in each position after the scenario equally often. Colour mappings
+  r every four people, so per 24 people every block order meets every menu row once. Colour mappings
   cycle too. Gender × shopping frequency is still recorded as the stratum but no longer steers
   allocation. A withdrawn participant's position is not reused. `npm run audit:balance` reports
   balance.
 - **Task bank.** 72 tasks, one per product. T01–T12 are the plan's Table 5.1 tasks on their
   listed products; the other 60 are generated. "Matched variants" are not generated.
-- **Scored searches: the plan's 12 plus 12 added, for everyone** (8 easy / 8 medium / 8 hard,
-  six per department). The 60 generated tasks describe hidden details (size, price) that the menu
-  names cannot lead to, so pilot participants could not find them; S01–S12 in `added-tasks.json`
-  are written in the plan's style instead. The 24 form four groups of six (two per tier); the
-  task rotation ("target set", equal to the block-order row) gives each emotion every group
-  equally often. Within a block, the watch for menu m is task (m + r) of the group, so each
-  task meets each menu equally often. No 6 × 6 design can also give each task every position
-  (six has no orthogonal Latin squares), so tasks spread unevenly over positions. T04, T05, T08 and T10
-  are reworded so no task names a different watch in its own collection (e.g. "Rose-gold" when
-  "Rose Gold" sits beside the answer). Practice uses six plan-style tasks in `practice.json`,
-  on watches that are never scored.
+- **Scored searches: 12 path-named searches, easy or medium only** (`scored-tasks.json`, Q01–Q12,
+  8 easy / 4 medium, one per collection). Participants could not find watches from the plan's
+  wording, so each search names its department and collection ("In Sport & Dive › Trail Master
+  GMT, …") and then the watch by its exact name (easy) or as the collection's only dial of a
+  colour (medium). No hard searches. They form four groups of two easy + one medium; the task
+  rotation ("target set", equal to the block-order row) gives each emotion every group equally
+  often. Practice (`practice.json`) uses the same easy wording on watches that are never scored.
+  The plan's T01–T12 and the 24-search design's S01–S12 stay in the bank so earlier sessions
+  still resolve their tasks.
+- **Sessions assigned an earlier design.** When a session's page loads and it has not started a
+  scored search, the server reissues its design from the current searches with the same
+  sequence (same block order and block ids), and records `design_reissued:<session>` in meta.
+  Sessions already in their scored searches keep their design. The quality report counts each
+  session against its own design.
 - **Difficulty weights** (0.35 position / 0.40 semantic / 0.25 distractors) are my choice; see
   `docs/difficulty.md`. Rewording the generated tasks renumbered six task ids within their
   tier; no task changed tier, target or attributes.

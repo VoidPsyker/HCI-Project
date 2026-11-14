@@ -109,14 +109,14 @@ export const COLOUR_PERMUTATIONS = permutations(COLOURS).map(
 );
 
 /**
- * The 24 scored searches form four groups of six, each with two easy, two medium and two hard
- * searches (tiers in task-id order), so every emotion gets the same mix of difficulty.
+ * The 12 scored searches form four groups of three, each with two easy and one medium search
+ * (tiers in task-id order), so every emotion gets the same mix of difficulty.
  */
 function scoredTaskGroups(): Task[][] {
   const tier = (difficulty: Difficulty) => SCORED_TASKS.filter((t) => t.difficulty === difficulty);
-  const [easy, medium, hard] = [tier("Easy"), tier("Medium"), tier("Hard")];
-  const groups = [0, 1, 2, 3].map((g) => [easy[2 * g], easy[2 * g + 1], medium[2 * g], medium[2 * g + 1], hard[2 * g], hard[2 * g + 1]]);
-  if (groups.some((group) => group.some((task) => !task))) throw new Error("scored tasks must be 8 easy, 8 medium and 8 hard");
+  const [easy, medium] = [tier("Easy"), tier("Medium")];
+  const groups = [0, 1, 2, 3].map((g) => [easy[2 * g], easy[2 * g + 1], medium[g]]);
+  if (groups.some((group) => group.some((task) => !task))) throw new Error("scored tasks must be 8 easy and 4 medium");
   return groups as Task[][];
 }
 
@@ -141,13 +141,15 @@ export const SEQUENCE_CYCLE = 24;
 const menuRow = (row: number): MenuId[] => (MENU_ROWS[row % MENU_ROWS.length] ?? []).map((i) => MENU_IDS[i] as MenuId);
 
 /**
- * Block b searches all six menus in Williams row menuRow + b, so across people each menu takes every
- * position after the scenario equally often in every emotion. The watch searched on menu m is task
- * (m + menuRow) of the emotion's group: over six rows each task meets each menu once. (No 6 x 6 design
- * can also give each task every position once; six has no orthogonal Latin squares.)
+ * Blocks 1-2 split Williams row menuRow and blocks 3-4 split row menuRow + 3, so each menu is searched
+ * twice, never twice in a block, and across 24 people each menu meets each emotion and each task
+ * equally often. Slot t of block b takes task (t + b) of the emotion's group.
  */
 function blockSearches(group: Task[], row: number, block: number): Array<{ menuId: MenuId; task: Task }> {
-  return menuRow(row + block).map((menuId) => ({ menuId, task: group[(MENU_IDS.indexOf(menuId) + row) % 6]! }));
+  const half = block % 2;
+  return menuRow(row + 3 * Math.floor(block / 2))
+    .slice(3 * half, 3 * half + 3)
+    .map((menuId, t) => ({ menuId, task: group[(t + block) % 3]! }));
 }
 
 /** Practice uses a menu row the scored blocks skip, so it never previews block 1's order. */

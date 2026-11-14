@@ -1,6 +1,6 @@
 {
-  "protocolVersion": "study-v5",
-  "targetSeconds": 1200,
+  "protocolVersion": "study-v6",
+  "targetSeconds": 900,
   "scoredTrialSeconds": 60,
   "practiceTrialSeconds": 45,
   "neutralResetSeconds": 15

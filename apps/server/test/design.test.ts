@@ -63,38 +63,35 @@ describe("generateDesign", () => {
     expect(new Set(factors.map((f) => f.colourRow)).size).toBe(24);
   });
 
-  it("gives every participant all 24 tasks once, two of each difficulty in every block", () => {
+  it("gives every participant all 12 tasks once, two easy and one medium in every block", () => {
     for (const d of cycle) {
       expect(d.trials.map((t) => t.taskId).sort()).toEqual(SCORED_TASKS.map((t) => t.id).sort());
       for (const block of d.blocks) {
-        expect(tally(d.trials.filter((t) => t.blockId === block.blockId).map((t) => t.difficulty))).toEqual([2, 2, 2]);
+        expect(d.trials.filter((t) => t.blockId === block.blockId).map((t) => t.difficulty).sort()).toEqual(["Easy", "Easy", "Medium"]);
       }
     }
   });
 
-  it("puts each menu in each position after every emotion's scenario equally often", () => {
+  it("meets every menu with every emotion, and every task with every menu, equally often per 24 people", () => {
     const trials = cycle.flatMap((d) => d.trials);
-    const counts = tally(trials.map((t) => `${t.stateLabel}:${t.menuId}:${t.trialIndex}`));
-    expect(counts).toHaveLength(4 * 6 * 6);
-    expect(new Set(counts)).toEqual(new Set([4]));
-  });
-
-  it("pairs every task with every menu equally often and every emotion with every task group", () => {
-    const trials = cycle.flatMap((d) => d.trials);
+    const stateMenu = tally(trials.map((t) => `${t.stateLabel}:${t.menuId}`));
+    expect(stateMenu).toHaveLength(4 * 6);
+    expect(new Set(stateMenu)).toEqual(new Set([12]));
     const taskMenu = tally(trials.map((t) => `${t.taskId}:${t.menuId}`));
-    expect(taskMenu).toHaveLength(24 * 6);
+    expect(taskMenu).toHaveLength(12 * 6);
     expect(new Set(taskMenu)).toEqual(new Set([4]));
+    const menuPosition = tally(trials.map((t) => `${t.menuId}:${t.trialIndex}`));
+    expect(new Set(menuPosition)).toEqual(new Set([16]));
     const stateTask = tally(trials.map((t) => `${t.stateLabel}:${t.taskId}`));
-    expect(stateTask).toHaveLength(4 * 24);
+    expect(stateTask).toHaveLength(4 * 12);
     expect(new Set(stateTask)).toEqual(new Set([6]));
   });
 
-  it("practises the six practice tasks, one per menu, in an order no scored block uses", () => {
+  it("practises the six practice tasks, one per menu", () => {
     for (const d of cycle) {
       const practice = d.practiceTrials;
       expect(practice.map((p) => p.taskId)).toEqual(PRACTICE_TASKS.map((t) => t.id));
       expect(new Set(practice.map((p) => p.menuId)).size).toBe(6);
-      for (const block of d.blocks) expect(block.menuIds).not.toEqual(practice.map((p) => p.menuId));
     }
   });
 

@@ -38,12 +38,17 @@ export function uniformChiSquare(factor: string, categories: string[], observed:
 export function designErrors(sessionId: string, design: StudyDesign): string[] {
   const errors: string[] = [];
   if (design.blocks.length !== 4) errors.push(`${sessionId}: expected 4 blocks`);
-  if (design.trials.length !== 24) errors.push(`${sessionId}: expected 24 trials`);
+  if (design.trials.length !== 12) errors.push(`${sessionId}: expected 12 trials`);
+  const flat = design.blocks.flatMap((b) => b.menuIds);
+  for (const menu of MENU_IDS) {
+    const n = flat.filter((m) => m === menu).length;
+    if (n !== 2) errors.push(`${sessionId}: menu ${menu} appears ${n} times`);
+  }
   if (new Set(design.trials.map((t) => t.trialId)).size !== design.trials.length) errors.push(`${sessionId}: duplicate trial IDs`);
   for (const block of design.blocks) {
     const trials = design.trials.filter((t) => t.blockId === block.blockId);
-    if (trials.length !== 6 || block.trialIds.length !== 6 || [...block.menuIds].sort().join() !== MENU_IDS.join()) {
-      errors.push(`${sessionId}: expected each menu once in ${block.blockId}`);
+    if (trials.length !== 3 || block.trialIds.length !== 3 || new Set(block.menuIds).size !== 3) {
+      errors.push(`${sessionId}: expected three different menus in ${block.blockId}`);
     }
     for (const [index, trialId] of block.trialIds.entries()) {
       const trial = trials.find((t) => t.trialId === trialId);
@@ -57,7 +62,7 @@ export function designErrors(sessionId: string, design: StudyDesign): string[] {
   const states = design.blocks.map((b) => b.stateLabel);
   if (states.indexOf("confused") > states.indexOf("frustrated")) errors.push(`${sessionId}: frustration before confusion`);
   const scored = design.trials.map((t) => t.taskId).sort().join(",");
-  if (scored !== SCORED_TASKS.map((t) => t.id).sort().join(",")) errors.push(`${sessionId}: scored tasks are not the study's 24`);
+  if (scored !== SCORED_TASKS.map((t) => t.id).sort().join(",")) errors.push(`${sessionId}: scored tasks are not the study's 12`);
   return errors;
 }
 

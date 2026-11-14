@@ -124,7 +124,7 @@ function questionnaireCompleteness(
   let answered = 0;
   for (const session of completed) {
     const protocol = protocols.get(session.session_id);
-    const count = [timing.protocolVersion, "short-pilot-v3", "short-pilot-v4"].includes(protocol ?? "")
+    const count = [timing.protocolVersion, "short-pilot-v3", "short-pilot-v4", "study-v5"].includes(protocol ?? "")
       ? base + 1 : protocol === "short-pilot-v2" ? base : base + 5 * questionnaires.sus.length;
     const unique = new Set(answers.filter((answer) => answer.session_id === session.session_id)
       .map((answer) => JSON.stringify([answer.instrument, answer.menu_id, answer.item_id])));
@@ -252,7 +252,7 @@ export function buildGoNoGo(repo: Repository): QaCriterion[] {
   for (const event of events) {
     if (event.event_type === "session_start") {
       const meta = JSON.parse(event.meta_json);
-      if ([timing.protocolVersion, "short-pilot-v2", "short-pilot-v3", "short-pilot-v4"].includes(meta.protocol_version)) {
+      if ([timing.protocolVersion, "short-pilot-v2", "short-pilot-v3", "short-pilot-v4", "study-v5"].includes(meta.protocol_version)) {
         shortPilotStarts.set(event.session_id, meta);
       }
     } else if (event.event_type === "session_end") {
@@ -401,7 +401,8 @@ export function buildQaReport(repo: Repository): QaReport {
 
   const missingTrialEnds = completed.reduce((sum, session) => {
     const observed = trials.filter((trial) => trial.session_id === session.session_id);
-    return sum + Math.max(0, SCORED_TASKS.length + PRACTICE_TASKS.length - observed.length);
+    // Sessions keep the design they were assigned, so count against that design.
+    return sum + Math.max(0, (session.expected_trials ?? SCORED_TASKS.length + PRACTICE_TASKS.length) - observed.length);
   }, 0) + trials.filter((t) => t.missing_trial_end).length;
   const missingStarts = trials.filter((t) => t.missing_trial_start).length;
   const duplicateEnds = trials.filter((t) => t.trial_end_count > 1).length;

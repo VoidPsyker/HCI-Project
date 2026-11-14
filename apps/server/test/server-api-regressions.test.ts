@@ -140,3 +140,22 @@ it('expires an admin token exactly at its expiry time', () => {
  expect(adminTokenValid('pw', undefined)).toBe(false);
  expect(adminTokenValid('pw', 'not-a-token')).toBe(false);
 });
+it('moves a session onto the current searches only until its first scored search starts', () => {
+ const begin = () => { const session = repo.createSession().session; repo.recordConsent(session.session_id, 'v1'); repo.assignDesign(session.session_id, { gender: 'woman', shopping_freq: 'rarely' }); return session; };
+ const outdate = (sessionId: string) => {
+  const design = repo.getDesign(sessionId)!;
+  const old = { ...design, trials: design.trials.map((t) => ({ ...t, taskId: `OLD-${t.taskId}` })) };
+  repo.db.prepare('UPDATE sessions SET design_json = ? WHERE session_id = ?').run(JSON.stringify(old), sessionId);
+  return design;
+ };
+ const fresh = begin(); const expected = outdate(fresh.session_id);
+ expect(repo.refreshOutdatedDesign(fresh.session_id)).toEqual(expected);
+ expect(repo.getDesign(fresh.session_id)).toEqual(expected);
+ expect(JSON.parse(repo.allAssignments().find((row) => row.session_id === fresh.session_id)!.design_json as string)).toEqual(expected);
+
+ const searching = begin(); const current = outdate(searching.session_id); const stored = repo.getDesign(searching.session_id)!;
+ repo.db.prepare(`INSERT INTO events (event_id, participant_id, session_id, study, trial_id, state_label, condition, event_type, t_client, t_server, input_type, meta_json)
+  VALUES ('e1', ?, ?, 'study1', ?, 'happy', 'static', 'trial_start', 1, '2026-11-14T00:00:00Z', 'mouse', '{}')`)
+  .run(searching.participant_id, searching.session_id, current.trials[0]!.trialId);
+ expect(repo.refreshOutdatedDesign(searching.session_id)).toEqual(stored);
+});
