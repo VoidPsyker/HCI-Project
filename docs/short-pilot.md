@@ -43,8 +43,8 @@ and manipulation-check results, not intended state, for labels. No emotion is in
 
 The shorter inductions and resets are unvalidated protocol changes. The bored activity remains
 longer because repetition is its mechanism; this is a design choice, not proof it induces boredom.
-The happy media slot is currently empty: the sunrise placeholder cannot establish a successful
-positive induction. Supply and rehearse an approved local clip before collecting real data.
+The pilot uses a playful puppy clip for positive affect and running water for neutral resets.
+Verify the new clips with the existing mood checks before pooling results with earlier runs.
 
 The scored timeout changed from 20 seconds in the first short pilot and 120 seconds in
 the longer plan. Report timeout rates by menu, state and difficulty. Compare runs with

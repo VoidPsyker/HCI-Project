@@ -635,6 +635,47 @@ describe("Biometric Gaze Server Integration", () => {
       const firstLine = JSON.parse(lines[0]!);
       expect(firstLine.seq).toBe(1);
       expect(firstLine.x_px).toBe(500);
+
+      const partial = setupParticipantAndSession();
+      repo.recordConsent(partial.sessionId, "core-1.0");
+      const partialConsent = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${partial.sessionId}/consent`,
+        payload: { version: "gaze-1.0", camera_used: true, synthetic: false,
+          viewport: VIEWPORT, geometry: GEOMETRY, source: WEBCAM_SOURCE }
+      });
+      expect(partialConsent.statusCode).toBe(200);
+      const partialSample = await app.inject({
+        method: "POST",
+        url: `/api/gaze/sessions/${partial.sessionId}/batches`,
+        headers: { "x-gaze-token": partialConsent.json().token },
+        payload: { batch_id: "206001f0-04bc-469a-9dae-4950e498982d", samples: [
+          { seq: 1, t_ms: 10, x_px: 100, y_px: 200, valid: true, trial_id: "partial-trial" }
+        ] }
+      });
+      expect(partialSample.statusCode).toBe(200);
+
+      const url = "/api/admin/export/gaze_samples.csv";
+      const admin = { "x-admin-password": ADMIN_PW };
+      expect((await app.inject({ url })).statusCode).toBe(401);
+      const combined = await app.inject({ url, headers: admin });
+      expect(combined.statusCode).toBe(200);
+      expect(combined.headers["x-row-count"]).toBe("3");
+      expect(combined.headers["x-checksum-sha256"]).toMatch(/^[a-f0-9]{64}$/);
+      const [columns, ...sampleRows] = combined.body.trim().split("\r\n");
+      const rows = sampleRows.map((row) => Object.fromEntries(columns!.split(",").map((column, index) =>
+        [column, row.split(",")[index]])));
+      expect(rows.filter((row) => row.session_id === sessionId)).toHaveLength(2);
+      expect(rows.filter((row) => row.session_id === sessionId).every((row) => row.finalized === "1")).toBe(true);
+      expect(rows).toContainEqual(expect.objectContaining({
+        session_id: partial.sessionId, participant_id: partial.participantId, trial_id: "partial-trial",
+        t_ms: "10", x_px: "100", y_px: "200", valid: "1", synthetic: "0", finalized: "0"
+      }));
+
+      repo.withdrawSession(partial.sessionId);
+      const afterWithdrawal = await app.inject({ url, headers: admin });
+      expect(afterWithdrawal.headers["x-row-count"]).toBe("2");
+      expect(afterWithdrawal.body).not.toContain(partial.sessionId);
     });
   });
 });

@@ -75,6 +75,10 @@ All other participant wording (consent, scripts, items, debrief) is in `apps/web
 
 - **Exports** in the admin console provides events, trials, mood check-ins, demographics,
   questionnaires, and assignment files. Downloads carry SHA-256 checksums.
+- **gaze_samples.csv** in the same panel downloads saved eye-tracking samples across
+  sessions. Use `session_id` and `trial_id` to join samples to behavioral exports.
+  `finalized` is 1 when the gaze bundle is complete and 0 for partial data.
+  `synthetic` identifies rehearsal samples.
 - In the events export, use `pointer_move` and `pointer_click` for cursor position in
   browser viewport pixels. Movement is sampled at most ten times per second during active
   searches, including practice. The trial-start event records viewport width and height.

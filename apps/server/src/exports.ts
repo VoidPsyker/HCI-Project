@@ -279,6 +279,7 @@ export function writeExportBundle(repo: Repository, exportRoot: string): { direc
 }
 
 export function exportFile(repo: Repository, kind: string): ExportFile | null {
+  if (kind === "gaze_samples.csv") return { name: kind, ...repo.gazeSamplesCsv() };
   const files = buildExportBundle(repo);
   if (kind === "manifest") {
     const manifest = {

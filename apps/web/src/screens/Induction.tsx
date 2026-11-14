@@ -50,6 +50,7 @@ export function InductionScreen({
           script: state,
           max_seconds: definition.durationSeconds,
           fast_mode: fastMode,
+          ...(state === "happy" ? { clip: MEDIA.happy_clip.src } : {}),
           ...(searches ? { search_task_ids: searches.map((task) => task.id) } : {})
         }
       });

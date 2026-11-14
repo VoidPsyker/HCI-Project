@@ -1,11 +1,11 @@
 {
   "happy_clip": {
-    "src": null,
+    "src": "/media/playful-puppies.webm",
     "placeholder": "/assets/happy-placeholder.svg",
     "placeholder_alt": "Local abstract sunrise placeholder for the pleasant clip"
   },
   "neutral_reset_clip": {
-    "src": null,
+    "src": "/media/quiet-stream.webm",
     "placeholder": "/assets/neutral-reset-placeholder.svg",
     "placeholder_alt": "Local placeholder for the calm nature clip"
   }

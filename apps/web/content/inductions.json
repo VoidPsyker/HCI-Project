@@ -9,8 +9,8 @@
   "inductions": {
     "happy": {
       "title": "A pleasant browsing moment",
-      "intro": "Before the next set, we'll show a short clip from a comedy show used in mood research. Imagine you have also just found a great deal on a watch you love. There is nothing to solve here.",
-      "task": "Watch the local clip. When the timer ends, continue to the check-in.",
+      "intro": "Watch the two puppies play. Imagine you have also just found a great deal on a watch you love. There is nothing to solve here.",
+      "task": "Keep watching the clip. When the timer ends, continue to the check-in.",
       "durationSeconds": 45,
       "blockDebrief": "The clip was there to set a mood, not to evaluate you."
     },

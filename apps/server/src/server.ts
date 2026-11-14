@@ -472,7 +472,7 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     const normalized = kind === "manifest" ? "manifest" : kind;
     const file = exportFile(repo, normalized);
     if (!file) {
-      return reply.code(404).send({ error: "export_not_found", kinds: [...buildExportBundle(repo).map((f) => f.name), "manifest"] });
+      return reply.code(404).send({ error: "export_not_found", kinds: [...buildExportBundle(repo).map((f) => f.name), "gaze_samples.csv", "manifest"] });
     }
     const type = file.name.endsWith(".jsonl")
       ? "application/x-ndjson; charset=utf-8"

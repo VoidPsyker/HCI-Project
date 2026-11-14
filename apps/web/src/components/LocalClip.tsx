@@ -6,7 +6,7 @@ export function LocalClip({ slot, testId }: { slot: MediaSlot; testId: string })
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   if (slot.src) return (
     <>
-      <video key={slot.src} src={slot.src} autoPlay playsInline className="local-clip" data-testid={testId}
+      <video key={slot.src} src={slot.src} autoPlay muted loop playsInline className="local-clip" data-testid={testId}
         onError={() => setFailedSrc(slot.src)} />
       {failedSrc === slot.src ? <p role="alert">The video could not be loaded. Please ask the researcher for help before continuing.</p> : null}
     </>

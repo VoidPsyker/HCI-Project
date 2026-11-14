@@ -1273,21 +1273,29 @@ export class Repository {
     };
   }
 
+  gazeSamplesCsv(sessionId?: string): { content: string; sha256: string; rows: number } {
+    const query = this.db.prepare(
+      `SELECT samples.*, gaze.participant_id, gaze.synthetic, (gaze.status = 'completed') AS finalized
+       FROM gaze_samples AS samples
+       JOIN gaze_sessions AS gaze ON gaze.session_id = samples.session_id
+       JOIN sessions AS study ON study.session_id = gaze.session_id
+       JOIN participants AS participant ON participant.participant_id = study.participant_id
+       WHERE gaze.status != 'withdrawn' AND study.status != 'withdrawn' AND participant.withdrawn_at IS NULL
+       ${sessionId === undefined ? "" : "AND samples.session_id = ?"}
+       ORDER BY samples.session_id, samples.seq`
+    );
+    const samples = (sessionId === undefined ? query.all() : query.all(sessionId)) as Array<Record<string, unknown>>;
+    const content = toCsv(samples, [
+      "session_id", "participant_id", "trial_id", "seq", "t_ms", "t_source_ms",
+      "x_px", "y_px", "valid", "invalid_reason", "pupil_left_mm", "pupil_right_mm", "synthetic", "finalized"
+    ]);
+    return { content, sha256: crypto.createHash("sha256").update(content, "utf8").digest("hex"), rows: samples.length };
+  }
+
   readGazeExportFile(sessionId: string, name: string): { content: string; sha256: string } | null {
     if (name === "gaze_samples.csv") {
-      const session = this.getGazeSession(sessionId);
-      if (!session || session.status === "withdrawn" || session.sample_count === 0) return null;
-      const samples = this.getGazeSamples(sessionId).map((sample) => ({
-        ...sample,
-        participant_id: session.participant_id,
-        synthetic: session.synthetic === 1,
-        finalized: session.status === "completed"
-      }));
-      const content = toCsv(samples, [
-        "session_id", "participant_id", "trial_id", "seq", "t_ms", "t_source_ms",
-        "x_px", "y_px", "valid", "invalid_reason", "pupil_left_mm", "pupil_right_mm", "synthetic", "finalized"
-      ]);
-      return { content, sha256: crypto.createHash("sha256").update(content, "utf8").digest("hex") };
+      const file = this.gazeSamplesCsv(sessionId);
+      return file.rows > 0 ? file : null;
     }
     const allowed = new Set(["manifest.json", "gaze_samples.jsonl", "aoi_metrics.jsonl", "gaze_quality.json"]);
     if (!allowed.has(name)) return null;

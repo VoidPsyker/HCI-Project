@@ -30,7 +30,7 @@
     "no_preference": "No preference"
   },
   "credibility": [
-    { "id": "credible_happy", "label": "The comedy clip and great-deal scenario felt believable." },
+    { "id": "credible_happy", "label": "The puppy clip and great-deal scenario felt believable." },
     { "id": "credible_frustrated", "label": "The quick watch searches felt like a genuine shopping situation." },
     { "id": "credible_confused", "label": "The search for the green-dial dress watch felt like a genuine request." },
     { "id": "credible_bored", "label": "The strap price check felt like a genuine catalogue task." }
