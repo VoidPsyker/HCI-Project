@@ -1,10 +1,10 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "tasks": [
     {
-      "id": "Q01",
+      "id": "R01",
       "targetId": "dress.heritage.ivory-dial",
-      "description": "In Dress & Formal › Heritage Classic, find the Ivory Dial watch.",
+      "description": "Heritage Classic dress watch, Ivory Dial",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -14,9 +14,9 @@
       }
     },
     {
-      "id": "Q02",
+      "id": "R02",
       "targetId": "everyday.field.khaki-canvas",
-      "description": "In Everyday & Casual › Field Standard, find the Khaki Canvas watch.",
+      "description": "Field Standard casual watch, Khaki Canvas",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -26,9 +26,9 @@
       }
     },
     {
-      "id": "Q03",
+      "id": "R03",
       "targetId": "sport.prodiver.ocean-green",
-      "description": "In Sport & Dive › Pro Diver 300m, find the watch with a green dial.",
+      "description": "Diver’s watch rated to 300 m, ocean green dial",
       "difficulty": "Medium",
       "canonical": false,
       "criteria": {
@@ -38,9 +38,9 @@
       }
     },
     {
-      "id": "Q04",
+      "id": "R04",
       "targetId": "everyday.urban.deep-teal",
-      "description": "In Everyday & Casual › Urban Minimal, find the Deep Teal watch.",
+      "description": "Urban Minimal everyday watch, Deep Teal",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -50,9 +50,9 @@
       }
     },
     {
-      "id": "Q05",
+      "id": "R05",
       "targetId": "smart.hybridactive.white-sport",
-      "description": "In Smart & Hybrid › Hybrid Active, find the White Sport watch.",
+      "description": "Hybrid Active smartwatch, White Sport",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -62,9 +62,9 @@
       }
     },
     {
-      "id": "Q06",
+      "id": "R06",
       "targetId": "dress.moonphase.celestial-blue",
-      "description": "In Dress & Formal › Artisan Moonphase, find the watch with a blue dial.",
+      "description": "Dress watch that shows the phases of the moon, celestial blue dial",
       "difficulty": "Medium",
       "canonical": false,
       "criteria": {
@@ -74,9 +74,9 @@
       }
     },
     {
-      "id": "Q07",
+      "id": "R07",
       "targetId": "smart.connected.burgundy",
-      "description": "In Smart & Hybrid › Connected Classic, find the Burgundy watch.",
+      "description": "Connected Classic smartwatch, Burgundy",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -87,9 +87,9 @@
       }
     },
     {
-      "id": "Q08",
+      "id": "R08",
       "targetId": "sport.aqua.regatta-white",
-      "description": "In Sport & Dive › Aqua Racer Chrono, find the Regatta White watch.",
+      "description": "Aqua Racer Chrono sports watch, Regatta White",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -99,9 +99,9 @@
       }
     },
     {
-      "id": "Q09",
+      "id": "R09",
       "targetId": "everyday.weekender.moss",
-      "description": "In Everyday & Casual › Weekender, find the watch with a green dial.",
+      "description": "Casual watch for the weekend, moss green dial",
       "difficulty": "Medium",
       "canonical": false,
       "criteria": {
@@ -111,9 +111,9 @@
       }
     },
     {
-      "id": "Q10",
+      "id": "R10",
       "targetId": "sport.trail.granite-grey",
-      "description": "In Sport & Dive › Trail Master GMT, find the Granite Grey watch.",
+      "description": "Trail Master GMT sports watch, Granite Grey",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -123,9 +123,9 @@
       }
     },
     {
-      "id": "Q11",
+      "id": "R11",
       "targetId": "dress.midnight.black-tie",
-      "description": "In Dress & Formal › Midnight Dress, find the Black Tie watch.",
+      "description": "Midnight Dress formal watch, Black Tie",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -135,9 +135,9 @@
       }
     },
     {
-      "id": "Q12",
+      "id": "R12",
       "targetId": "smart.smartone.silver",
-      "description": "In Smart & Hybrid › Smart One, find the watch with a silver dial.",
+      "description": "Simple everyday smartwatch, silver dial",
       "difficulty": "Medium",
       "canonical": false,
       "criteria": {

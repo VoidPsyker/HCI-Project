@@ -1,10 +1,10 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "tasks": [
     {
       "id": "P1",
       "targetId": "sport.aqua.gulf-blue",
-      "description": "In Sport & Dive › Aqua Racer Chrono, find the Gulf Blue watch.",
+      "description": "Aqua Racer Chrono sports watch, Gulf Blue",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -16,7 +16,7 @@
     {
       "id": "P2",
       "targetId": "sport.trail.summit-blue",
-      "description": "In Sport & Dive › Trail Master GMT, find the Summit Blue watch.",
+      "description": "Trail Master GMT sports watch, Summit Blue",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -28,7 +28,7 @@
     {
       "id": "P3",
       "targetId": "dress.moonphase.copper-brown",
-      "description": "In Dress & Formal › Artisan Moonphase, find the Copper Brown watch.",
+      "description": "Artisan Moonphase dress watch, Copper Brown",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -40,7 +40,7 @@
     {
       "id": "P4",
       "targetId": "everyday.field.olive",
-      "description": "In Everyday & Casual › Field Standard, find the Olive watch.",
+      "description": "Field Standard casual watch, Olive",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -52,7 +52,7 @@
     {
       "id": "P5",
       "targetId": "everyday.urban.ink-black",
-      "description": "In Everyday & Casual › Urban Minimal, find the Ink Black watch.",
+      "description": "Urban Minimal casual watch, Ink Black",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {
@@ -64,7 +64,7 @@
     {
       "id": "P6",
       "targetId": "smart.smartone.forest",
-      "description": "In Smart & Hybrid › Smart One, find the Forest watch.",
+      "description": "Smart One smartwatch, Forest",
       "difficulty": "Easy",
       "canonical": false,
       "criteria": {

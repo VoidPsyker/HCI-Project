@@ -53,15 +53,17 @@ build prompt and the plan disagree, the plan wins; each case is listed here.
   menu × emotion pair across real sessions.
 - **Task bank.** 72 tasks, one per product. T01–T12 are the plan's Table 5.1 tasks on their
   listed products; the other 60 are generated. "Matched variants" are not generated.
-- **Scored searches: 12 path-named searches, easy or medium only** (`scored-tasks.json`, Q01–Q12,
-  8 easy / 4 medium, one per collection). Participants could not find watches from the plan's
-  wording, so each search names its department and collection ("In Sport & Dive › Trail Master
-  GMT, …") and then the watch by its exact name (easy) or as the collection's only dial of a
-  colour (medium). No hard searches. They form four groups of two easy + one medium; the task
-  rotation ("target set", equal to the block-order row) gives each emotion every group equally
-  often. Practice (`practice.json`) uses the same easy wording on watches that are never scored.
-  The plan's T01–T12 and the 24-search design's S01–S12 stay in the bank so earlier sessions
-  still resolve their tasks.
+- **Scored searches: 12 easy or medium searches** (`scored-tasks.json`, R01–R12, 8 easy /
+  4 medium, one per collection), in the plan's natural style: the kind of watch ("dress watch",
+  "sports watch", "casual watch", "smartwatch") points to the department. Participants lost their
+  way at the collection level, so easy searches name the collection and watch ("Trail Master GMT
+  sports watch, Granite Grey"); medium ones hint at the collection without naming it ("Diver's
+  watch rated to 300 m" → Pro Diver 300m) and give the watch's colour as it appears in its name.
+  No hard searches. They form four groups of two easy + one medium; the task rotation ("target
+  set", equal to the block-order row) gives each emotion every group equally often. Practice
+  (`practice.json`) uses the easy style on watches that are never scored. Earlier searches (T01–T12,
+  S01–S12 and the path-named Q01–Q12 in `retired-tasks.json`) stay in the bank so sessions
+  assigned them still resolve their tasks.
 - **Sessions assigned an earlier design.** When a session's page loads and it has not started a
   scored search, the server reissues its design from the current searches through the same slot
   allocation, keeping its block order and block ids, and records `design_reissued:<session>` in

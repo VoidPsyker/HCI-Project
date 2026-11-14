@@ -6,11 +6,12 @@ describes that code; it does not replace it.
 
 ## The 12 scored tasks
 
-Q01–Q12 (`scored-tasks.json`) are tiered by hand, easy or medium only. Every one names the
-department and collection. Easy then names the watch exactly; medium asks for the collection's only
-dial of a colour that also appears in, or is plainly implied by, the watch's name. The tests check
-both rules against the catalogue. The plan's T01–T12 (3 easy, 5 medium, 4 hard) and S01–S12 are no
-longer scored but stay in the bank for sessions assigned earlier designs.
+R01–R12 (`scored-tasks.json`) are tiered by hand, easy or medium only. Every one names the kind of
+watch, which points to the department. Easy names the collection and the watch; medium hints at the
+collection without naming it and asks for the collection's only dial of a colour that appears in the
+watch's name. The tests check these rules against the catalogue. Earlier searches (the plan's
+T01–T12, S01–S12 and Q01–Q12, kept in `retired-tasks.json` or `tasks.json`) are no longer scored but
+stay in the bank for sessions assigned earlier designs.
 
 ## The 60 generated tasks
 

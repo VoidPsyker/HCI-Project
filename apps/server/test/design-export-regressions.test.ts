@@ -84,7 +84,7 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
     const coverage = before.find((file) => file.name === "coverage.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
     expect(coverage).toHaveLength(24);
     const tasks = before.find((file) => file.name === "tasks.jsonl")!.content;
-    for (const id of ["Q01", "Q12", "P1", "S01", "T01"]) expect(tasks).toContain(`"id":"${id}"`);
+    for (const id of ["R01", "R12", "Q01", "P1", "S01", "T01"]) expect(tasks).toContain(`"id":"${id}"`);
     const trials = before.find((file) => file.name === "trials.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
     expect(trials.every((trial) => trial.synthetic === true)).toBe(true);
     expect(trials.every((trial) => !("gaze_x" in trial) && !("affect_prediction" in trial))).toBe(true);

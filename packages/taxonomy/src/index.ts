@@ -2,7 +2,7 @@ import taxonomyJson from "../taxonomy.json";
 import productsJson from "../products.json";
 import tasksJson from "../tasks.json";
 import practiceJson from "../practice.json";
-import addedJson from "../added-tasks.json";
+import retiredJson from "../retired-tasks.json";
 import scoredJson from "../scored-tasks.json";
 
 export type Level = 1 | 2 | 3;
@@ -93,11 +93,12 @@ export const tasksData = tasksJson as TasksData;
 export const nodes: TaxonomyNode[] = taxonomy.nodes;
 export const products: Product[] = productsData.products;
 export const tasks: Task[] = tasksData.tasks;
-/** S01–S12 from the 24-search design; kept so sessions assigned that design still resolve their tasks. */
-export const RETIRED_TASKS = (addedJson as TasksData).tasks;
+/** Searches from earlier designs (S01–S12, Q01–Q12); kept so sessions assigned them still resolve their tasks. */
+export const RETIRED_TASKS = (retiredJson as TasksData).tasks;
 /**
- * Every participant's 12 scored searches (8 easy, 4 medium), one per collection. Each names the
- * department and collection, then the watch by name (easy) or by its only dial of that colour (medium).
+ * Every participant's 12 scored searches (8 easy, 4 medium), one per collection, worded so the kind of
+ * watch points to its department. Easy searches name the collection and watch; medium ones only hint at
+ * the collection (e.g. "diver's watch") and give the watch's colour as it appears in its name.
  */
 export const SCORED_TASKS: Task[] = (scoredJson as TasksData).tasks;
 /** Six plan-style practice searches, one per menu, on targets that are never scored. */

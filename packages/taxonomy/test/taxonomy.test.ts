@@ -93,18 +93,24 @@ describe("scored and practice tasks", () => {
       .map((leaf) => leaf.label);
   };
 
-  it("scores 12 easy or medium searches, one per collection, each naming its full menu path", () => {
-    expect(SCORED_TASKS.map((task) => task.id)).toEqual(["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10", "Q11", "Q12"]);
+  it("scores 12 easy or medium searches, one per collection: easy ones name it, medium ones only hint at it", () => {
+    expect(SCORED_TASKS.map((task) => task.id)).toEqual(["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"]);
     const count = (key: (task: (typeof SCORED_TASKS)[number]) => string) =>
       SCORED_TASKS.reduce<Record<string, number>>((acc, task) => ({ ...acc, [key(task)]: (acc[key(task)] ?? 0) + 1 }), {});
     expect(count((task) => task.difficulty)).toEqual({ Easy: 8, Medium: 4 });
     expect(new Set(SCORED_TASKS.map((task) => task.criteria.subcategoryId)).size).toBe(12);
+    // The kind of watch points to the department, as in the plan's wording.
+    const kinds: Record<string, RegExp> = { sport: /sports|diver/i, dress: /dress|formal/i, everyday: /casual|everyday/i, smart: /smartwatch/i };
     for (const task of [...SCORED_TASKS, ...PRACTICE_TASKS]) {
       const [department, collection, watch] = semanticPath(task.targetId);
-      expect(task.description, task.id).toContain(`In ${department!.label} › ${collection!.label}, find `);
-      if (task.difficulty === "Easy") expect(task.description, task.id).toContain(`the ${watch!.label} watch`);
+      const text = task.description.toLowerCase();
+      expect(task.description, task.id).toMatch(kinds[department!.id]!);
+      expect(text, task.id).not.toContain(department!.label.toLowerCase());
+      expect(text, task.id).toContain(watch!.label.toLowerCase());
+      if (task.difficulty === "Easy") expect(task.description, task.id).toContain(collection!.label);
       else {
-        expect(task.description, task.id).toContain(`the watch with a ${task.criteria.dial} dial`);
+        expect(text, task.id).not.toContain(collection!.label.toLowerCase());
+        expect(text, task.id).toContain(`${task.criteria.dial} dial`);
         const sameDial = products.filter((p) => p.subcategoryId === collection!.id && p.attributes.dial === task.criteria.dial);
         expect(sameDial.map((p) => p.id), task.id).toEqual([task.targetId]);
       }
