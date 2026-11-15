@@ -140,11 +140,7 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
       await expect(page.getByTestId("store-search")).toBeVisible();
       await expect(page.getByTestId("store-search")).toContainText("The searches are over");
     }
-    if (block.stateLabel === "bored") {
-      await page.getByTestId("induction-early-exit").click();
-    } else {
-      await page.getByTestId("induction-continue").click();
-    }
+    await page.getByTestId("induction-continue").click();
     await checkIn(page, block.stateLabel);
 
     for (const trialId of block.trialIds) {
@@ -180,7 +176,8 @@ for (const failCalibration of [false, true]) test("@session completes the pilot 
     .split("\n")
     .map((line) => JSON.parse(line) as Record<string, unknown>)
     .filter((row) => row.session_id === sessionId);
-  expect(mine).toHaveLength(18);
+  expect(design.practiceTrials).toHaveLength(3);
+  expect(mine).toHaveLength(15);
   const main = mine.filter((row) => !row.practice);
   expect(main).toHaveLength(12);
   expect(main.filter((row) => row.success)).toHaveLength(11);

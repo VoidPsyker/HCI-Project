@@ -49,6 +49,7 @@ export const BASELINE_ITEMS = checkin.baseline_items;
 export const STATE_ITEMS = checkin.state_items as Array<{ id: InductionState; label: string }>;
 
 export const SUS_ITEMS = questionnaires.sus;
+export const NASA_INTRO = questionnaires.nasa_intro;
 export const NASA_ITEMS = questionnaires.nasa_tlx;
 export const OPEN_QUESTIONS = questionnaires.open;
 export const MENU_PREFERENCE = questionnaires.menu_preference;

@@ -87,11 +87,12 @@ describe("generateDesign", () => {
     expect(new Set(stateTask)).toEqual(new Set([6]));
   });
 
-  it("practises the six practice tasks, one per menu", () => {
+  it("assigns three practice tasks per run and rotates practice across all six menus", () => {
+    expect(new Set(cycle.flatMap((d) => d.practiceTrials.map((p) => p.menuId))).size).toBe(6);
     for (const d of cycle) {
       const practice = d.practiceTrials;
-      expect(practice.map((p) => p.taskId)).toEqual(PRACTICE_TASKS.map((t) => t.id));
-      expect(new Set(practice.map((p) => p.menuId)).size).toBe(6);
+      expect(practice.map((p) => p.taskId)).toEqual(PRACTICE_TASKS.slice(0, 3).map((t) => t.id));
+      expect(new Set(practice.map((p) => p.menuId)).size).toBe(3);
     }
   });
 

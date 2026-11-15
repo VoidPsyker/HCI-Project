@@ -356,6 +356,7 @@ export class Repository {
         seed: this.seed,
         now: design.createdAt
       });
+      fresh.practiceTrials = design.practiceTrials;
       const json = JSON.stringify(fresh);
       this.db
         .prepare("UPDATE sessions SET design_json = ?, sequence_index = ?, sequence_id = ?, target_set = ? WHERE session_id = ?")

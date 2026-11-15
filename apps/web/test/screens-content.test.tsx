@@ -6,7 +6,6 @@ import { CheckinScreen } from "../src/screens/Checkin";
 import { DemographicsScreen } from "../src/screens/Demographics";
 import { QuestionnairesScreen } from "../src/screens/Questionnaires";
 import { NeutralResetScreen } from "../src/screens/Interstitials";
-import { InductionScreen } from "../src/screens/Induction";
 import type { EventLogger } from "../src/logger";
 
 const logger = { log: vi.fn() } as unknown as EventLogger;
@@ -17,9 +16,11 @@ describe("participant screen regressions", () => {
     vi.useFakeTimers();
     try {
       const proceed = vi.fn();
-      render(<NeutralResetScreen state="bored" fastMode onContinue={proceed} />);
+      render(<NeutralResetScreen state="bored" fastMode={false} onContinue={proceed} />);
       expect(screen.getByTestId("reset-continue")).toBeDisabled();
-      act(() => vi.advanceTimersByTime(1200));
+      act(() => vi.advanceTimersByTime(6999));
+      expect(screen.getByTestId("reset-continue")).toBeDisabled();
+      act(() => vi.advanceTimersByTime(1));
       fireEvent.click(screen.getByTestId("reset-continue"));
       fireEvent.click(screen.getByTestId("reset-continue"));
       expect(proceed).toHaveBeenCalledTimes(1);
@@ -126,11 +127,20 @@ describe("participant screen regressions", () => {
     expect(screen.getByText("Next section →")).toBeEnabled();
   });
 
-  it("does not submit twice from induction early exit", () => {
-    const complete = vi.fn();
-    render(<InductionScreen state="bored" blockId="b" fastMode logger={logger} onComplete={complete} onDistressStop={vi.fn()} />);
-    fireEvent.click(screen.getByTestId("induction-early-exit"));
-    fireEvent.click(screen.getByTestId("induction-early-exit"));
-    expect(complete).toHaveBeenCalledTimes(1);
+  it("shows higher performance on the right while preserving workload scoring", async () => {
+    const submit = vi.fn().mockResolvedValue(undefined);
+    render(<QuestionnairesScreen sessionId="s" usabilityMenu="A" logger={logger} fastMode busy={false} onSubmit={submit} />);
+    fireEvent.click(screen.getByTestId("fill-neutral"));
+    fireEvent.click(screen.getByRole("button", { name: "Workload" }));
+    const performance = screen.getByRole("slider", { name: "Performance" });
+    const labels = within(performance.parentElement!).getByText("Failure").parentElement!;
+    expect(Array.from(labels.children, (label) => label.textContent)).toEqual(["Failure", "Perfect"]);
+    fireEvent.change(performance, { target: { value: "100" } });
+    expect(performance).toHaveAttribute("aria-valuetext", "Perfect");
+    fireEvent.click(screen.getByRole("button", { name: /^Credibility$/ }));
+    await act(async () => fireEvent.click(screen.getByTestId("submit-questionnaires")));
+    expect(submit).toHaveBeenCalledWith(expect.arrayContaining([
+      expect.objectContaining({ instrument: "NASA_TLX", item_id: "performance", value: 0 })
+    ]));
   });
 });

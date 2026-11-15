@@ -42,9 +42,10 @@ Each run that reaches completion appears separately in the dashboard's completed
 ## 3. During the session
 
 The participant works through: consent → eye-tracking consent →
-demographics → baseline check-in → instructions (think aloud) → six practice trials → calibration → four
-blocks (scenario → check-in → three searches → check-in with fatigue → 15-s neutral reset) →
-questionnaires → debrief. Eye-tracking calibration runs before the first induction;
+demographics → baseline check-in → instructions (think aloud) → three practice trials → calibration → four
+blocks (scenario → check-in → three searches → check-in with fatigue → 7-s neutral reset) →
+questionnaires → debrief. The frustration scenario includes five 15-second searches.
+Eye-tracking calibration runs before the first induction;
 gaze is recorded whatever the calibration error, and the session manifest stores that error
 for choosing a cutoff at analysis. Participants can continue the full study without gaze if
 the camera fails or they decline. The event export records the reason as a gaze_unavailable event.

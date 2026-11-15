@@ -245,8 +245,15 @@ it('moves a session onto the current searches only until its first scored search
   return design;
  };
  const fresh = begin(); const expected = outdate(fresh.session_id);
+ const obsolete = repo.getDesign(fresh.session_id)!;
+ obsolete.practiceTrials = [...obsolete.practiceTrials, ...obsolete.practiceTrials.map((trial, index) => ({
+  ...trial, practiceId: `${fresh.session_id}-P${index + 4}`
+ }))];
+ repo.db.prepare('UPDATE sessions SET design_json = ? WHERE session_id = ?').run(JSON.stringify(obsolete), fresh.session_id);
  const reissued = repo.refreshOutdatedDesign(fresh.session_id)!;
  expect(reissued.blockOrder).toEqual(expected.blockOrder);
+ expect(reissued.practiceTrials).toHaveLength(6);
+ expect(reissued.practiceTrials).toEqual(obsolete.practiceTrials);
  expect(reissued.trials.map((t) => t.taskId).sort()).toEqual(expected.trials.map((t) => t.taskId).sort());
  expect(repo.getDesign(fresh.session_id)).toEqual(reissued);
  expect(JSON.parse(repo.allAssignments().find((row) => row.session_id === fresh.session_id)!.design_json as string)).toEqual(reissued);

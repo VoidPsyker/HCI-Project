@@ -48,7 +48,7 @@ and data pipeline, not human gaze accuracy.
 ## Short pilot timing
 
 The session targets about 15 minutes including setup, with time to finish if needed.
-It has four emotion blocks, six practice searches and 12 scored searches (three per emotion,
+It has four emotion blocks, three practice searches and 12 scored searches (three per emotion,
 each menu twice). Every search names its department and collection. Practice
 allows 45 seconds per search and scored trials allow 60 seconds. The final questionnaire
 includes the full usability scale for the last menu used, plus workload and credibility ratings.

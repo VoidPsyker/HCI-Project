@@ -15,11 +15,11 @@
       "blockDebrief": "The clip was there to set a mood, not to evaluate you."
     },
     "frustrated": {
-      "title": "Three quick searches",
+      "title": "Five quick searches",
       "intro": "Find each watch in this shop. You have 15 seconds per search, so be quick.",
-      "durationSeconds": 45,
+      "durationSeconds": 75,
       "searchSeconds": 15,
-      "searches": 3,
+      "searches": 5,
       "blockDebrief": "The searches were too short and too hard to finish on purpose; it was not your fault. Take a break if you would like one."
     },
     "confused": {
@@ -33,12 +33,11 @@
     },
     "bored": {
       "title": "The very repetitive catalogue check",
-      "intro": "Please verify the prices of these identical straps for the catalogue. You do not need to finish, and you may stop early.",
+      "intro": "Please verify the prices of these identical straps for the catalogue. You do not need to confirm every price.",
       "task": "Verify the price of each strap in the list. The same value repeats.",
       "durationSeconds": 60,
       "items": 30,
       "price": "£240",
-      "earlyExit": "I've had enough — continue",
       "blockDebrief": "The repetitive task was deliberately dull. Stretch or look around before the next block."
     }
   }

@@ -1,3 +1,4 @@
+import timing from "../../web/content/session-timing.json";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -555,10 +556,10 @@ function seedSession(repo: Repository, index: number, failurePlan: { Easy: numbe
         t_client: t,
         block_id: block.blockId,
         state_label: block.stateLabel,
-        meta: { neutral_reset_seconds: 60 }
+        meta: { neutral_reset_seconds: timing.neutralResetSeconds }
       })
     );
-    t += 60000;
+    t += timing.neutralResetSeconds * 1000;
   }
 
   const q = questionnaires(design, t + 1000);

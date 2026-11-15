@@ -36,21 +36,21 @@ describe("InductionScreen", () => {
     expect(ends()).toHaveLength(0);
   });
 
-  it("frustrates with three 15-second searches for script-written watches, then unlocks the check-in", () => {
+  it("frustrates with five 15-second searches for script-written watches, then unlocks the check-in", () => {
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "setTimeout", "clearTimeout", "performance", "Date"] });
     const { log, ends } = setup("frustrated");
     const store = () => screen.getByTestId("store-search");
     const seen = new Set<string>();
-    for (let search = 1; search <= 3; search++) {
-      expect(store()).toHaveTextContent(`Search ${search} of 3`);
+    for (let search = 1; search <= 5; search++) {
+      expect(store()).toHaveTextContent(`Search ${search} of 5`);
       const taskId = store().getAttribute("data-task-id")!;
       expect(SCENARIO_TASKS.some((task) => task.id === taskId)).toBe(true);
       seen.add(taskId);
       expect(screen.getByTestId("induction-continue")).toBeDisabled();
       act(() => vi.advanceTimersByTime(15_200));
     }
-    expect(seen.size).toBe(3);
-    expect(outcomes(log).map((meta) => meta.outcome)).toEqual(["timeout", "timeout", "timeout"]);
+    expect(seen.size).toBe(5);
+    expect(outcomes(log).map((meta) => meta.outcome)).toEqual(Array(5).fill("timeout"));
     expect(screen.getByTestId("induction-continue")).toBeEnabled();
     expect(ends()).toHaveLength(1);
   });
@@ -61,7 +61,7 @@ describe("InductionScreen", () => {
     const task = SCENARIO_TASKS.find((candidate) => candidate.id === screen.getByTestId("store-search").getAttribute("data-task-id"))!;
     for (const node of semanticPath(task.targetId)) fireEvent.click(store.getByRole("button", { name: node.label }));
     fireEvent.click(screen.getByRole("button", { name: "Next search" }));
-    expect(screen.getByTestId("store-search")).toHaveTextContent("Search 2 of 3");
+    expect(screen.getByTestId("store-search")).toHaveTextContent("Search 2 of 5");
     expect(outcomes(log)[0]).toMatchObject({ induction: "frustrated", search: 1, task_id: task.id, outcome: "found" });
   });
 
@@ -89,11 +89,19 @@ describe("InductionScreen", () => {
     expect(within(screen.getByTestId("store-search")).getAllByRole("button", { name: /Sport & Dive|Dress & Formal|Everyday & Casual|Smart & Hybrid/ })).toHaveLength(4);
   });
 
-  it("lets the bored participant leave early and logs it once", () => {
+  it("unlocks the boredom check-in after 60 seconds while keeping the stop control available", () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "performance"] });
     const { onComplete, ends } = setup("bored");
-    fireEvent.click(screen.getByTestId("induction-early-exit"));
+    const advance = screen.getByTestId("induction-continue");
+    expect(screen.queryByText(/I've had enough/)).not.toBeInTheDocument();
+    expect(screen.getByTestId("induction-stop")).toBeEnabled();
+    act(() => vi.advanceTimersByTime(59_999));
+    expect(advance).toBeDisabled();
+    act(() => vi.advanceTimersByTime(1));
+    fireEvent.click(advance);
+    fireEvent.click(advance);
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(ends()).toHaveLength(1);
-    expect(ends()[0]![0].meta).toMatchObject({ completed: false, early_exit: true });
+    expect(ends()[0]![0].meta).toMatchObject({ completed: true });
   });
 });

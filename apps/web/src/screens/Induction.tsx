@@ -66,20 +66,20 @@ export function InductionScreen({
     return () => clearInterval(interval);
   }, [blockId, definition.durationSeconds, duration, fastMode, logger, searches, state]);
 
-  /** Logs the induction_end for a timed or early finish; a stop is logged by the runner, which owns every stop path. */
-  const end = (meta: { completed: boolean; distress_stop: false; early_exit?: boolean }) => {
+  // The runner logs stops; this screen logs completed inductions.
+  const end = () => {
     if (endedRef.current) return;
     endedRef.current = true;
     logger.log({
       event_type: "induction_end",
       block_id: blockId,
       state_label: state,
-      meta: { ...meta, duration_ms: Math.round(performance.now() - startedRef.current) }
+      meta: { completed: true, distress_stop: false, duration_ms: Math.round(performance.now() - startedRef.current) }
     });
   };
 
   useEffect(() => {
-    if (done) end({ completed: true, distress_stop: false });
+    if (done) end();
     // `end` is idempotent; the timer reaching zero is the only trigger here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
@@ -91,10 +91,10 @@ export function InductionScreen({
     onDistressStop();
   };
 
-  const continueAfter = (earlyExit = false) => {
-    if (advancedRef.current) return;
+  const continueAfter = () => {
+    if (!done || advancedRef.current) return;
     advancedRef.current = true;
-    end(earlyExit ? { completed: false, distress_stop: false, early_exit: true } : { completed: true, distress_stop: false });
+    end();
     onComplete(Math.round(performance.now() - startedRef.current));
   };
 
@@ -178,12 +178,7 @@ export function InductionScreen({
           <span className="small-note">
             {done ? "The scenario is over. Continue when ready." : searches ? "Continue unlocks when the searches end." : "Continue unlocks when the timer ends."}
           </span>
-          {state === "bored" && !done ? (
-            <button type="button" className="button secondary" onClick={() => continueAfter(true)} data-testid="induction-early-exit">
-              {INDUCTIONS.bored.earlyExit}
-            </button>
-          ) : null}
-          <button type="button" className="button primary" disabled={!done} onClick={() => continueAfter()} data-testid="induction-continue">
+          <button type="button" className="button primary" disabled={!done} onClick={continueAfter} data-testid="induction-continue">
             Continue to check-in
           </button>
         </div>

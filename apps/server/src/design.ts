@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import timing from "../../web/content/session-timing.json";
 import {
   MENU_IDS,
   PRACTICE_TASKS,
@@ -154,7 +155,7 @@ function blockSearches(group: Task[], row: number, block: number): Array<{ menuI
 
 /** Practice uses a menu row the scored blocks skip, so it never previews block 1's order. */
 function practiceTrialsFor(sessionId: string, row: number): PracticeTrialSpec[] {
-  return menuRow(row + 4).map((menuId, i) => {
+  return menuRow(row + 4).slice(0, timing.practiceTrialCount).map((menuId, i) => {
     const task = PRACTICE_TASKS[i]!;
     return {
       practiceId: `${sessionId}-P${i + 1}`,

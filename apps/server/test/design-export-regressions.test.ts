@@ -75,7 +75,7 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
     seedDatabase(repo, 2);
     const session = repo.listAdminSessions()[0]!;
     const before = buildExportBundle(repo);
-    expect(before.find((file) => file.name === "trials.jsonl")!.rows).toBe(36);
+    expect(before.find((file) => file.name === "trials.jsonl")!.rows).toBe(30);
     expect(before.every((file) => !file.name.includes("gaze"))).toBe(true);
     const combinations = before.find((file) => file.name === "combinations.jsonl")!.content.trim().split("\n").map((line) => JSON.parse(line));
     expect(combinations).toHaveLength(24);
@@ -94,7 +94,7 @@ it("excludes withdrawn records and keeps gaze artifacts out of behavioural expor
       expect(file.content).not.toContain(session.session_id);
       expect(file.content).not.toContain(session.participant_id);
     }
-    expect(after.find((file) => file.name === "trials.jsonl")!.rows).toBe(18);
+    expect(after.find((file) => file.name === "trials.jsonl")!.rows).toBe(15);
   } finally {
     repo.close();
     fs.rmSync(directory, { recursive: true, force: true });

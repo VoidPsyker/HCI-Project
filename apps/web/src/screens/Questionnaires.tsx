@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { MENU_IDS, type MenuId } from "@meridian/taxonomy";
 import { MENU_NAMES } from "../components/MenuChrome";
 import type { EventLogger } from "../logger";
-import { CREDIBILITY_ITEMS, MENU_PREFERENCE, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITEMS } from "../content";
+import { CREDIBILITY_ITEMS, MENU_PREFERENCE, NASA_INTRO, NASA_ITEMS, OPEN_QUESTIONS, SUS_ITEMS } from "../content";
 
 const TABS = [
   { id: "sus", label: "Menu usability", kind: "sus" as const },
@@ -102,7 +102,8 @@ export function QuestionnairesScreen({
         session_id: sessionId,
         instrument: "NASA_TLX",
         item_id: item.id,
-        value: nasa[item.id],
+        // Preserve the stored workload scale, where higher Performance scores mean worse performance.
+        value: item.id === "performance" ? 100 - nasa[item.id]! : nasa[item.id],
         text_value: null,
         answered_at: now
       });
@@ -229,10 +230,7 @@ export function QuestionnairesScreen({
         {current.kind === "nasa" ? (
           <div className="nasa-page" data-testid="nasa-page">
             <h2>Workload (NASA-TLX)</h2>
-            <p className="nasa-intro">
-              &ldquo;The task&rdquo; means the 12 searches as a whole. Move each slider: <strong>left is very low, right is very
-              high</strong>. The success question is the other way round: <strong>left is perfect, right is failure</strong>.
-            </p>
+            <p className="nasa-intro">{NASA_INTRO}</p>
             {NASA_ITEMS.map((item) => (
               <div key={item.id} className="nasa-row">
                 <span className="nasa-question">
@@ -241,6 +239,7 @@ export function QuestionnairesScreen({
                 </span>
                 <input
                   aria-label={item.label}
+                  aria-valuetext={nasa[item.id] === 0 ? item.low : nasa[item.id] === 100 ? item.high : undefined}
                   type="range"
                   min={0}
                   max={100}

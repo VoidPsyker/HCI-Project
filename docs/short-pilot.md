@@ -10,17 +10,17 @@ every 24 participants.
 | Activity | Planning allowance |
 | --- | ---: |
 | Consent, setup, calibration and debrief | 2:00 |
-| Six practice searches, averaging 10 seconds | 1:00 |
-| Four mood activities | 3:15 |
+| Three practice searches, averaging 10 seconds | 0:30 |
+| Four mood activities (including five frustration searches) | 3:45 |
 | Twelve scored searches, averaging 25 seconds | 5:00 |
-| Four neutral resets | 1:00 |
+| Four 7-second neutral resets | 0:28 |
 | Check-ins, instructions and transitions | 1:30 |
 | End questionnaires | 1:15 |
-| Total | 15:00 |
+| Total | 14:28 |
 
 The estimates assume the participant
 finishes most searches well before the individual limit. The longer plan expects a typical
-scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes 17 minutes.
+scored search of 25–45 seconds. At 35 seconds per scored search, this estimate becomes about 16½ minutes.
 Measure the full session in a rehearsal and allow people enough time to read consent, calibrate,
 and answer. A 45-second practice or 60-second scored timeout ends that search only. The app
 records it separately from voluntary give-up and successful completion.
@@ -66,7 +66,7 @@ Use the persistent Node/SQLite server or Docker deployment. The Vercel demo expl
 persistent data and must not collect research sessions. Keep the data directory on a persistent
 volume; back up the database and restricted gaze store together. Never retain webcam video.
 
-After a rehearsal, export CSV/JSONL with the checksum manifest. Verify six practice results,
+After a rehearsal, export CSV/JSONL with the checksum manifest. Verify three practice results,
 twelve main trials, four induction pairs, nine check-ins (baseline plus two per block), one complete 10-item SUS and the other
 questionnaire answers, assignment metadata and gaze quality records for a completed run.
 For a participant-stopped run, verify its stop reason and only the records actually collected; do not fill
