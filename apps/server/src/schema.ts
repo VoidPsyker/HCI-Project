@@ -42,6 +42,11 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
 CREATE INDEX IF NOT EXISTS idx_sessions_stratum ON sessions(stratum);
 
+CREATE TABLE IF NOT EXISTS study_link_starts (
+  start_id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL UNIQUE REFERENCES sessions(session_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS assignments_audit (
   participant_id TEXT PRIMARY KEY,
   session_id TEXT NOT NULL UNIQUE,

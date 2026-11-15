@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { StudyEntry } from "./StudyEntry";
 import { AdminDashboard } from "./admin/AdminDashboard";
 import { ExperimentRunner } from "./ExperimentRunner";
 import { Home } from "./Home";
@@ -44,6 +45,8 @@ export function App() {
 
   if (path === "/admin") return <AdminDashboard />;
   if (path === "/lab") return <MenuLab />;
+  const joinMatch = path.match(/^\/join\/([^/]+)\/?$/);
+  if (joinMatch?.[1]) return <StudyEntry key={joinMatch[1]} linkId={joinMatch[1]} />;
   const runMatch = path.match(/^\/run\/([^/]+)\/?$/);
   if (runMatch?.[1]) {
     return (

@@ -134,6 +134,15 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
     time: new Date().toISOString()
   }));
 
+  app.post("/api/study-link/:linkId/start", async (request, reply) => {
+    const { linkId } = request.params as { linkId: string };
+    const body = parseBody(z.object({ start_id: z.string().uuid() }), request.body, reply);
+    if (!body) return;
+    const sessionId = repo.startFromStudyLink(linkId, body.start_id.toLowerCase());
+    if (!sessionId) return reply.code(404).send({ error: "study_link_not_found" });
+    return reply.header("Cache-Control", "no-store").send({ session_id: sessionId });
+  });
+
   app.get("/api/sessions/:sessionId", async (request, reply) => {
     const { sessionId } = request.params as { sessionId: string };
     const session = repo.getSession(sessionId);
@@ -373,6 +382,10 @@ export async function createServer(repo: Repository, options: ServerOptions = {}
       return reply.code(400).send({ error: "questionnaire_ingestion_failed", message: (error as Error).message });
     }
   });
+
+  app.post("/api/admin/study-link", { preHandler: requireAdmin }, async () => ({
+    participant_url: `/join/${repo.getOrCreateStudyLink()}`
+  }));
 
   app.post("/api/admin/sessions", { preHandler: requireAdmin }, async (request, reply) => {
     const body = parseBody(createSessionSchema, request.body ?? {}, reply);

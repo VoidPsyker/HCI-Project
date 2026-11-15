@@ -292,6 +292,29 @@ export class Repository {
     };
   }
 
+  getOrCreateStudyLink(): string {
+    return this.db.transaction(() => {
+      const existing = this.getMeta("study_link_id");
+      if (existing) return existing;
+      const linkId = makeId("L");
+      this.setMeta("study_link_id", linkId);
+      return linkId;
+    }).immediate();
+  }
+
+  startFromStudyLink(linkId: string, startId: string): string | null {
+    return this.db.transaction(() => {
+      if (this.getMeta("study_link_id") !== linkId) return null;
+      const existing = this.db.prepare("SELECT session_id FROM study_link_starts WHERE start_id = ?")
+        .get(startId) as { session_id: string } | undefined;
+      if (existing) return existing.session_id;
+      const { session } = this.createSession();
+      this.db.prepare("INSERT INTO study_link_starts (start_id, session_id) VALUES (?, ?)")
+        .run(startId, session.session_id);
+      return session.session_id;
+    }).immediate();
+  }
+
   getSession(sessionId: string): SessionRow | null {
     return (this.db.prepare("SELECT * FROM sessions WHERE session_id = ?").get(sessionId) as SessionRow | undefined) ?? null;
   }

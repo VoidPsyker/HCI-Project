@@ -20,6 +20,97 @@ function gaze() {
  const result = repo.createGazeConsent(session.session_id, { version: 'v1', camera_used: true, synthetic: false, viewport: { width_px: 100, height_px: 100 }, geometry: {}, source: { kind: 'webcam' } });
  return { session, token: result.token };
 }
+it('isolates concurrent starts, trial assignments and records from one shared link', async () => {
+ const app = await createServer(repo, { adminPassword: 'test-admin' });
+ const admin = { 'x-admin-password': 'test-admin' };
+ try {
+  const legacy = repo.createSession('Existing participant').session;
+  const getLink = (headers = {}) => app.inject({ method: 'POST', url: '/api/admin/study-link', headers });
+  expect((await getLink()).statusCode).toBe(401);
+  const [link, repeated] = await Promise.all([getLink(admin), getLink(admin)]);
+  expect(link.statusCode).toBe(200);
+  expect(repeated.json()).toEqual(link.json());
+  expect(repo.listAdminSessions()).toHaveLength(1);
+  const linkId = link.json().participant_url.split('/').at(-1);
+  const start = (start_id: string, id = linkId) => app.inject({
+   method: 'POST', url: `/api/study-link/${id}/start`, payload: { start_id }
+  });
+  const firstStart = randomUUID();
+  const [first, second, retry] = await Promise.all([start(firstStart), start(randomUUID()), start(firstStart)]);
+  expect([first.statusCode, second.statusCode, retry.statusCode]).toEqual([200, 200, 200]);
+  expect(retry.json()).toEqual(first.json());
+  expect((await start(randomUUID(), 'invalid')).statusCode).toBe(404);
+  const sessions = [first, second].map((response) => repo.getSession(response.json().session_id)!);
+  expect(new Set(sessions.map((session) => session.participant_id)).size).toBe(2);
+  expect(repo.listAdminSessions()).toHaveLength(3);
+  expect((await app.inject({ url: `/api/sessions/${legacy.session_id}` })).json().participant.label)
+   .toBe('Existing participant');
+  const demographics = {
+   age_band: '25-34', gender: 'woman', education: 'undergraduate', shopping_freq: 'rarely',
+   watch_expertise: 3, tech_savvy: 4, colour_vision: 'typical'
+  };
+  const assign = async (session: typeof legacy) => {
+   const base = `/api/sessions/${session.session_id}`;
+   expect((await app.inject({ method: 'POST', url: `${base}/consent`, payload: { version: 'v1' } })).statusCode).toBe(200);
+   const assigned = await app.inject({ method: 'POST', url: `${base}/demographics`, payload: demographics });
+   expect(assigned.statusCode).toBe(200);
+   return repo.getDesign(session.session_id)!;
+  };
+  const designs = await Promise.all(sessions.map(assign));
+  expect(new Set(designs.map((design) => design.sequenceIndex))).toEqual(new Set([0, 1]));
+  const events = sessions.map((session, index) => ({
+   ...event(session), trial_id: designs[index]!.trials[0]!.trialId
+  }));
+  expect(events[0]!.trial_id).not.toBe(events[1]!.trial_id);
+  const results = await Promise.all(events.map((record) => app.inject({
+   method: 'POST', url: '/api/events', payload: { events: [record] }
+  })));
+  expect(results.map((response) => response.statusCode)).toEqual([200, 200]);
+  for (const record of events) {
+   expect(repo.allEvents()).toEqual(expect.arrayContaining([expect.objectContaining({
+    event_id: record.event_id, session_id: record.session_id,
+    participant_id: record.participant_id, trial_id: record.trial_id
+   })]));
+  }
+  expect((await app.inject({ method: 'POST', url: '/api/events', payload: {
+   events: [{ ...events[0], event_id: randomUUID(), participant_id: sessions[1]!.participant_id }]
+  } })).statusCode).toBe(400);
+  expect((await app.inject({ method: 'POST', url: '/api/events', payload: {
+   events: [{ ...events[1], event_id: randomUUID(), trial_id: events[0]!.trial_id }]
+  } })).statusCode).toBe(409);
+  expect(repo.allEvents()).toHaveLength(2);
+ } finally { await app.close(); }
+});
+it('counts successive completed attempts from the same study link separately', async () => {
+ const app = await createServer(repo, { adminPassword: 'test-admin' });
+ try {
+  const linkId = repo.getOrCreateStudyLink();
+  const completedSessions = [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+   const start = await app.inject({
+    method: 'POST', url: `/api/study-link/${linkId}/start`, payload: { start_id: randomUUID() }
+   });
+   expect(start.statusCode).toBe(200);
+   const session = repo.getSession(start.json().session_id)!;
+   expect(session.status).toBe('created');
+   const record = event(session);
+   const completion = await app.inject({ method: 'POST', url: '/api/events', payload: {
+    events: [
+     { ...record, event_type: 'gaze_unavailable', meta: { reason: 'consent_declined' } },
+     { ...record, event_id: randomUUID(), event_type: 'session_end', meta: { completed: true } }
+    ]
+   } });
+   expect(completion.statusCode).toBe(200);
+   expect(repo.getSession(session.session_id)?.status).toBe('completed');
+   completedSessions.push(session.session_id);
+  }
+  expect(new Set(completedSessions).size).toBe(2);
+  const qa = await app.inject({ url: '/api/admin/qa', headers: { 'x-admin-password': 'test-admin' } });
+  expect(qa.statusCode).toBe(200);
+  expect(qa.json().sessions).toMatchObject({ total: 2, completed: 2 });
+ } finally { await app.close(); }
+});
+
 it('does not reopen aborted sessions through consent or state updates', () => {
  const session = repo.createSession().session; repo.abortSession(session.session_id, 'gaze_quality_gate_failed');
  expect(() => repo.recordConsent(session.session_id, 'v1')).toThrow('session_not_active');

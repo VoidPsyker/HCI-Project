@@ -27,13 +27,17 @@ pixel ratio; that warning is never shown to the participant.
 
 ## 2. Before each participant
 
-1. In **New participant**, enter a pseudonymous label (e.g. `P03`) and press **Create session
-   link**. Never enter a name or email.
-2. Open the link on the participant machine. The server assigns the sequence (block order,
+1. In **Shared study link**, select **Get shared study link** and copy the URL. The dashboard
+   returns the same URL when you come back. You can send it to multiple participants.
+2. Each participant opens the shared link and selects **Start study** once. To resume after a
+   refresh, use the individual session page the study opens. The server assigns the sequence (block order,
    menu order, task rotation, colour mapping) from a fixed schedule in arrival order after demographics and writes it to
    `assignments_audit`; the participant's browser never chooses a condition.
 3. Ask the participant to keep the browser window the same size from calibration onwards;
    screen geometry is estimated automatically when the camera starts.
+
+For another run by the same participant, reopen the shared link and select **Start study** again.
+Each run that reaches completion appears separately in the dashboard's completed count.
 
 ## 3. During the session
 

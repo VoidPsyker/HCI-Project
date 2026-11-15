@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type { GazeUnavailableReason } from "@meridian/scoring";
 import type { GazeConsent } from "@meridian/analysis";
 import type { StudyDesign, SessionInfo, ParticipantInfo } from "./types";
@@ -270,6 +270,32 @@ export const useRunnerStore = create<RunnerState>()(
     }),
     {
       name: "meridian.runner.v2",
+      storage: createJSONStorage(() => {
+        const sessionId = window.location.pathname.match(/^\/run\/([^/]+)\/?$/)?.[1];
+        if (!sessionId) return localStorage;
+        const sessionKey = (name: string) => `${name}:${sessionId}`;
+        return {
+          getItem(name) {
+            const saved = localStorage.getItem(sessionKey(name));
+            if (saved) return saved;
+            const legacy = localStorage.getItem(name);
+            if (!legacy) return null;
+            try {
+              return JSON.parse(legacy).state?.sessionId === sessionId ? legacy : null;
+            } catch {
+              return null;
+            }
+          },
+          setItem(name, value) {
+            localStorage.setItem(sessionKey(name), value);
+            // The home page uses the original key to find the latest session.
+            localStorage.setItem(name, value);
+          },
+          removeItem(name) {
+            localStorage.removeItem(sessionKey(name));
+          }
+        };
+      }),
       partialize: (state) => ({
         sessionId: state.sessionId,
         session: state.session,

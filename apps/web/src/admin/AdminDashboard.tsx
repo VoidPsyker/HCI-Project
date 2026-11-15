@@ -11,6 +11,7 @@ import {
   downloadGazeExport,
   getGazeSummary,
   getAdminSessions,
+  getAdminStudyLink,
   getGoNoGo,
   getQa
 } from "../api";
@@ -204,6 +205,29 @@ export function AdminDashboard() {
   return <AuthenticatedDashboard key={signIn.token} token={signIn.token} expiresAt={signIn.expires_at} signOut={signOut} />;
 }
 
+function ParticipantLink({ url, label, setError }: { url: string; label: string; setError: (message: string) => void }) {
+  return (
+    <div className="created-link" data-testid="created-link">
+      <span>{label}</span>
+      <code>{url}</code>
+      <button
+        type="button"
+        className="button tiny"
+        onClick={() => {
+          if (!navigator.clipboard) {
+            setError("Clipboard unavailable. Copy the participant link manually.");
+            return;
+          }
+          void navigator.clipboard.writeText(url).catch(() => setError("Could not copy the participant link. Copy it manually."));
+        }}
+      >
+        Copy
+      </button>
+      <a className="button tiny" href={url} target="_blank" rel="noreferrer">Open</a>
+    </div>
+  );
+}
+
 function AuthenticatedDashboard({ token, expiresAt, signOut }: { token: string; expiresAt: string; signOut: (message?: string | null) => void }) {
   const [sessions, setSessions] = useState<AdminSession[]>([]);
   const [qa, setQa] = useState<QaReport | null>(null);
@@ -211,6 +235,7 @@ function AuthenticatedDashboard({ token, expiresAt, signOut }: { token: string; 
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [label, setLabel] = useState("");
+  const [sharedUrl, setSharedUrl] = useState<string | null>(null);
   const [createdUrl, setCreatedUrl] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = sessions.find((session) => session.session_id === selectedId) ?? null;
@@ -348,53 +373,53 @@ function AuthenticatedDashboard({ token, expiresAt, signOut }: { token: string; 
       <section className="admin-section">
         <div className="section-head">
           <div>
-            <h2>New participant</h2>
-            <p className="small-note">Assignments are generated on this server and recorded in assignments_audit.</p>
+            <h2>Shared study link</h2>
+            <p className="small-note">Send this link to multiple participants. Each person starts a separate session.</p>
           </div>
         </div>
-        <form
-          className="create-row"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setBusy("create");
-            setCreatedUrl(null);
-            void createAdminSession(token, label.trim() || undefined)
-              .then((response) => {
-                setCreatedUrl(`${window.location.origin}${response.participant_url}`);
-                setLabel("");
-                return refresh();
-              })
+        <button
+          type="button"
+          className="button primary"
+          disabled={busy !== null}
+          onClick={() => {
+            setBusy("study-link");
+            void getAdminStudyLink(token)
+              .then(({ participant_url }) => setSharedUrl(`${window.location.origin}${participant_url}`))
               .catch(handleError)
               .finally(() => setBusy(null));
           }}
         >
-          <label className="field">
-            <span>Participant label (optional)</span>
-            <input value={label} maxLength={40} onChange={(event) => setLabel(event.target.value)} placeholder="e.g. P09" />
-          </label>
-          <button type="submit" className="button primary" disabled={busy !== null} data-testid="create-session">
-            {busy === "create" ? "Creating…" : "Create session link"}
-          </button>
-        </form>
-        {createdUrl ? (
-          <div className="created-link" data-testid="created-link">
-            <span>Participant link</span>
-            <code>{createdUrl}</code>
-            <button
-              type="button"
-              className="button tiny"
-              onClick={() => {
-                if (!navigator.clipboard) { setError("Clipboard unavailable. Copy the participant link manually."); return; }
-                void navigator.clipboard.writeText(createdUrl).catch(() => setError("Could not copy the participant link. Copy it manually."));
-              }}
-            >
-              Copy
+          {busy === "study-link" ? "Loading…" : "Get shared study link"}
+        </button>
+        {sharedUrl && <ParticipantLink url={sharedUrl} label="Shared study link" setError={setError} />}
+        <details>
+          <summary>Create an individual link</summary>
+          <form
+            className="create-row"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setBusy("create");
+              setCreatedUrl(null);
+              void createAdminSession(token, label.trim() || undefined)
+                .then((response) => {
+                  setCreatedUrl(`${window.location.origin}${response.participant_url}`);
+                  setLabel("");
+                  return refresh();
+                })
+                .catch(handleError)
+                .finally(() => setBusy(null));
+            }}
+          >
+            <label className="field">
+              <span>Participant label (optional)</span>
+              <input value={label} maxLength={40} onChange={(event) => setLabel(event.target.value)} placeholder="e.g. P09" />
+            </label>
+            <button type="submit" className="button primary" disabled={busy !== null} data-testid="create-session">
+              {busy === "create" ? "Creating…" : "Create session link"}
             </button>
-            <a className="button tiny" href={createdUrl} target="_blank" rel="noreferrer">
-              Open
-            </a>
-          </div>
-        ) : null}
+          </form>
+          {createdUrl && <ParticipantLink url={createdUrl} label="Participant link" setError={setError} />}
+        </details>
       </section>
 
       <section className="admin-section">

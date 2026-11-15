@@ -24,6 +24,13 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
   return body as T;
 }
 
+export function startStudySession(linkId: string, startId: string) {
+  return request<{ session_id: string }>(`/api/study-link/${encodeURIComponent(linkId)}/start`, {
+    method: "POST",
+    body: JSON.stringify({ start_id: startId })
+  });
+}
+
 export function loadSession(sessionId: string): Promise<SessionBundle> {
   return request(`/api/sessions/${encodeURIComponent(sessionId)}`);
 }
@@ -91,6 +98,10 @@ export function createAdminSession(token: string, label?: string) {
     token,
     { method: "POST", body: JSON.stringify(label ? { label } : {}) }
   );
+}
+
+export function getAdminStudyLink(token: string) {
+  return adminRequest<{ participant_url: string }>("/api/admin/study-link", token, { method: "POST" });
 }
 
 export function getAdminSessions(token: string) {

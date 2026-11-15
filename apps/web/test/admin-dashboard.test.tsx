@@ -6,7 +6,7 @@ import type { AdminSession, QaReport } from "../src/types";
 
 vi.mock("../src/api", () => ({
   getAdminSessions: vi.fn(), getQa: vi.fn(), getGoNoGo: vi.fn(), getGazeSummary: vi.fn(),
-  abortAdminSession: vi.fn(), addAdminNote: vi.fn(), createAdminSession: vi.fn(),
+  abortAdminSession: vi.fn(), addAdminNote: vi.fn(), createAdminSession: vi.fn(), getAdminStudyLink: vi.fn(),
   deleteAdminSession: vi.fn(), downloadExport: vi.fn(), downloadGazeExport: vi.fn(), adminRequest: vi.fn(), adminLogin: vi.fn()
 }));
 const SIGN_IN_KEY = "meridian.admin.sign-in";
@@ -125,12 +125,14 @@ describe("researcher dashboard", () => {
     expect(screen.queryByText("P01")).not.toBeInTheDocument();
   });
   it("reports clipboard rejection", async () => {
-    vi.mocked(api.createAdminSession).mockResolvedValue({ participant_url: "/run/new" } as Awaited<ReturnType<typeof api.createAdminSession>>);
+    vi.mocked(api.getAdminStudyLink).mockResolvedValue({ participant_url: "/join/shared" });
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: vi.fn().mockRejectedValue(new Error("denied")) } });
     render(<AdminDashboard />);
     await screen.findByText("P01");
-    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Create session link" })); });
-    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy" })); });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Get shared study link" })); });
+    const sharedLink = within(screen.getByTestId("created-link"));
+    expect(sharedLink.getByRole("link", { name: "Open" })).toHaveAttribute("href", window.location.origin + "/join/shared");
+    await act(async () => { fireEvent.click(sharedLink.getByRole("button", { name: "Copy" })); });
     expect(screen.getByRole("alert")).toHaveTextContent("Copy it manually");
   });
   it("clears a stale gaze error when no gaze session is found on retry", async () => {
